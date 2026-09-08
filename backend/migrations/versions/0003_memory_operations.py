@@ -13,6 +13,8 @@ depends_on = None
 
 
 def upgrade() -> None:
+    if "memory_operations" in sa.inspect(op.get_bind()).get_table_names():
+        return
     op.create_table(
         "memory_operations",
         sa.Column("id", sa.String(length=64), nullable=False),

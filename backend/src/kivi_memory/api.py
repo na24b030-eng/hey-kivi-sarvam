@@ -5,9 +5,10 @@ import uuid
 from pathlib import Path
 from typing import Any
 
-from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -47,7 +48,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(title="Kivi Memory Workbench", version="0.1.0")
     app.state.session_factory = factory
     app.state.engine = engine
-    app.add_middleware(CORSMiddleware, allow_origins=sorted(settings.origins), allow_methods=["GET", "POST", "DELETE"], allow_headers=["Content-Type"])
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=sorted(settings.origins),
+        allow_methods=["GET", "POST", "DELETE"],
+        allow_headers=["Content-Type", "X-Request-ID"],
+    )
 
     def session_dep():
         yield from get_session(factory)
@@ -60,7 +66,24 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.exception_handler(HTTPException)
     async def http_error(_: Request, exc: HTTPException):
-        return Response(content=json.dumps(exc.detail), status_code=exc.status_code, media_type="application/json")
+        return JSONResponse(content=exc.detail, status_code=exc.status_code)
+
+    @app.exception_handler(RequestValidationError)
+    async def validation_error(request: Request, exc: RequestValidationError):
+        errors = [
+            {key: value for key, value in error.items() if key != "ctx"}
+            for error in exc.errors()
+        ]
+        return JSONResponse(
+            status_code=422,
+            content={
+                "code": "validation_error",
+                "message": "The request did not match the expected format.",
+                "request_id": request_id(request),
+                "retryable": False,
+                "details": {"errors": errors},
+            },
+        )
 
     def namespace_or_404(namespace_id: str, db: Session, request: Request) -> Namespace:
         item = db.get(Namespace, namespace_id)
@@ -68,8 +91,31 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             fail(404, "missing_namespace", "Namespace was not found.", request)
         return item
 
-    def operation_exists(db: Session, operation_id: str) -> bool:
-        return db.scalar(select(MemoryOperation).where(MemoryOperation.operation_id == operation_id)) is not None
+    def replayed_operation(
+        db: Session,
+        operation_id: str,
+        namespace_id: str,
+        kind: str,
+        target_id: str,
+        request: Request,
+    ) -> bool:
+        operation = db.scalar(
+            select(MemoryOperation).where(MemoryOperation.operation_id == operation_id)
+        )
+        if operation is None:
+            return False
+        if (
+            operation.namespace_id != namespace_id
+            or operation.kind != kind
+            or operation.target_id != target_id
+        ):
+            fail(
+                409,
+                "operation_id_reused",
+                "This operation ID was already used for a different change.",
+                request,
+            )
+        return True
 
     def record_operation(db: Session, namespace_id: str, operation_id: str, kind: str, target_id: str) -> None:
         db.add(MemoryOperation(id=f"op_{uuid.uuid4().hex}", namespace_id=namespace_id, operation_id=operation_id, kind=kind, target_id=target_id))
@@ -79,12 +125,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {"status": "alive", "version": "0.1.0"}
 
     @app.get("/api/readiness")
-    def readiness(db: Session = Depends(session_dep)):
+    def readiness(request: Request, db: Session = Depends(session_dep)):
         try:
             db.execute(__import__("sqlalchemy").text("SELECT 1"))
             return {"status": "ready", "database": "ready", "provider_configured": bool(settings.sarvam_api_key)}
         except SQLAlchemyError:
-            return {"status": "not_ready", "database": "unavailable"}
+            fail(503, "database_unavailable", "The database is unavailable.", request, retryable=True)
 
     @app.post("/api/namespaces")
     def create_namespace(payload: NamespaceCreate, db: Session = Depends(session_dep)):
@@ -173,7 +219,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.post("/api/namespaces/{namespace_id}/memories/{memory_id}/corrections")
     def correct_memory(namespace_id: str, memory_id: str, payload: CorrectionRequest, request: Request, db: Session = Depends(session_dep)):
         namespace = namespace_or_404(namespace_id, db, request)
-        if operation_exists(db, payload.operation_id):
+        if replayed_operation(
+            db, payload.operation_id, namespace_id, "correct", memory_id, request
+        ):
             return {"id": memory_id, "revision": namespace.revision, "state": "already_applied"}
         if namespace.revision != payload.expected_revision:
             fail(409, "stale_namespace", "Memory changed while you were editing it.", request, details={"revision": namespace.revision})
@@ -191,7 +239,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.post("/api/namespaces/{namespace_id}/memories/{memory_id}/suppressions")
     def suppress_memory(namespace_id: str, memory_id: str, payload: SuppressionRequest, request: Request, db: Session = Depends(session_dep)):
         namespace = namespace_or_404(namespace_id, db, request)
-        if operation_exists(db, payload.operation_id):
+        if replayed_operation(
+            db, payload.operation_id, namespace_id, "suppress", memory_id, request
+        ):
             return {"id": memory_id, "revision": namespace.revision, "state": "already_applied"}
         if namespace.revision != payload.expected_revision:
             fail(409, "stale_namespace", "Memory changed while you were editing it.", request, details={"revision": namespace.revision})
@@ -207,7 +257,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.delete("/api/namespaces/{namespace_id}/sources/{source_id}")
     def delete_source(namespace_id: str, source_id: str, expected_revision: int, operation_id: str, request: Request, db: Session = Depends(session_dep)):
         namespace = namespace_or_404(namespace_id, db, request)
-        if operation_exists(db, operation_id):
+        if not 8 <= len(operation_id) <= 100:
+            fail(422, "invalid_operation_id", "Operation ID must contain 8 to 100 characters.", request)
+        if replayed_operation(
+            db, operation_id, namespace_id, "delete_source", source_id, request
+        ):
             return {"deleted": source_id, "revision": namespace.revision, "state": "already_applied"}
         if namespace.revision != expected_revision:
             fail(409, "stale_namespace", "History changed while you were deleting it.", request, details={"revision": namespace.revision})
@@ -238,12 +292,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         Path.cwd().parent / "frontend" / "dist",
         Path(__file__).resolve().parents[3] / "frontend" / "dist",
     ]
-    frontend = next((path for path in frontend_candidates if path and path.exists()), None)
+    frontend = next((path.resolve() for path in frontend_candidates if path and path.exists()), None)
     if frontend is not None:
         @app.get("/{path:path}", include_in_schema=False)
-        def spa(path: str):
-            candidate = frontend / path
-            if path and candidate.is_file():
+        def spa(path: str, request: Request):
+            if path == "api" or path.startswith("api/"):
+                fail(404, "missing_api_route", "API route was not found.", request)
+            candidate = (frontend / path).resolve()
+            if path and candidate.is_relative_to(frontend) and candidate.is_file():
                 return FileResponse(candidate)
             return FileResponse(frontend / "index.html")
     return app

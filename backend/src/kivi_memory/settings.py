@@ -21,13 +21,20 @@ class Settings(BaseSettings):
     chat_base_url: str = "https://api.sarvam.ai/v1"
     sarvam_api_key: str | None = None
     chat_model: str = "sarvam-105b"
+    provider_input_inr_per_million: float = Field(default=29.28, ge=0)
+    provider_output_inr_per_million: float = Field(default=73.2, ge=0)
+    provider_pricing_as_of: str = "2026-09-09"
     model_reasoning_effort: str | None = None
     model_connect_timeout_seconds: float = 10.0
     model_read_timeout_seconds: float = 60.0
     query_deadline_seconds: float = 90.0
+    model_max_attempts: int = Field(default=2, ge=1, le=5)
     max_import_bytes: int = 10 * 1024 * 1024
     max_record_bytes: int = 256 * 1024
+    max_evidence_chars_per_source: int = Field(default=4000, ge=500, le=20000)
+    max_evidence_chars_total: int = Field(default=24000, ge=1000, le=100000)
     embedding_model: str = "intfloat/multilingual-e5-small"
+    embedding_min_similarity: float = Field(default=0.72, ge=-1.0, le=1.0)
     embedding_cache_dir: Path | None = None
     frontend_dist_dir: Path | None = None
     trusted_origins: str = "http://127.0.0.1:8000,http://localhost:8000,http://127.0.0.1:5173"

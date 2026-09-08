@@ -50,6 +50,21 @@ def run_suite(session: Session, namespace: Namespace, suite_path: Path, output_p
         for key in ("prompt_tokens", "completion_tokens", "total_tokens"):
             if isinstance(usage.get(key), int):
                 provider_usage[key] += usage[key]
+    provider_cost = None
+    if provider_usage["answered_with_provider"]:
+        estimated_total = (
+            provider_usage["prompt_tokens"] * settings.provider_input_inr_per_million
+            + provider_usage["completion_tokens"] * settings.provider_output_inr_per_million
+        ) / 1_000_000
+        provider_cost = {
+            "currency": "INR",
+            "estimated_total": round(estimated_total, 6),
+            "input_inr_per_million_tokens": settings.provider_input_inr_per_million,
+            "output_inr_per_million_tokens": settings.provider_output_inr_per_million,
+            "pricing_as_of": settings.provider_pricing_as_of,
+            "pricing_source": "https://docs.sarvam.ai/api/getting-started/pricing",
+            "note": "Cached-input tokens were not separately reported in this smoke run.",
+        }
     latencies = [result["latency_ms"] for result in results]
     database_path = settings.app_data_dir / "memory.sqlite3" if settings.database_url is None else None
     report = {
@@ -62,6 +77,7 @@ def run_suite(session: Session, namespace: Namespace, suite_path: Path, output_p
         "database_bytes": database_path.stat().st_size if database_path and database_path.exists() else None,
         "embedding_model": settings.embedding_model, "provider_configured": bool(settings.sarvam_api_key),
         "provider_usage": provider_usage if provider_usage["answered_with_provider"] else "unknown_without_a_live_provider_response",
+        "provider_cost": provider_cost or "unknown_without_a_live_provider_response",
         "results": results,
     }
     output_path.parent.mkdir(parents=True, exist_ok=True)

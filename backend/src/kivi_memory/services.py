@@ -14,7 +14,7 @@ from .contracts import TranscriptRecord
 from .db import Embedding, Job, Memory, Namespace, QueryRun, Source, SourceChunk, now
 from .embeddings import content_hash, encode_passage
 from .generation import synthesize
-from .retrieval import active_memories, search_sources
+from .retrieval import active_memories, search_sources, suppressed_source_ids
 from .settings import Settings
 
 
@@ -32,10 +32,15 @@ def normalize(value: str) -> str:
 
 
 def ensure_namespace(session: Session, name: str) -> Namespace:
-    key = re.sub(r"[^a-z0-9_-]+", "-", name.casefold()).strip("-")[:64] or "default"
+    clean_name = name.strip()
+    key = re.sub(r"[^a-z0-9_-]+", "-", clean_name.casefold()).strip("-")[:64] or "default"
     namespace = session.get(Namespace, key)
+    if namespace is not None and normalize(namespace.name) != normalize(clean_name):
+        suffix = hashlib.sha256(clean_name.casefold().encode()).hexdigest()[:8]
+        key = f"{key[:55].rstrip('-')}-{suffix}"
+        namespace = session.get(Namespace, key)
     if namespace is None:
-        namespace = Namespace(id=key, name=name.strip())
+        namespace = Namespace(id=key, name=clean_name)
         session.add(namespace)
         session.flush()
     return namespace
@@ -77,26 +82,52 @@ def import_records(
     replace_conflicts: bool,
 ) -> dict[str, Any]:
     records, errors = parse_jsonl(raw, max_record_bytes)
+    if errors:
+        return {
+            "accepted": 0,
+            "conflicts": 0,
+            "invalid": errors,
+            "job_ids": [],
+            "revision": namespace.revision,
+        }
     accepted = conflicts = 0
     job_ids: list[str] = []
     for record in records:
         digest = checksum(record)
-        existing = session.scalar(
+        prior_sources = session.scalars(
             select(Source)
             .where(Source.namespace_id == namespace.id, Source.external_id == record.id)
             .order_by(Source.source_version.desc())
-        )
+        ).all()
+        existing = prior_sources[0] if prior_sources else None
         if existing and existing.checksum == digest:
             continue
         if existing and not replace_conflicts:
             conflicts += 1
             continue
+        if existing:
+            prior_ids = [source.id for source in prior_sources]
+            for source in prior_sources:
+                source.eligible = False
+            for job in session.scalars(
+                select(Job).where(Job.source_id.in_(prior_ids), Job.state == "queued")
+            ).all():
+                job.state, job.progress, job.lease_until = "cancelled", 100, None
+            for memory in session.scalars(
+                select(Memory).where(Memory.source_id.in_(prior_ids), Memory.state == "active")
+            ).all():
+                memory.state = "superseded"
         version = (existing.source_version + 1) if existing else 1
+        metadata = dict(record.context)
+        if record.language_hints:
+            metadata["language_hints"] = record.language_hints
+        if record.model_extra:
+            metadata["extra"] = record.model_extra
         source = Source(
             id=ident("src"), namespace_id=namespace.id, external_id=record.id,
             source_version=version, raw_asr=record.raw_asr, formatted_text=record.formatted_text,
             occurred_at=record.occurred_at, timezone_name=record.timezone, app=record.app,
-            context_json=json.dumps(record.context, ensure_ascii=False), checksum=digest,
+            context_json=json.dumps(metadata, ensure_ascii=False), checksum=digest,
             processing_status="queued",
         )
         session.add(source)
@@ -215,9 +246,30 @@ def lexical_tokens(query: str) -> list[str]:
 
 
 def ask(session: Session, namespace: Namespace, question: str, mode: str, settings: Settings) -> dict[str, Any]:
-    candidates = search_sources(session, namespace.id, question, settings)
-    evidence = [candidate.source for candidate in candidates[:8]]
     relevant_memories = active_memories(session, namespace.id, question)
+    corrected_memories = [memory for memory in relevant_memories if memory.supersedes_id]
+    blocked_sources = suppressed_source_ids(session, namespace.id, question)
+    blocked_sources.difference_update(memory.source_id for memory in corrected_memories)
+    candidates = search_sources(
+        session,
+        namespace.id,
+        question,
+        settings,
+        excluded_source_ids=blocked_sources,
+    )
+    evidence = [candidate.source for candidate in candidates[:8]]
+    if corrected_memories:
+        corrected_sources = session.scalars(
+            select(Source).where(
+                Source.id.in_([memory.source_id for memory in corrected_memories]),
+                Source.namespace_id == namespace.id,
+                Source.eligible.is_(True),
+                Source.processing_status == "ready",
+            )
+        ).all()
+        corrected_ids = {source.id for source in corrected_sources}
+        evidence = corrected_sources + [source for source in evidence if source.id not in corrected_ids]
+        evidence = evidence[:8]
     revision = namespace.revision
     if not evidence:
         result = {
@@ -226,27 +278,71 @@ def ask(session: Session, namespace: Namespace, question: str, mode: str, settin
             "coverage": {"mode": "focused", "complete": True}, "namespace_revision": revision,
         }
     else:
+        bounded_evidence: list[Source] = []
+        snippets: list[str] = []
+        remaining_chars = settings.max_evidence_chars_total
+        for source in evidence:
+            full_text = source.formatted_text.strip() or source.raw_asr.strip()
+            limit = min(settings.max_evidence_chars_per_source, remaining_chars)
+            if limit <= 0:
+                break
+            if len(full_text) > limit:
+                snippet = f"{full_text[: limit - 1].rstrip()}…"
+            else:
+                snippet = full_text
+            bounded_evidence.append(source)
+            snippets.append(snippet)
+            remaining_chars -= len(snippet)
+        evidence = bounded_evidence
         top = evidence[0]
-        snippets = [source.formatted_text.strip() or source.raw_asr.strip() for source in evidence]
-        if mode == "draft":
-            answer = "\n\n".join(snippets[:3])
-            result = {"status": "answered", "draft_text": answer, "answer": answer}
+        memory_context = [
+            {
+                "id": memory.id,
+                "source_id": memory.source_id,
+                "text": f"{memory.subject} {memory.predicate} {memory.value}",
+                "scope": memory.scope,
+            }
+            for memory in corrected_memories
+        ]
+        if corrected_memories and not settings.sarvam_api_key:
+            answer = "\n".join(
+                f"Based on your correction: {memory.subject} {memory.predicate} {memory.value}."
+                for memory in corrected_memories
+            )
+            result = {"status": "answered", "answer": answer, "generation": "controlled_memory"}
         else:
-            generated = synthesize(settings, question, [{"id": source.id, "text": text} for source, text in zip(evidence, snippets)])
+            generated = synthesize(
+                settings,
+                question,
+                [{"id": source.id, "text": text} for source, text in zip(evidence, snippets)],
+                mode=mode,
+                memory_context=memory_context,
+            )
             if generated.error and generated.error != "model_not_configured":
                 result = {"status": "failed", "answer": "The model provider is unavailable. Your source history remains available below."}
             else:
-                answer = generated.text or snippets[0]
+                if generated.text:
+                    answer = generated.text
+                elif mode == "draft":
+                    answer = "\n".join(f"• {snippet}" for snippet in snippets[:3])
+                else:
+                    answer = snippets[0]
                 result = {
                     "status": "answered", "answer": answer,
                     "generation": "sarvam" if generated.text else "grounded_replay",
                     "provider": {"model": generated.model, "latency_ms": generated.latency_ms, "usage": generated.usage} if generated.text else None,
                 }
+        if mode == "draft":
+            result["draft_text"] = result["answer"]
         result.update({
-            "claims": [{"text": result["answer"], "evidence_ids": [top.id], "kind": "attributed_record"}],
-            "evidence": [{"id": source.id, "external_id": source.external_id, "text": source.formatted_text,
+            "claims": [{
+                "text": result["answer"],
+                "evidence_ids": [memory.id for memory in corrected_memories] or [top.id],
+                "kind": "user_corrected_memory" if corrected_memories else "attributed_record",
+            }],
+            "evidence": [{"id": source.id, "external_id": source.external_id, "text": snippet,
                           "occurred_at": source.occurred_at.isoformat() if source.occurred_at else None}
-                         for source in evidence],
+                         for source, snippet in zip(evidence, snippets)],
             "applied_preferences": [{"id": item.id, "value": item.value, "scope": item.scope} for item in relevant_memories if item.kind == "preference"],
             "uncertainties": ["Answers are grounded in the listed source evidence. Review source wording for high-stakes decisions."],
             "coverage": {"mode": "focused", "complete": len(candidates) <= 8}, "namespace_revision": revision,
@@ -265,7 +361,9 @@ def ask(session: Session, namespace: Namespace, question: str, mode: str, settin
 def source_payload(source: Source) -> dict[str, Any]:
     return {"id": source.id, "external_id": source.external_id, "raw_asr": source.raw_asr,
             "formatted_text": source.formatted_text, "occurred_at": source.occurred_at,
-            "app": source.app, "processing_status": source.processing_status, "eligible": source.eligible,
+            "timezone": source.timezone_name, "app": source.app,
+            "context": json.loads(source.context_json),
+            "processing_status": source.processing_status, "eligible": source.eligible,
             "source_version": source.source_version}
 
 

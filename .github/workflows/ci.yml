@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      SARVAM_API_KEY: ""
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install backend
+        run: uv sync --project backend --extra dev --locked
+      - name: Test backend
+        run: uv run --project backend pytest backend/tests
+      - name: Lint backend
+        run: uv run --project backend ruff check backend/src backend/tests eval/multilingual_embedding_smoke.py
+      - name: Install frontend
+        run: npm --prefix frontend ci
+      - name: Type-check frontend
+        run: npm --prefix frontend test
+      - name: Build frontend
+        run: npm --prefix frontend run build

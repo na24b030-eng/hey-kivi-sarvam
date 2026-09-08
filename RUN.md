@@ -1,13 +1,19 @@
 # Reviewer run guide
 
-Run the commands from the repository root in two PowerShell terminals. This is the primary reviewer path: it exercises migrations, the generated 500-record corpus, queue processing, evidence evaluation, and the built desktop UI.
+**Primary review method: local.** Run the commands from the repository root in two PowerShell terminals. This path exercises migrations, the generated 500-record corpus, queue processing, evidence evaluation, and the built desktop UI.
 
 Tested runtime: **Python 3.12.13**, **uv 0.11.3**, **Node.js 24.15.0**, and **npm 11.12.1** on Windows. Python package versions are locked in `backend/uv.lock`; frontend package versions are locked in `frontend/package-lock.json`.
 
-For an isolated rehearsal, set `APP_DATA_DIR` to an empty writable folder before migration. On OneDrive folders where uv reports a hard-link error, add `--link-mode copy` to `uv sync` (or set `UV_LINK_MODE=copy`).
+## Environment variables
+
+No environment variable is required for the offline local review. Copy `backend/.env.example` to `backend/.env` only to configure documented overrides. `SARVAM_API_KEY` is optional and enables generated answers; never place it in frontend code or commit the real `.env`. `APP_DATA_DIR` selects an isolated data directory, and `EMBEDDING_CACHE_DIR` can point to a previously downloaded local model cache.
+
+## Install, initialize, and seed
+
+For an isolated rehearsal, set `APP_DATA_DIR` to an empty writable folder before migration. The command uses uv's copy mode because this repository may live in OneDrive, where package hard links can fail.
 
 ```powershell
-uv sync --project backend --extra dev --locked
+uv sync --project backend --extra dev --extra embeddings --locked --link-mode copy
 npm --prefix frontend ci
 npm --prefix frontend run build
 uv run --project backend python data/generate_synthetic.py
@@ -26,6 +32,12 @@ After seeding and processing the demo namespace, run the reproducible 120-case s
 
 ```powershell
 uv run --project backend python -m kivi_memory.cli evaluate --namespace demo --suite eval/cases.jsonl --output eval/results/demo-report.json
+```
+
+Verify that the persisted E5 path can retrieve Hindi evidence from an English query without lexical overlap:
+
+```powershell
+uv run --project backend python eval/multilingual_embedding_smoke.py
 ```
 
 With `SARVAM_API_KEY` configured, this small one-per-family smoke suite validates the live provider path and aggregates the returned token usage. It deliberately uses only fictional corpus records:
@@ -50,6 +62,8 @@ uv run --project backend python -m kivi_memory.cli serve --host 127.0.0.1 --port
 
 Open `http://127.0.0.1:8000`. Create a memory space, paste JSONL in **Import**, then use **Hey Kivi** to ask a question. The answer provides source evidence. **History** has a source inspector for raw/formatted text, passages and derived memories. **Memory** supports correction and suppression. The Import UI validates, imports and drains its local queue in one action; use the CLI worker for a large or continuous import.
 
+Recommended review interactions: ask when a project launches, ask an unrelated question to observe abstention, open an answer source, correct or suppress its promoted memory, repeat the question, request a draft, and delete a source from History.
+
 To import an unfamiliar compatible corpus without changing code:
 
 ```powershell
@@ -58,7 +72,11 @@ uv run --project backend python -m kivi_memory.cli worker
 uv run --project backend python -m kivi_memory.cli inspect --namespace reviewer
 ```
 
-The app data directory defaults to the Windows local-app-data directory. Override it for a disposable run with `APP_DATA_DIR=C:\path\to\data`. Do not put a Sarvam key in the frontend; use `backend/.env` if enabling a future server-side adapter.
+## Inspect state and traces
+
+The memory database defaults to `%LOCALAPPDATA%\KiviMemoryWorkbench\memory.sqlite3`; with `APP_DATA_DIR=C:\path\to\data`, it is `C:\path\to\data\memory.sqlite3`. Use the documented `inspect` command for namespace counts, the source inspector in the UI for provenance, and `GET /api/namespaces/{namespace_id}/query-runs/{trace_id}` for a stored query trace. Generated reports are written under `eval/results/` unless `--output` specifies another path.
+
+Do not put a Sarvam key in the frontend; use the ignored `backend/.env` only when enabling the server-side adapter.
 
 For the hosted Railway deployment, use Railway's native Railpack builder, attach a volume at `/data`, set `APP_DATA_DIR=/data` and `FRONTEND_DIST_DIR=/app/frontend/dist`, and set `SARVAM_API_KEY` in Railway service variables. The start command runs migrations automatically; see [docs/deploy-railway.md](docs/deploy-railway.md).
 
@@ -68,4 +86,4 @@ Reset only the named namespace after stopping the API and worker:
 uv run --project backend python -m kivi_memory.cli reset --namespace demo
 ```
 
-This deletes that namespace's imported sources and their cascaded chunks/memories/jobs. It never touches the installed Kivi application, its settings, or any other namespace.
+This deletes that namespace's imported sources and their cascaded chunks/memories/jobs, plus its query traces and lifecycle-operation metadata. It keeps the empty namespace so the same workspace can be reused. It never touches the installed Kivi application, its settings, or any other namespace.

@@ -13,6 +13,8 @@ depends_on = None
 
 
 def upgrade() -> None:
+    if "embeddings" in sa.inspect(op.get_bind()).get_table_names():
+        return
     op.create_table(
         "embeddings",
         sa.Column("id", sa.String(length=64), nullable=False),

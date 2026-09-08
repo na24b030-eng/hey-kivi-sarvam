@@ -8,15 +8,15 @@ Provide UTF-8 JSONL: one JSON object per line. Each object must contain `schema_
 {"schema_version":1,"id":"example-001","raw_asr":"lantern launch monday not friday","formatted_text":"Lantern launches Monday, not Friday.","occurred_at":"2026-09-07T10:30:00+05:30","timezone":"Asia/Kolkata","app":"Notepad","language_hints":["en"],"context":{"mode":"dictation"}}
 ```
 
-The two text views remain distinct evidence. Both fields are required, but an empty string is representable: the importer will retain it and report the source as empty or one-view-only rather than invent a missing transcription. Records with both views blank are retained for inspection and excluded from semantic processing. This edge-case policy refines the initial blueprint's strict missing-view rule: absent fields are validation errors; explicitly empty strings are observable capture data.
+The two text views remain distinct evidence. Both fields are required, and at least one must contain a non-whitespace character. One view may be empty when the other contains the available transcript; the importer retains that state rather than inventing missing text. Missing fields or a fully blank pair are validation errors.
 
-`occurred_at`, `timezone`, `app`, `language_hints`, and `context` are optional. Missing occurrence time stays unknown. Import time is stored separately. If occurrence time is present, use RFC 3339 with a timezone offset; do not guess offsets when converting another corpus. The optional timezone name will be validated separately against supported timezones, with conflicts reported explicitly.
+`occurred_at`, `timezone`, `app`, `language_hints`, and `context` are optional. Missing occurrence time stays unknown. Import time is stored separately. If occurrence time is present, use RFC 3339 with a timezone offset; naive timestamps are rejected. The optional timezone name is retained as source metadata and is not treated as a substitute for an offset.
 
-Unknown metadata is preserved as inert metadata; it cannot set internal namespace IDs, job states, memory authority or ownership. The importer selects these through explicit application controls. A selected app does not prove a recipient or that the dictated text was sent.
+Unknown top-level metadata is preserved under the source context's `extra` key as inert metadata; it cannot set internal namespace IDs, job states, memory authority or ownership. Language hints are preserved in the same context payload. The importer selects internal fields through explicit application controls. A selected app does not prove a recipient or that the dictated text was sent.
 
-## Planned import behavior
+## Import behavior
 
-- Preview validation failures with line numbers before processing. Offer explicit valid-row-only import; do not silently skip invalid records.
+- Preview validation failures with line numbers before processing. An import containing any invalid row is rejected atomically; valid rows are not silently imported around it.
 - Scope external IDs to the selected corpus. Same ID and same stored payload is idempotent. Same ID with different text or metadata is a conflict requiring an explicit replacement revision.
 - Keep different IDs as different episodes even when text is repeated. Retrieval may group duplicates; counting must respect the requested unit.
 - Preserve Unicode and exact original text for source spans. Normalize only derived search representations.

@@ -8,7 +8,7 @@ This deployment runs the existing React client and FastAPI API as one service. I
 2. In **Settings → Build**, use **Railpack**, leave the root directory as the repository root, and set the custom build command:
 
    ```text
-   npm --prefix frontend ci && npm --prefix frontend run build && python -m pip install ./backend
+   npm --prefix frontend ci && npm --prefix frontend run build && python -m pip install "./backend[embeddings]"
    ```
 
 3. In **Settings → Deploy**, set the custom start command:

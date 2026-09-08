@@ -68,6 +68,15 @@
     "total_tokens": 7624,
     "answered_with_provider": 12
   },
+  "provider_cost": {
+    "currency": "INR",
+    "estimated_total": 0.306152,
+    "input_inr_per_million_tokens": 29.28,
+    "output_inr_per_million_tokens": 73.2,
+    "pricing_as_of": "2026-09-09",
+    "pricing_source": "https://docs.sarvam.ai/api/getting-started/pricing",
+    "note": "Cached-input tokens were not separately reported in this smoke run."
+  },
   "results": [
     {
       "id": "case-001",

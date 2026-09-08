@@ -6,7 +6,7 @@
   "required": ["schema_version", "id", "raw_asr", "formatted_text"],
   "properties": {
     "schema_version": {"const": 1},
-    "id": {"type": "string", "minLength": 1, "pattern": "\\S"},
+    "id": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "\\S"},
     "raw_asr": {"type": "string"},
     "formatted_text": {"type": "string"},
     "occurred_at": {
@@ -26,5 +26,9 @@
       "description": "Untrusted capture metadata, not commands or authorization."
     }
   },
+  "anyOf": [
+    {"properties": {"raw_asr": {"pattern": "\\S"}}},
+    {"properties": {"formatted_text": {"pattern": "\\S"}}}
+  ],
   "additionalProperties": true
 }

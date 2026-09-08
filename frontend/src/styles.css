@@ -328,12 +328,19 @@ header > p:not(.eyebrow) {
   gap: 10px;
 }
 
-.sources article {
+.source-evidence {
   flex: 1 1 230px;
   min-width: 0;
   background: #edf4e7;
+  color: #254b3c;
+  text-align: left;
   border-radius: 8px;
   padding: 12px 14px;
+  font-weight: 400;
+}
+
+.source-evidence:hover:not(:disabled) {
+  background: #e2eed9;
 }
 
 .sources strong {
@@ -346,6 +353,14 @@ header > p:not(.eyebrow) {
   font-size: 13px;
   line-height: 1.45;
   margin: 7px 0 0;
+}
+
+.sources small {
+  display: block;
+  margin-top: 10px;
+  color: #4c704f;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .uncertainty {
@@ -421,6 +436,7 @@ header > p:not(.eyebrow) {
   color: #456616;
 }
 
+.status.replaced,
 .status.superseded,
 .status.suppressed {
   background: #efefec;
@@ -576,9 +592,29 @@ header > p:not(.eyebrow) {
     white-space: nowrap;
   }
 
-  .workspace-health,
-  .space-controls {
+  .workspace-health {
     display: none;
+  }
+
+  .space-controls {
+    display: flex;
+    align-items: end;
+    gap: 10px;
+    margin: 0;
+    padding: 10px 0 0;
+  }
+
+  .space-controls label {
+    flex: 1 1 auto;
+  }
+
+  .space-controls select {
+    margin-top: 4px;
+  }
+
+  .space-controls button {
+    flex: 0 0 auto;
+    padding: 9px 12px;
   }
 
   .content {
@@ -592,6 +628,11 @@ header > p:not(.eyebrow) {
 }
 
 @media (max-width: 640px) {
+  .space-controls {
+    align-items: stretch;
+    display: grid;
+  }
+
   .askbox > div {
     align-items: stretch;
     flex-direction: column;

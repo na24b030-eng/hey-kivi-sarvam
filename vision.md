@@ -1,0 +1,17 @@
+# Product vision
+
+People often dictate something useful and later have to reconstruct it: which plan changed, what they told a colleague, why work stopped, or how they wanted an update written. Kivi should turn those intentional interactions into dependable continuity. Its relationship with the person is a careful work companion: remember enough to help, make the evidence available, and leave decisions with the person.
+
+Our Windows audit showed that Kivi already connects dictation, custom vocabulary, app-specific formatting, stored history, and cited answers. In a simple evolving project, it preferred the newer launch update and declined to invent an unknown budget. Search and summarization are a foundation. The next value is understanding changes and scope, and making mistakes recoverable. The correction path we exercised appeared editable but did not retain our changes.
+
+We will focus on three connected activities: recovering an earlier interaction, understanding the current state of an ongoing topic, and preparing the next useful draft. A person could ask, “Find yesterday's update and revise it for the team.” Kivi should recover the episode, check later changes, apply a relevant writing preference, and show a ready-to-use draft with evidence. These activities should work across arbitrary topics in the person's history, including Hindi and English references to the same work.
+
+What deserves memory is information that makes those activities easier: factual claims about ongoing work, decisions and events, and explicit preferences about how the person wants help. Memory should preserve who said something, when it applied, and the context in which it matters. Repeated wording alone should not become a permanent personality profile. Quoted preferences belong to their speaker. Temporary details can remain searchable without becoming lasting memories.
+
+Kivi must never assume a dictated message was sent, a proposed deadline was accepted, or a spoken intention was completed. A newer quotation does not automatically replace an earlier fact. Missing dates, ambiguous people, and conflicting claims should remain visible uncertainties. If raw speech recognition and formatted text disagree materially, the system should retain both and avoid turning an unverified rewrite into authoritative memory.
+
+Ordinary dictation should write what the person intends, using vocabulary and chosen style without silently injecting facts from history. Hey Kivi is where semantic memory should influence retrieval, clarification, and drafting. It should ask a brief question when an ambiguity changes the result, and admit when the history cannot answer.
+
+Control should be available where it matters. A source can be opened from an answer; a mistaken memory can be corrected there; a preference can be limited to a context; and a remembered detail can be excluded from future assistance. These changes must survive restart and reprocessing. People should not need to maintain a database to trust the product.
+
+We will demonstrate this through a working client and persistent backend, using replayed transcript pairs. Success means useful answers grounded in unfamiliar history, appropriate restraint, and measurable improvement over ordinary history retrieval. We will publish varied evaluation cases, failures, and operating costs. We will defer always-on capture and external autonomous actions so the product's value remains clear and its behavior can be inspected end to end.

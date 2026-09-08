@@ -8,10 +8,20 @@ import time
 from pathlib import Path
 
 import uvicorn
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 
 from .api import create_app
-from .db import Embedding, Job, Memory, Source, SourceChunk, build_session_factory
+from .db import (
+    Embedding,
+    Job,
+    Memory,
+    MemoryOperation,
+    Namespace,
+    QueryRun,
+    Source,
+    SourceChunk,
+    build_session_factory,
+)
 from .embeddings import load_encoder
 from .evaluation import run_suite
 from .services import ensure_namespace, import_records, process_one_job
@@ -103,15 +113,33 @@ def command_inspect(settings: Settings, namespace_name: str) -> int:
 def command_reset(settings: Settings, namespace_name: str) -> int:
     factory, _ = build_session_factory(settings)
     with factory() as session:
-        namespace = ensure_namespace(session, namespace_name)
+        namespace = session.scalar(
+            select(Namespace).where(Namespace.name == namespace_name.strip())
+        )
+        if namespace is None:
+            print(json.dumps({"error": "namespace_not_found", "namespace": namespace_name}))
+            return 1
         source_ids = [source.id for source in session.scalars(select(Source).where(Source.namespace_id == namespace.id)).all()]
+        query_runs = session.scalar(
+            select(func.count(QueryRun.id)).where(QueryRun.namespace_id == namespace.id)
+        ) or 0
+        operations = session.scalar(
+            select(func.count(MemoryOperation.id)).where(MemoryOperation.namespace_id == namespace.id)
+        ) or 0
+        session.execute(delete(QueryRun).where(QueryRun.namespace_id == namespace.id))
+        session.execute(delete(MemoryOperation).where(MemoryOperation.namespace_id == namespace.id))
         for source_id in source_ids:
             source = session.get(Source, source_id)
             if source:
                 session.delete(source)
         namespace.revision += 1
         session.commit()
-    print(json.dumps({"namespace": namespace_name, "deleted_sources": len(source_ids)}))
+    print(json.dumps({
+        "namespace": namespace_name,
+        "deleted_sources": len(source_ids),
+        "deleted_query_runs": query_runs,
+        "deleted_operations": operations,
+    }))
     return 0
 
 
