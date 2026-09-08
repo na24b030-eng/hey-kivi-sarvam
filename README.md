@@ -51,6 +51,10 @@ That report verifies grounded source retrieval and provenance, not broad model q
 
 See [RUN.md](RUN.md) for the exact fresh local setup, migration, seed, processing, evaluation, inspection, and reset commands. Input fields and limits are documented in [docs/import-format.md](docs/import-format.md).
 
+## Deploy on Railway
+
+The repository includes a production Dockerfile for Railway. Attach a Railway Volume at `/data`, set `APP_DATA_DIR=/data`, and add `SARVAM_API_KEY` only in Railway's protected service variables. The container applies Alembic migrations before it starts the FastAPI service, which also serves the compiled React UI. Follow the complete [Railway deployment guide](docs/deploy-railway.md).
+
 ## Scope and limitations
 
 The project is local-only and binds to loopback. It does not integrate with the installed Kivi application, transcribe live audio, or expose any provider credential to the browser. A Sarvam API key is optional and is never included in this repository. The Sarvam adapter was validated with a harmless synthetic end-to-end query; returned model and usage metadata are retained in the query trace. The committed 120-case report remains an offline provenance run, not a live-provider quality benchmark.
