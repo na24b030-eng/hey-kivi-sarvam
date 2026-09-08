@@ -233,8 +233,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         namespace_or_404(namespace_id, db, request)
         return [{"kind": item.kind, "target_id": item.target_id, "reason": item.reason, "created_at": item.created_at} for item in db.scalars(select(MemoryOperation).where(MemoryOperation.namespace_id == namespace_id).order_by(MemoryOperation.created_at.desc())).all()]
 
-    frontend = Path(__file__).resolve().parents[3] / "frontend" / "dist"
-    if frontend.exists():
+    frontend_candidates = [
+        settings.frontend_dist_dir,
+        Path.cwd().parent / "frontend" / "dist",
+        Path(__file__).resolve().parents[3] / "frontend" / "dist",
+    ]
+    frontend = next((path for path in frontend_candidates if path and path.exists()), None)
+    if frontend is not None:
         @app.get("/{path:path}", include_in_schema=False)
         def spa(path: str):
             candidate = frontend / path

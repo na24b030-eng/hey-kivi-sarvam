@@ -56,7 +56,7 @@ uv run --project backend python -m kivi_memory.cli inspect --namespace reviewer
 
 The app data directory defaults to the Windows local-app-data directory. Override it for a disposable run with `APP_DATA_DIR=C:\path\to\data`. Do not put a Sarvam key in the frontend; use `backend/.env` if enabling a future server-side adapter.
 
-For the hosted Railway deployment, use the root `Dockerfile`, attach a volume at `/data`, set `APP_DATA_DIR=/data`, and set `SARVAM_API_KEY` in Railway service variables. The deployment command runs migrations automatically; see [docs/deploy-railway.md](docs/deploy-railway.md).
+For the hosted Railway deployment, use Railway's native Railpack builder, attach a volume at `/data`, set `APP_DATA_DIR=/data` and `FRONTEND_DIST_DIR=/app/frontend/dist`, and set `SARVAM_API_KEY` in Railway service variables. The start command runs migrations automatically; see [docs/deploy-railway.md](docs/deploy-railway.md).
 
 Reset only the named namespace after stopping the API and worker:
 

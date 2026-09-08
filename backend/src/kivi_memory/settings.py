@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     max_record_bytes: int = 256 * 1024
     embedding_model: str = "intfloat/multilingual-e5-small"
     embedding_cache_dir: Path | None = None
+    frontend_dist_dir: Path | None = None
     trusted_origins: str = "http://127.0.0.1:8000,http://localhost:8000,http://127.0.0.1:5173"
 
     @property

@@ -53,7 +53,7 @@ See [RUN.md](RUN.md) for the exact fresh local setup, migration, seed, processin
 
 ## Deploy on Railway
 
-The repository includes a production Dockerfile for Railway. Attach a Railway Volume at `/data`, set `APP_DATA_DIR=/data`, and add `SARVAM_API_KEY` only in Railway's protected service variables. The container applies Alembic migrations before it starts the FastAPI service, which also serves the compiled React UI. Follow the complete [Railway deployment guide](docs/deploy-railway.md).
+Railway can build this repository natively with Railpack; Docker is not required. Attach a Railway Volume at `/data`, set `APP_DATA_DIR=/data` and `FRONTEND_DIST_DIR=/app/frontend/dist`, and add `SARVAM_API_KEY` only in Railway's protected service variables. The Railway start command applies Alembic migrations before it starts the FastAPI service, which also serves the compiled React UI. Follow the complete [Railway deployment guide](docs/deploy-railway.md).
 
 ## Scope and limitations
 
