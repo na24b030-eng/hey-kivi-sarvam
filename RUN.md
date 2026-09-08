@@ -16,6 +16,10 @@ uv run --project backend python -m kivi_memory.cli migrate
 uv run --project backend python -m kivi_memory.cli doctor --download-embedding
 uv run --project backend python -m kivi_memory.cli seed --namespace demo
 uv run --project backend python -m kivi_memory.cli worker --drain
+
+# Optional code-quality checks (run from the repository root)
+uv run --project backend pytest backend/tests
+uv run --project backend ruff check backend/src backend/tests
 ```
 
 After seeding and processing the demo namespace, run the reproducible 120-case status suite:
