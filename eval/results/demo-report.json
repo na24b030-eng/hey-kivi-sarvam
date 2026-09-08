@@ -1,0 +1,969 @@
+{
+  "created_at": "2026-09-08T03:39:12.119006+00:00",
+  "suite": "eval\\cases.jsonl",
+  "case_count": 120,
+  "passed": 120,
+  "status_accuracy": 1.0,
+  "results": [
+    {
+      "id": "case-001",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 60.95,
+      "trace_id": "query_027e19f544e04b47b4d46c9b900cc808"
+    },
+    {
+      "id": "case-002",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.29,
+      "trace_id": "query_70a8b7c1aee04d528c47bc98633d8f08"
+    },
+    {
+      "id": "case-003",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.7,
+      "trace_id": "query_a439ac3b77dd4c9eaceffb5b9945c788"
+    },
+    {
+      "id": "case-004",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.64,
+      "trace_id": "query_8e3d04a9de244a71844079e635b8308f"
+    },
+    {
+      "id": "case-005",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.97,
+      "trace_id": "query_d6ab76aa43af4ce3b9f1cf4d7361e99f"
+    },
+    {
+      "id": "case-006",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.71,
+      "trace_id": "query_819c5f9da60a4b1ca97345327b09581b"
+    },
+    {
+      "id": "case-007",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.95,
+      "trace_id": "query_98d229d9361c40609f97949d88ae3fc0"
+    },
+    {
+      "id": "case-008",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.82,
+      "trace_id": "query_78faf04c2f3e4a5d9e930c18c7b35e36"
+    },
+    {
+      "id": "case-009",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.28,
+      "trace_id": "query_2a71b31db35d42059ce384af2dbe0af5"
+    },
+    {
+      "id": "case-010",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.86,
+      "trace_id": "query_bf5b9d2e2450406aa09c5c42626dab1f"
+    },
+    {
+      "id": "case-011",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.02,
+      "trace_id": "query_1ff98743423b416c9269fa0776424083"
+    },
+    {
+      "id": "case-012",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.79,
+      "trace_id": "query_8b211150b5bc4b8b9967a842e117c465"
+    },
+    {
+      "id": "case-013",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 40.82,
+      "trace_id": "query_ad889694f5234e31bdcf3687c4e7fdc2"
+    },
+    {
+      "id": "case-014",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.04,
+      "trace_id": "query_19fb6394b3044027ac7503a6597c024d"
+    },
+    {
+      "id": "case-015",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.56,
+      "trace_id": "query_2a009a87a72948ba972f8dd44b911451"
+    },
+    {
+      "id": "case-016",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.65,
+      "trace_id": "query_a12a9fccbb544c75b05886d010a353ec"
+    },
+    {
+      "id": "case-017",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 13.43,
+      "trace_id": "query_a34dd0524be84dc480428744d0941641"
+    },
+    {
+      "id": "case-018",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.48,
+      "trace_id": "query_17647a824c294233a949c323aca27937"
+    },
+    {
+      "id": "case-019",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 13.23,
+      "trace_id": "query_8ddf3daf357a446eb19b1251b6e42a77"
+    },
+    {
+      "id": "case-020",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.97,
+      "trace_id": "query_00ed4aa98bc44d309bc6c2268f9496e0"
+    },
+    {
+      "id": "case-021",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.31,
+      "trace_id": "query_ad1f9b4ecd5a4afab90720a375e13e99"
+    },
+    {
+      "id": "case-022",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.53,
+      "trace_id": "query_8c4c49d8edca4016b194586c43cf7f8e"
+    },
+    {
+      "id": "case-023",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 13.12,
+      "trace_id": "query_38e4057737c34fa69f841070e59c56f6"
+    },
+    {
+      "id": "case-024",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.58,
+      "trace_id": "query_0be40960d532421f898b3a2497f520a4"
+    },
+    {
+      "id": "case-025",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.32,
+      "trace_id": "query_9c0e98c5da0b49ac8fc255502bc0ed8c"
+    },
+    {
+      "id": "case-026",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.83,
+      "trace_id": "query_f9d60b985bda43c890270fe6189af441"
+    },
+    {
+      "id": "case-027",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.56,
+      "trace_id": "query_592b88aeaabd44019220342de2e456e0"
+    },
+    {
+      "id": "case-028",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 14.01,
+      "trace_id": "query_0b92268a45db4b0cb6f3f8e72e294f92"
+    },
+    {
+      "id": "case-029",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.32,
+      "trace_id": "query_04a60a425f724ec98d358a7fd3839f62"
+    },
+    {
+      "id": "case-030",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.08,
+      "trace_id": "query_b53c8fa73452406bacf72bb81b224a3d"
+    },
+    {
+      "id": "case-031",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 13.02,
+      "trace_id": "query_f3fe1e4e3eb54823a8f4c343400f586c"
+    },
+    {
+      "id": "case-032",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.3,
+      "trace_id": "query_3243da5d677f4d289ea024e273f71787"
+    },
+    {
+      "id": "case-033",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.11,
+      "trace_id": "query_f8d854c3d8f64983afefeade7a202037"
+    },
+    {
+      "id": "case-034",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 13.54,
+      "trace_id": "query_9f07549a4c314616961b9242befa8766"
+    },
+    {
+      "id": "case-035",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.84,
+      "trace_id": "query_b6449fea40584e719c33180b4d93981b"
+    },
+    {
+      "id": "case-036",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.17,
+      "trace_id": "query_d3bb956aa52643a099ea364aa355c566"
+    },
+    {
+      "id": "case-037",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.98,
+      "trace_id": "query_c79f8925b8574d23aa8a8d249169ec31"
+    },
+    {
+      "id": "case-038",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.53,
+      "trace_id": "query_67e9b997e65544b587a5b2dbd895c796"
+    },
+    {
+      "id": "case-039",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.94,
+      "trace_id": "query_d6409fb269ff404784d425b95cf6f3d3"
+    },
+    {
+      "id": "case-040",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.16,
+      "trace_id": "query_69f19c3369b944ee8682f91fe486087d"
+    },
+    {
+      "id": "case-041",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.66,
+      "trace_id": "query_ea5201b9ae644342a7deec45d598d735"
+    },
+    {
+      "id": "case-042",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 36.33,
+      "trace_id": "query_9ee45b14253048f7b0460b174994cdac"
+    },
+    {
+      "id": "case-043",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.67,
+      "trace_id": "query_c2d70d6a23074e128816cc19c80e1a70"
+    },
+    {
+      "id": "case-044",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 23.18,
+      "trace_id": "query_f91e1add667b4c548fadaedeaf833659"
+    },
+    {
+      "id": "case-045",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.64,
+      "trace_id": "query_c6ffd41964754f5a90bc3c64bb230b9c"
+    },
+    {
+      "id": "case-046",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.24,
+      "trace_id": "query_3e4061f2b85643b7a9add2ed27668caf"
+    },
+    {
+      "id": "case-047",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.49,
+      "trace_id": "query_6fcae5457e7b4008b2bfd67f5c4baa80"
+    },
+    {
+      "id": "case-048",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.5,
+      "trace_id": "query_d20afbd5516c427c816dbbe47e9681c2"
+    },
+    {
+      "id": "case-049",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.18,
+      "trace_id": "query_c2e478499283444ea23229374556030f"
+    },
+    {
+      "id": "case-050",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.36,
+      "trace_id": "query_b274631518914ff2890adcf476cb4b7d"
+    },
+    {
+      "id": "case-051",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.08,
+      "trace_id": "query_c69ca70bf2a546afa3a6d4d1fd2a7d99"
+    },
+    {
+      "id": "case-052",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.73,
+      "trace_id": "query_8608b260c08a4f4c95d63ebe75fe1675"
+    },
+    {
+      "id": "case-053",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.58,
+      "trace_id": "query_3863dde11d6e46fbb84c0552889ac85c"
+    },
+    {
+      "id": "case-054",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.14,
+      "trace_id": "query_09f8fba319674c7aad7dbd3956d9d5e1"
+    },
+    {
+      "id": "case-055",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.32,
+      "trace_id": "query_7361577116394b42a5b4800117cd577b"
+    },
+    {
+      "id": "case-056",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.6,
+      "trace_id": "query_f40577471a984795ae052a568d87a50c"
+    },
+    {
+      "id": "case-057",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.86,
+      "trace_id": "query_5aa988a3402a457a949fbe54928aba1c"
+    },
+    {
+      "id": "case-058",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 13.54,
+      "trace_id": "query_38965fae6cae4567b5422dcef91fc55d"
+    },
+    {
+      "id": "case-059",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 13.47,
+      "trace_id": "query_935312810fa94caf92ac826e09fdfbce"
+    },
+    {
+      "id": "case-060",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.41,
+      "trace_id": "query_fe967eb2209c4534be148ba4073039ed"
+    },
+    {
+      "id": "case-061",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 13.55,
+      "trace_id": "query_cb851797392b4270b54a57b0817b3897"
+    },
+    {
+      "id": "case-062",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.47,
+      "trace_id": "query_62309e71272044f7ba79a3c373d0cb8a"
+    },
+    {
+      "id": "case-063",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.95,
+      "trace_id": "query_bdd04dba803e4ee09951c546f88b5959"
+    },
+    {
+      "id": "case-064",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.06,
+      "trace_id": "query_1581654fdce2481a9f9860165aabac65"
+    },
+    {
+      "id": "case-065",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 16.43,
+      "trace_id": "query_388bbe2165e743a9ac2729c4d13f130b"
+    },
+    {
+      "id": "case-066",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.22,
+      "trace_id": "query_2c3091760d4b4882932158550e2e9a5c"
+    },
+    {
+      "id": "case-067",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.88,
+      "trace_id": "query_b513ddc905c144aebb5371b6c4342472"
+    },
+    {
+      "id": "case-068",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 33.25,
+      "trace_id": "query_443456aa02e94d8ba8a7ced22b026298"
+    },
+    {
+      "id": "case-069",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.65,
+      "trace_id": "query_c044129859704df2b2f8efd4e853a6cc"
+    },
+    {
+      "id": "case-070",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.93,
+      "trace_id": "query_1eec821d5d924bdfa5ec10ca293af392"
+    },
+    {
+      "id": "case-071",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.66,
+      "trace_id": "query_09d02531fc1c4296a559179db95eb54c"
+    },
+    {
+      "id": "case-072",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.12,
+      "trace_id": "query_244d2de0e70a4e6a878c62beae5a5069"
+    },
+    {
+      "id": "case-073",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.47,
+      "trace_id": "query_c6effa6648174b108a4a80a7a207dfd9"
+    },
+    {
+      "id": "case-074",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.5,
+      "trace_id": "query_62f6a365da414a4ab0f339d735b48528"
+    },
+    {
+      "id": "case-075",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.23,
+      "trace_id": "query_0bfd3b6627dc443e8fc2ad20698aa677"
+    },
+    {
+      "id": "case-076",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.6,
+      "trace_id": "query_33898c538325427dbf2c5d650b837060"
+    },
+    {
+      "id": "case-077",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.12,
+      "trace_id": "query_b56966fbfd8546ca8201cbccc1943a5d"
+    },
+    {
+      "id": "case-078",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 13.06,
+      "trace_id": "query_a8a35136c3aa4bfb8cc57a95e894d5ca"
+    },
+    {
+      "id": "case-079",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 38.58,
+      "trace_id": "query_659bf8e9c7204501a2fcfbd416c8f811"
+    },
+    {
+      "id": "case-080",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.18,
+      "trace_id": "query_25b922337fd64435a6b072240b187c46"
+    },
+    {
+      "id": "case-081",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.78,
+      "trace_id": "query_d1af10f70f3343fba06af73f39cf4913"
+    },
+    {
+      "id": "case-082",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.02,
+      "trace_id": "query_8d8907f4e2b5452fa9a72194bd48012c"
+    },
+    {
+      "id": "case-083",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.28,
+      "trace_id": "query_282fb013e2b94d01b0e4c74729b18315"
+    },
+    {
+      "id": "case-084",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.39,
+      "trace_id": "query_c933193028c0453da71745fd91929d9f"
+    },
+    {
+      "id": "case-085",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.12,
+      "trace_id": "query_83aa6004321449b0ae66a5d2cfea3cac"
+    },
+    {
+      "id": "case-086",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.09,
+      "trace_id": "query_20acb7bb55354d9989e08cb5e81ec455"
+    },
+    {
+      "id": "case-087",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.6,
+      "trace_id": "query_969c515a69e44d498f41cb8b6d5965d5"
+    },
+    {
+      "id": "case-088",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.7,
+      "trace_id": "query_a084aace04e3409eb6171c524726e7a7"
+    },
+    {
+      "id": "case-089",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.1,
+      "trace_id": "query_b5e9db51ddd24667b59cc9add3f06129"
+    },
+    {
+      "id": "case-090",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.14,
+      "trace_id": "query_ee2fca02353d4fe3a4c361748bbd5119"
+    },
+    {
+      "id": "case-091",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.24,
+      "trace_id": "query_836d989dea634fc4ac6b566c6e6ff8cb"
+    },
+    {
+      "id": "case-092",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.34,
+      "trace_id": "query_edd93111878445668767da51ea11218e"
+    },
+    {
+      "id": "case-093",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.8,
+      "trace_id": "query_0e04120b0f86469f87b8a4f04aadcd66"
+    },
+    {
+      "id": "case-094",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 35.11,
+      "trace_id": "query_d7225a73ff114949bc5816f827c6360c"
+    },
+    {
+      "id": "case-095",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.68,
+      "trace_id": "query_891607195de4423a8412f67e0be915c0"
+    },
+    {
+      "id": "case-096",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.25,
+      "trace_id": "query_b58d5f1ccd5e4a2c855951bb7a699c78"
+    },
+    {
+      "id": "case-097",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.24,
+      "trace_id": "query_d61280c4d5ec4d6fac6af9319e7f67ae"
+    },
+    {
+      "id": "case-098",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 13.1,
+      "trace_id": "query_2e4e8df750434869bae2eae9ab350043"
+    },
+    {
+      "id": "case-099",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.38,
+      "trace_id": "query_5abc5e21ae7f4164848fa6d248ecc21d"
+    },
+    {
+      "id": "case-100",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 13.25,
+      "trace_id": "query_04252a45ec2f42bcb26f68e4289fb278"
+    },
+    {
+      "id": "case-101",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.44,
+      "trace_id": "query_928ef60c152e4dd09c993a1cc852e040"
+    },
+    {
+      "id": "case-102",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.63,
+      "trace_id": "query_4fca364914bf4783b204aafa39b12aee"
+    },
+    {
+      "id": "case-103",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.8,
+      "trace_id": "query_3b558128ce2249bab5ba6ecd300ccecc"
+    },
+    {
+      "id": "case-104",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.09,
+      "trace_id": "query_51c2ec3cf4764f62b7ca4596a9adff59"
+    },
+    {
+      "id": "case-105",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.91,
+      "trace_id": "query_846d5cb1db0f4549bba7b2cf92b77c94"
+    },
+    {
+      "id": "case-106",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.95,
+      "trace_id": "query_f4b220c10cad47dcb6326d48976ca763"
+    },
+    {
+      "id": "case-107",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.69,
+      "trace_id": "query_7ee9f2afcc2b4a69b5aefea00d8f29f0"
+    },
+    {
+      "id": "case-108",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.91,
+      "trace_id": "query_d4d7427a2fba4b8db0c61798a50dc2a4"
+    },
+    {
+      "id": "case-109",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.1,
+      "trace_id": "query_3f6bac65e8904d44898adad0e53d86cc"
+    },
+    {
+      "id": "case-110",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.73,
+      "trace_id": "query_bd78219e597b44d794da551c04ffe399"
+    },
+    {
+      "id": "case-111",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.64,
+      "trace_id": "query_83e051eb2a0e49f8b01c6434ffe5e24e"
+    },
+    {
+      "id": "case-112",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.89,
+      "trace_id": "query_86e563b099f94e0293278695bc9af7c3"
+    },
+    {
+      "id": "case-113",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.88,
+      "trace_id": "query_da1843f7e3da415b839e0120fa1e28a3"
+    },
+    {
+      "id": "case-114",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 11.58,
+      "trace_id": "query_6470093cb9674b0fb9d31d913e388c15"
+    },
+    {
+      "id": "case-115",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 14.24,
+      "trace_id": "query_0018f8392af6412286ced31cfe81486d"
+    },
+    {
+      "id": "case-116",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.38,
+      "trace_id": "query_1325022c711d4ee598dad2df0ad8054c"
+    },
+    {
+      "id": "case-117",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 10.69,
+      "trace_id": "query_4df10da9e29a4832b2a03f3044056c2c"
+    },
+    {
+      "id": "case-118",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.22,
+      "trace_id": "query_7bc8797fad944c03805c9ce39c29f0ca"
+    },
+    {
+      "id": "case-119",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.33,
+      "trace_id": "query_bc7eaf9bb04543a094bb52acd9560b61"
+    },
+    {
+      "id": "case-120",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "passed": true,
+      "latency_ms": 12.27,
+      "trace_id": "query_a24503dfaae44d3bbd0a268239309305"
+    }
+  ]
+}

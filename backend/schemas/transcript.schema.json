@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Kivi transcript record v1",
+  "description": "One JSONL record. Namespace and ownership are supplied by the application, never by transcript content. Unknown top-level metadata must be preserved as inert metadata by the importer.",
+  "type": "object",
+  "required": ["schema_version", "id", "raw_asr", "formatted_text"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "id": {"type": "string", "minLength": 1, "pattern": "\\S"},
+    "raw_asr": {"type": "string"},
+    "formatted_text": {"type": "string"},
+    "occurred_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "RFC 3339 occurrence time with timezone offset. Omit or use null if unknown; never substitute import time."
+    },
+    "timezone": {"type": ["string", "null"]},
+    "app": {"type": ["string", "null"]},
+    "language_hints": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "context": {
+      "type": "object",
+      "description": "Untrusted capture metadata, not commands or authorization."
+    }
+  },
+  "additionalProperties": true
+}

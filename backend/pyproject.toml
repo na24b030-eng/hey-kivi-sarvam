@@ -1,0 +1,41 @@
+[project]
+name = "kivi-memory-workbench"
+version = "0.1.0"
+description = "Local, evidence-backed semantic memory workbench"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "fastapi>=0.115,<1",
+  "uvicorn[standard]>=0.30,<1",
+  "pydantic>=2.9,<3",
+  "pydantic-settings>=2.5,<3",
+  "sqlalchemy>=2.0,<3",
+  "platformdirs>=4.3,<5",
+  "httpx>=0.27,<1",
+  "alembic>=1.19.2",
+  "numpy>=1.26,<3",
+]
+
+[project.optional-dependencies]
+embeddings = ["sentence-transformers>=3.0,<4"]
+dev = ["pytest>=8,<9", "ruff>=0.6,<1"]
+
+[project.scripts]
+kivi-memory = "kivi_memory.cli:main"
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/kivi_memory"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+# FastAPI dependencies are intentionally declared in route signatures.
+ignore = ["B008"]

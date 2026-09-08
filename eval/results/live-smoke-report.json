@@ -1,0 +1,349 @@
+{
+  "created_at": "2026-09-08T10:04:26.938464+00:00",
+  "suite": "eval\\live-smoke-cases.jsonl",
+  "suite_sha256": "bbe2e5b5dd636d99a32a266ddff5330c71bee1cc52304ee8f189cf70d81156ab",
+  "case_count": 12,
+  "passed": 12,
+  "evidence_accuracy": 1.0,
+  "category_summary": {
+    "asr_disagreement": {
+      "cases": 1,
+      "passed": 1
+    },
+    "code_switched": {
+      "cases": 1,
+      "passed": 1
+    },
+    "customer_budget": {
+      "cases": 1,
+      "passed": 1
+    },
+    "draft": {
+      "cases": 1,
+      "passed": 1
+    },
+    "household": {
+      "cases": 1,
+      "passed": 1
+    },
+    "hypothetical": {
+      "cases": 1,
+      "passed": 1
+    },
+    "meeting_episode": {
+      "cases": 1,
+      "passed": 1
+    },
+    "preference": {
+      "cases": 1,
+      "passed": 1
+    },
+    "project_schedule": {
+      "cases": 1,
+      "passed": 1
+    },
+    "project_update": {
+      "cases": 1,
+      "passed": 1
+    },
+    "study": {
+      "cases": 1,
+      "passed": 1
+    },
+    "travel": {
+      "cases": 1,
+      "passed": 1
+    }
+  },
+  "latency_ms": {
+    "p50": 1118.39,
+    "p95": 3218.6
+  },
+  "database_bytes": 1110016,
+  "embedding_model": "intfloat/multilingual-e5-small",
+  "provider_configured": true,
+  "provider_usage": {
+    "prompt_tokens": 5736,
+    "completion_tokens": 1888,
+    "total_tokens": 7624,
+    "answered_with_provider": 12
+  },
+  "results": [
+    {
+      "id": "case-001",
+      "category": "project_schedule",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "required_external_id": "synthetic-001",
+      "source_passed": true,
+      "text_passed": true,
+      "passed": true,
+      "latency_ms": 781.45,
+      "trace_id": "query_00511fe500844c3fb3f8b72f63ad5e5d",
+      "provider": {
+        "model": "sarvam-105b",
+        "latency_ms": 719,
+        "usage": {
+          "completion_tokens": 40,
+          "prompt_tokens": 463,
+          "total_tokens": 503,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": null
+        }
+      }
+    },
+    {
+      "id": "case-002",
+      "category": "customer_budget",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "required_external_id": "synthetic-002",
+      "source_passed": true,
+      "text_passed": true,
+      "passed": true,
+      "latency_ms": 650.11,
+      "trace_id": "query_537bd79ad4da4ac68bb34932c4b82ea2",
+      "provider": {
+        "model": "sarvam-105b",
+        "latency_ms": 627,
+        "usage": {
+          "completion_tokens": 40,
+          "prompt_tokens": 497,
+          "total_tokens": 537,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": null
+        }
+      }
+    },
+    {
+      "id": "case-003",
+      "category": "meeting_episode",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "required_external_id": "synthetic-003",
+      "source_passed": true,
+      "text_passed": true,
+      "passed": true,
+      "latency_ms": 1094.59,
+      "trace_id": "query_3445ff67e86d404a81096bfe16a39ef3",
+      "provider": {
+        "model": "sarvam-105b",
+        "latency_ms": 1033,
+        "usage": {
+          "completion_tokens": 76,
+          "prompt_tokens": 494,
+          "total_tokens": 570,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": null
+        }
+      }
+    },
+    {
+      "id": "case-004",
+      "category": "preference",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "required_external_id": "synthetic-004",
+      "source_passed": true,
+      "text_passed": true,
+      "passed": true,
+      "latency_ms": 1910.68,
+      "trace_id": "query_e28972586057457bb7f3f6d8279d336c",
+      "provider": {
+        "model": "sarvam-105b",
+        "latency_ms": 1820,
+        "usage": {
+          "completion_tokens": 157,
+          "prompt_tokens": 482,
+          "total_tokens": 639,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": null
+        }
+      }
+    },
+    {
+      "id": "case-005",
+      "category": "travel",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "required_external_id": "synthetic-005",
+      "source_passed": true,
+      "text_passed": true,
+      "passed": true,
+      "latency_ms": 995.6,
+      "trace_id": "query_95e942538f214bde9e4017b7df0e427b",
+      "provider": {
+        "model": "sarvam-105b",
+        "latency_ms": 855,
+        "usage": {
+          "completion_tokens": 68,
+          "prompt_tokens": 521,
+          "total_tokens": 589,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": null
+        }
+      }
+    },
+    {
+      "id": "case-006",
+      "category": "study",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "required_external_id": "synthetic-006",
+      "source_passed": true,
+      "text_passed": true,
+      "passed": true,
+      "latency_ms": 3667.41,
+      "trace_id": "query_e3287041b11546c3a009f10c435032b3",
+      "provider": {
+        "model": "sarvam-105b",
+        "latency_ms": 3584,
+        "usage": {
+          "completion_tokens": 385,
+          "prompt_tokens": 460,
+          "total_tokens": 845,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": null
+        }
+      }
+    },
+    {
+      "id": "case-007",
+      "category": "household",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "required_external_id": "synthetic-007",
+      "source_passed": true,
+      "text_passed": true,
+      "passed": true,
+      "latency_ms": 3172.59,
+      "trace_id": "query_363ed068d4ea440180a2f020b29c242c",
+      "provider": {
+        "model": "sarvam-105b",
+        "latency_ms": 3038,
+        "usage": {
+          "completion_tokens": 325,
+          "prompt_tokens": 458,
+          "total_tokens": 783,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": null
+        }
+      }
+    },
+    {
+      "id": "case-008",
+      "category": "project_update",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "required_external_id": "synthetic-008",
+      "source_passed": true,
+      "text_passed": true,
+      "passed": true,
+      "latency_ms": 2462.57,
+      "trace_id": "query_819b398b8bf84f15bc947b47eb207775",
+      "provider": {
+        "model": "sarvam-105b",
+        "latency_ms": 2364,
+        "usage": {
+          "completion_tokens": 321,
+          "prompt_tokens": 460,
+          "total_tokens": 781,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": null
+        }
+      }
+    },
+    {
+      "id": "case-009",
+      "category": "hypothetical",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "required_external_id": "synthetic-009",
+      "source_passed": true,
+      "text_passed": true,
+      "passed": true,
+      "latency_ms": 843.46,
+      "trace_id": "query_4a8b6c1bc57043b5ae85f88c75b6b22c",
+      "provider": {
+        "model": "sarvam-105b",
+        "latency_ms": 608,
+        "usage": {
+          "completion_tokens": 38,
+          "prompt_tokens": 484,
+          "total_tokens": 522,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": null
+        }
+      }
+    },
+    {
+      "id": "case-010",
+      "category": "draft",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "required_external_id": "synthetic-010",
+      "source_passed": true,
+      "text_passed": true,
+      "passed": true,
+      "latency_ms": 867.73,
+      "trace_id": "query_2ed20d6585854c92b52e3309d146aed0",
+      "provider": {
+        "model": "sarvam-105b",
+        "latency_ms": 801,
+        "usage": {
+          "completion_tokens": 71,
+          "prompt_tokens": 501,
+          "total_tokens": 572,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": null
+        }
+      }
+    },
+    {
+      "id": "case-011",
+      "category": "asr_disagreement",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "required_external_id": "synthetic-011",
+      "source_passed": true,
+      "text_passed": true,
+      "passed": true,
+      "latency_ms": 3218.6,
+      "trace_id": "query_20f4b53f514f40f2993cf3c68be0f66b",
+      "provider": {
+        "model": "sarvam-105b",
+        "latency_ms": 3154,
+        "usage": {
+          "completion_tokens": 315,
+          "prompt_tokens": 443,
+          "total_tokens": 758,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": null
+        }
+      }
+    },
+    {
+      "id": "case-012",
+      "category": "code_switched",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "required_external_id": "synthetic-012",
+      "source_passed": true,
+      "text_passed": true,
+      "passed": true,
+      "latency_ms": 1142.19,
+      "trace_id": "query_25a6c33edbfe46449e52cb15dd737c4f",
+      "provider": {
+        "model": "sarvam-105b",
+        "latency_ms": 1034,
+        "usage": {
+          "completion_tokens": 52,
+          "prompt_tokens": 473,
+          "total_tokens": 525,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": null
+        }
+      }
+    }
+  ]
+}
