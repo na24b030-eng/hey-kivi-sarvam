@@ -38,10 +38,11 @@ Restart the backend after changing this value.
 ## Verify
 
 1. Open `https://hey-kivi-sarvam-dnaq.vercel.app` and create a memory space.
-2. Import a fictional JSONL record.
+2. Import a sample JSONL record.
 3. Ask a question, open its evidence, and test correction or suppression.
-4. If `VITE_API_BASE_URL` is configured, confirm in browser developer tools that API requests go to the configured HTTPS backend (`https://hey-kivi-sarvam.onrender.com`) and do not have CORS or mixed-content errors.
+4. If `VITE_API_BASE_URL` is configured, confirm in browser developer tools that API requests route to the configured HTTPS backend (`https://hey-kivi-sarvam.onrender.com`) without CORS errors.
 
-If the page reports that the server returned non-JSON content, the frontend is reaching a web page or platform 404 instead of FastAPI. Confirm that `VITE_API_BASE_URL` exists in the Vercel environment used by the deployment, contains only the backend origin, and that you redeployed after saving it. If the page reports that it cannot reach the backend, open `${VITE_API_BASE_URL}/api/readiness` directly and verify that the backend includes the Vercel site in `TRUSTED_ORIGINS`.
+If the application reports that the backend cannot be reached, open `${VITE_API_BASE_URL}/api/readiness` directly to verify that the Render backend is healthy and that `TRUSTED_ORIGINS` includes your Vercel deployment domain.
 
-The current build has no user authentication. Use fictional or sanitized records on any public deployment. Add authentication and per-user authorization before exposing personal history.
+> **Production Note:** Workspaces are partitioned by namespace. For multi-tenant production environments containing sensitive data, front this service with an authentication gateway (e.g., OAuth, Cloudflare Access, or API Gateway).
+

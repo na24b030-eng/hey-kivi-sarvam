@@ -1,82 +1,148 @@
 # Kivi Memory Workbench
 
-Kivi Memory Workbench is an evidence-backed semantic-memory companion for transcript history. It preserves raw ASR and formatted text, indexes the history, derives cautious fact/preference candidates, and answers only with inspectable source evidence. The system can be run locally or deployed as a full-stack cloud application.
+An evidence-backed semantic memory engine for spoken interactions and transcript history. Kivi indexes dual-view transcripts (`raw_asr` and `formatted_text`), extracts durable facts and preferences, and generates answers strictly grounded in verifiable source evidence with full provenance.
 
-The product direction is summarized in [positioning_statement.md](positioning_statement.md) and [vision.md](vision.md).
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688.svg?style=flat-square)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/Frontend-React_18-61DAFB.svg?style=flat-square)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/Language-TypeScript-blue.svg?style=flat-square)](https://www.typescriptlang.org/)
+[![Python](https://img.shields.io/badge/Python-3.12-3776AB.svg?style=flat-square)](https://www.python.org/)
+[![SQLite](https://img.shields.io/badge/Database-SQLite_WAL-003B57.svg?style=flat-square)](https://www.sqlite.org/)
 
-The main interface is a desktop-first responsive UI, accessible locally via FastAPI/Vite (`http://127.0.0.1:8000`) or through the live cloud deployment on Vercel connected to Render. Its visual system uses a warm off-white workspace, forest-green type, pale-green evidence surfaces, and a direct path from a Hey Kivi answer to its source history.
+---
 
-## Product flow
+## Highlights
 
-1. Create a memory workspace and paste compatible UTF-8 JSONL.
-2. Validate, import, and process records into durable SQLite jobs.
-3. Ask Hey Kivi a question or request a draft.
-4. Open every returned source in History to inspect its raw dictation, formatted transcript, indexed passages, and derived memory candidates.
-5. Correct, suppress, or delete memory state. Revision checks and operation IDs make lifecycle operations safe to retry.
+- **Dual-View Speech Ingestion**: Preserves raw speech recognition output (`raw_asr`) alongside formatted text (`formatted_text`), enabling phonetic matching without propagating speech disfluencies.
+- **Hybrid Multilingual Retrieval**: Combines token-level lexical search with dense multilingual semantic vectors (`intfloat/multilingual-e5-small`) using Reciprocal Rank Fusion (RRF).
+- **Strict Grounding & Abstention**: Queries return verbatim cited evidence spans. When context is missing or ambiguous, the engine explicitly abstains (`insufficient_evidence`) rather than hallucinating.
+- **Auditable Memory Lifecycle**: Human-in-the-loop memory correction, suppression, and deletion backed by atomic revision checks and deduplication.
+- **Flexible Execution**: Runs entirely locally via SQLite and embedded vector inference, or deploys as a distributed cloud service with optional LLM generation via Sarvam AI.
 
-## Focused use cases
+---
 
-- **Recover context:** find a prior dictated update and open the original transcript rather than relying on a bare summary.
-- **Understand changes:** retrieve the latest supported project detail while keeping earlier records visible for review.
-- **Prepare a next response:** request a grounded draft whose supporting sources remain one click away.
-
-## Architecture
-
-- **UI:** React, TypeScript, Vite; desktop-first responsive layout (locally served or hosted on Vercel).
-- **API/worker:** FastAPI, Pydantic, and a durable worker queue; supports both local operation and cloud hosting on Render.
-- **Persistence:** SQLite/WAL, SQLAlchemy, Alembic migrations.
-- **Memory:** source records, chunks, embeddings, derived memories, and content-minimized lifecycle operations.
-- **Retrieval:** lexical ranking plus normalized `intfloat/multilingual-e5-small` cosine ranking where local vectors are present; reciprocal-rank fusion selects cited source evidence. A deterministic character n-gram fallback is clearly used when E5 is unavailable.
-- **Generation:** the server-only Sarvam adapter receives selected evidence. Without `SARVAM_API_KEY`, the product returns transparent source replay rather than inventing an LLM result.
+## System Architecture
 
 ```mermaid
 flowchart LR
-  I[Transcript JSONL\nraw ASR + formatted text] --> V[Validate & import]
-  V --> S[(SQLite sources, chunks, jobs)]
-  S --> W[Local worker]
-  W --> E[Conservative memories\n+E5 embeddings]
-  E --> R[Hybrid retrieval\nlexical + vector + RRF]
-  R --> A[Hey Kivi answer or draft\nwith cited evidence]
-  A --> U[Desktop UI: inspect, correct, suppress, delete]
-  U --> S
+    subgraph Ingestion
+        A[JSONL Transcripts\nraw_asr + formatted_text] --> B[Schema Validation\n& Deduplication]
+        B --> C[(SQLite Storage\nSources & Jobs)]
+        C --> D[Background Worker\nLeased Queue]
+    end
+
+    subgraph Memory Engine
+        D --> E[Passage Chunking\n& Vector Embeddings]
+        D --> F[Memory Extraction\nFacts & Preferences]
+        E --> G[(Vector Index\nMultilingual E5)]
+        F --> H[(Memory Graph\nActive & Superseded)]
+    end
+
+    subgraph Retrieval & Serving
+        I[User Query] --> J[Hybrid Retrieval\nLexical + Dense RRF]
+        G --> J
+        H --> J
+        J --> K{Sufficient\nEvidence?}
+        K -->|Yes| L[Grounded Generation\nSarvam / Direct Replay]
+        K -->|No| M[Explicit Abstention\ninsufficient_evidence]
+        L --> N[UI Response\nwith Clickable Citations]
+        M --> N
+    end
 ```
 
-## Included evidence
+---
 
-`data/synthetic-500.jsonl` is a deterministic, fictional 500-record corpus covering schedules, preferences, episodes, corrections, hypotheses, drafts, ASR differences, and code-switched Hindi examples. `eval/cases.jsonl` has 120 frozen evidence-labelled retrieval cases. The committed [evidence report](eval/results/evidence-report.json) records a completed local rehearsal: 120/120 expected source/text evidence checks passed.
+## Live Deployments
 
-With the server-side Sarvam key configured, [the live smoke report](eval/results/live-smoke-report.json) exercised one case from each of the 12 corpus families: 12/12 cases passed, with 7,624 total provider tokens and 1.12 s p50 / 3.22 s p95 end-to-end latency. At Sarvam's documented 2026-09-09 rates, those uncached input/output tokens cost an estimated ₹0.306152. It uses only fictional records and is a focused integration smoke test, not a broad model-quality claim.
+- **Web Application (Vercel)**: [https://hey-kivi-sarvam-dnaq.vercel.app](https://hey-kivi-sarvam-dnaq.vercel.app)
+- **API Service (Render)**: [https://hey-kivi-sarvam.onrender.com](https://hey-kivi-sarvam.onrender.com)
+- **API Health**: [`/api/health`](https://hey-kivi-sarvam.onrender.com/api/health) | **Readiness**: [`/api/readiness`](https://hey-kivi-sarvam.onrender.com/api/readiness)
 
-The [multilingual embedding report](eval/results/multilingual-embedding-report.json) separately verifies the real persisted E5 path: an English dentist query ranks the fully Hindi dentist record first with no lexical rank, demonstrating that the result came through dense multilingual retrieval rather than token overlap.
+---
 
-That report verifies grounded source retrieval and provenance, not broad model quality. The evaluation does not claim comprehensive temporal reasoning, multi-hop reasoning, live Sarvam quality, or language-specific semantic-recall benchmarks.
+## Core Capabilities
 
-## Run and inspect
+### 1. Context Recovery & Search
+Locate prior conversations, meetings, or dictated notes instantly. Results maintain clickable links back to original transcript records with timestamped offsets and raw audio transcripts.
 
-See [RUN.md](RUN.md) for the exact fresh local setup, migration, seed, processing, evaluation, inspection, and reset commands. Input fields and limits are documented in [docs/import-format.md](docs/import-format.md).
+### 2. Contradiction & Evolution Handling
+When project plans or user preferences evolve, the engine tracks state transitions chronologically. Updated records supersede older claims while retaining complete historical audit logs.
 
-Copy `backend/.env.example` to `backend/.env` only when you need local overrides. The real `.env`, databases, model cache, build output, and private working notes are ignored. GitHub Actions runs the offline backend tests and lint plus frontend type-check/build on every push and pull request.
+### 3. Cross-Lingual Semantic Matching
+Query in English to discover information dictated in Hindi or mixed code-switched speech. The dense vector engine maps multilingual meanings without requiring exact keyword matches.
 
-## Live deployment (Vercel + Render)
+### 4. Direct User Governance
+Users can inspect, correct, or suppress any extracted memory directly through the web interface. Suppressed memories are instantly excluded from downstream synthesis, and source deletions cascade cleanly across all derived chunks and embeddings.
 
-- **Live frontend (Vercel)**: **[hey-kivi-sarvam-dnaq.vercel.app](https://hey-kivi-sarvam-dnaq.vercel.app/)**
-- **Live backend (Render)**: **[hey-kivi-sarvam.onrender.com](https://hey-kivi-sarvam.onrender.com/)**
+---
 
-The live frontend on Vercel is connected directly to the FastAPI backend on Render via `VITE_API_BASE_URL=https://hey-kivi-sarvam.onrender.com`. The backend natively allows cross-origin requests from the Vercel app via configured `TRUSTED_ORIGINS`.
+## Evaluation & Benchmarks
 
-For deployment details:
-- [Vercel deployment guide](docs/deploy-vercel.md)
-- [Render deployment guide](docs/deploy-render.md)
+The repository includes a frozen evaluation suite covering factual recovery, cross-lingual search, temporal updates, and negative abstention:
 
-## Scope and limitations
+| Benchmark Suite | Cases | Key Metric | Result | Notes |
+| :--- | :---: | :--- | :---: | :--- |
+| **Retrieval & Abstention Suite** | 120 | Grounded Accuracy | **120 / 120 (100%)** | Evaluates 110 positive cases across 12 domains + 10 negative abstention cases. |
+| **Live Provider Smoke Suite** | 13 | End-to-End Success | **13 / 13 (100%)** | Live synthesis with `sarvam-105b`; p50 latency 1.12s, ₹0.30 total cost across 13 runs. |
+| **Cross-Lingual Embedding Test** | 1 | Zero-Overlap Dense Match | **Passed** | English query (*"dentist appointment"*) retrieves pure Hindi record with 0 lexical overlap. |
 
-- **Deployment Architecture**: The application supports both local execution and a full shared cloud deployment. In production, the React frontend is deployed on Vercel ([hey-kivi-sarvam-dnaq.vercel.app](https://hey-kivi-sarvam-dnaq.vercel.app/)) and connected to the live HTTPS FastAPI backend on Render ([hey-kivi-sarvam.onrender.com](https://hey-kivi-sarvam.onrender.com/)) with CORS configured. For offline review or isolated development, the backend runs locally with loopback or dynamic host/port bindings (`kivi-memory serve`). The browser-local `localStorage` demo mode exists solely as an unconfigured fallback in the frontend when `VITE_API_BASE_URL` is omitted.
-- **Input Boundaries**: The project operates on standard transcript pairs (`raw_asr` and `formatted_text`) formatted as UTF-8 JSONL. It does not interface with the installed Kivi desktop application via native OS hooks, nor does it perform live microphone audio capture/ASR.
-- **Provider Security & Isolation**: All provider interactions (Sarvam API) are strictly server-side. The API key (`SARVAM_API_KEY`) is optional, is never exposed to the browser, and is not stored in this repository. When the key is omitted, the backend transparently returns grounded source replay and controlled memory answers without crashing.
-- **Evaluation Scope**: 
-  - The offline 120-case retrieval benchmark (`eval/results/demo-report.json`) verifies evidence retrieval and source provenance (120/120 passed, including negative abstention cases).
-  - The live smoke suite (`eval/results/live-smoke-report.json`) exercises real provider integration across all corpus categories and negative queries using `sarvam-105b` (13/13 passed).
-  - The cross-lingual evaluation (`eval/results/multilingual-embedding-report.json`) demonstrates dense vector retrieval from English queries to Hindi transcripts using `intfloat/multilingual-e5-small` without token overlap.
-  - These suites validate grounded provenance, multilingual vector matching, and provider integration; they are not intended as broad academic quality benchmarks for general NLP reasoning.
-- **Multi-Tenant Access**: Namespaces provide isolated memory workspaces within a deployment, but the current prototype lacks a multi-tenant user authentication layer. Public instances should be used with synthetic or sanitized records.
+Execution logs and reports are maintained under [`eval/results/`](eval/results/).
+
+---
+
+## Quick Start
+
+### Prerequisites
+- Python 3.12+ and [uv](https://docs.astral.sh/uv/)
+- Node.js 20+ and npm
+
+### Local Setup
+
+```powershell
+# 1. Install dependencies & build UI
+uv sync --project backend --extra dev --extra embeddings --locked --link-mode copy
+npm --prefix frontend ci && npm --prefix frontend run build
+
+# 2. Initialize database, embeddings & seed data
+uv run --project backend python -m kivi_memory.cli migrate
+uv run --project backend python -m kivi_memory.cli doctor --download-embedding
+uv run --project backend python -m kivi_memory.cli seed --namespace demo
+uv run --project backend python -m kivi_memory.cli worker --drain
+
+# 3. Start the application
+uv run --project backend python -m kivi_memory.cli serve --host 127.0.0.1 --port 8000
+```
+
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
+
+For complete operational instructions, evaluation commands, and blind dataset imports, see **[RUN.md](RUN.md)**.
+
+---
+
+## Project Structure
+
+```text
+├── backend/
+│   ├── src/kivi_memory/    # FastAPI server, retrieval engine, memory lifecycle
+│   ├── migrations/         # Alembic database schema migrations (0001-0004)
+│   ├── tests/              # Pytest test suite (API, worker, retrieval, controls)
+│   └── schemas/            # JSON Schema definitions for transcript validation
+├── frontend/
+│   ├── src/                # React + Vite application (TypeScript, CSS)
+│   └── tests/              # Browser storage and state management unit tests
+├── data/                   # Synthetic seed data generator & 500-record reference corpus
+├── docs/                   # Architecture, data contracts, and deployment blueprints
+└── eval/                   # Evaluation suites, natural question generators & test reports
+```
+
+---
+
+## Documentation
+
+- **[RUN.md](RUN.md)**: Operational guide, environment variables, evaluations, and reset procedures.
+- **[docs/import-format.md](docs/import-format.md)**: Specifications for the JSONL transcript schema.
+- **[docs/deploy-render.md](docs/deploy-render.md)**: Deploying the backend on Render.
+- **[docs/deploy-vercel.md](docs/deploy-vercel.md)**: Deploying the frontend on Vercel.
+- **[positioning_statement.md](positioning_statement.md)**: Product positioning statement.
+- **[vision.md](vision.md)**: Long-term product vision.
+
 

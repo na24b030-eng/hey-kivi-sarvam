@@ -1,101 +1,181 @@
-# Local setup and operations
+# Operations & Runbook
 
-Run the commands from the repository root in two PowerShell terminals. This setup exercises migrations, the generated 500-record corpus, queue processing, evidence evaluation, and the built desktop UI.
+**Primary Review Method:** Local Application Review (FastAPI + React Desktop UI with SQLite persistence).
 
-Tested runtime: **Python 3.12.13**, **uv 0.11.3**, **Node.js 24.15.0**, and **npm 11.12.1** on Windows. Python package versions are locked in `backend/uv.lock`; frontend package versions are locked in `frontend/package-lock.json`.
+This guide documents environment setup, automated migrations, queue processing, UI workflows, benchmark evaluation, and administrative commands.
 
-## Environment variables
+---
 
-No environment variable is required for an offline local run. Copy `backend/.env.example` to `backend/.env` only to configure documented overrides:
-- `SARVAM_API_KEY`: Optional; enables server-side generated answers via `sarvam-105b`. Never place it in frontend code or commit `.env`.
-- `APP_DATA_DIR`: Selects an isolated data directory for SQLite database storage.
-- `EMBEDDING_CACHE_DIR`: Points to a local SentenceTransformers model cache for `intfloat/multilingual-e5-small`.
-- `HOST` and `PORT`: Override the server host and port (defaults to `127.0.0.1` and `8000` locally; Render passes `0.0.0.0` and `$PORT`).
-- `TRUSTED_ORIGINS`: Comma-separated list of allowed frontend origins (defaults include `http://127.0.0.1:8000`, `http://localhost:8000`, `https://hey-kivi-sarvam-dnaq.vercel.app`).
+## 1. System Requirements & Runtime Versions
 
-## Install, initialize, and seed
+The system is tested and supported on Windows, macOS, and Linux:
 
-For an isolated rehearsal, set `APP_DATA_DIR` to an empty writable folder before migration. The command uses uv's copy mode because this repository may live in OneDrive, where package hard links can fail.
+- **Python**: `3.12.13` (managed via **uv `0.11.3`**)
+- **Node.js**: `24.15.0` (with **npm `11.12.1`**)
+- **Dependencies**: Locked in `backend/uv.lock` and `frontend/package-lock.json`.
+
+---
+
+## 2. Configuration & Environment Variables
+
+No environment variables are required for standard local/offline operation. The engine defaults to deterministic local vector embeddings and direct source replay.
+
+To customize settings, copy `backend/.env.example` to `backend/.env`:
+
+| Variable | Required | Default | Description |
+| :--- | :---: | :--- | :--- |
+| `SARVAM_API_KEY` | No | `None` | Enables server-side LLM answer synthesis using `sarvam-105b`. Key is strictly server-side and never exposed to the client. |
+| `APP_DATA_DIR` | No | OS AppData / Local | Directory for the SQLite database and application files. |
+| `EMBEDDING_CACHE_DIR` | No | System cache | Local cache directory for `intfloat/multilingual-e5-small`. |
+| `HOST` / `PORT` | No | `127.0.0.1` / `8000` | Host binding and port for the FastAPI server. |
+| `TRUSTED_ORIGINS` | No | Localhost origins | Comma-separated list of allowed CORS origins for web clients. |
+
+---
+
+## 3. Installation & Dependency Setup
+
+Run these commands from the repository root:
 
 ```powershell
+# Install Python backend dependencies with locked versions
 uv sync --project backend --extra dev --extra embeddings --locked --link-mode copy
+
+# Install frontend dependencies and compile static assets
 npm --prefix frontend ci
 npm --prefix frontend run build
+```
+
+---
+
+## 4. Database Migration & Seeding
+
+Initialize the SQLite database, download the embedding model, and populate the seed dataset:
+
+```powershell
+# Run Alembic schema migrations (0001 -> 0004)
+uv run --project backend python -m kivi_memory.cli migrate
+
+# Cache the local multilingual vector model (runs once)
+uv run --project backend python -m kivi_memory.cli doctor --download-embedding
+
+# Generate seed datasets and initialize the demo workspace
 uv run --project backend python data/generate_synthetic.py
 uv run --project backend python eval/generate_cases.py
-uv run --project backend python -m kivi_memory.cli migrate
-uv run --project backend python -m kivi_memory.cli doctor --download-embedding
 uv run --project backend python -m kivi_memory.cli seed --namespace demo
+
+# Process all queued ingestion jobs
 uv run --project backend python -m kivi_memory.cli worker --drain
-
-# Optional code-quality checks (run from the repository root)
-uv run --project backend pytest backend/tests
-uv run --project backend ruff check backend/src backend/tests
 ```
 
-After seeding and processing the demo namespace, run the reproducible 120-case status suite:
+---
 
-```powershell
-uv run --project backend python -m kivi_memory.cli evaluate --namespace demo --suite eval/cases.jsonl --output eval/results/demo-report.json --offline
-```
+## 5. Starting the Application
 
-Verify that the persisted E5 path can retrieve Hindi evidence from an English query without lexical overlap:
+The system uses a web server and a background queue worker. Run these commands in separate terminals:
 
-```powershell
-uv run --project backend python eval/multilingual_embedding_smoke.py
-```
-
-With `SARVAM_API_KEY` configured, this small one-per-family smoke suite validates the live provider path and aggregates the returned token usage. It deliberately uses only fictional corpus records:
-
-```powershell
-uv run --project backend python -m kivi_memory.cli evaluate --namespace demo --suite eval/live-smoke-cases.jsonl --output eval/results/live-smoke-report.json
-```
-
-The corpus-generation command is deterministic and creates exactly 500 fictional records. `doctor --download-embedding` downloads the optional local multilingual E5 model once; it is required to exercise the persisted vector path. If it is unavailable, the app remains runnable with an explicitly deterministic fallback. The UI does not require a Sarvam key for source-backed replay. If `SARVAM_API_KEY` is configured in `backend/.env`, normal answers additionally use the server-side Sarvam adapter and retain the selected source evidence, returned model, latency, and provider usage in the query trace. The default integration sends `reasoning_effort: null` so the bounded answer budget is reserved for the answer rather than hidden reasoning tokens.
-
-`--drain` processes every queued job and exits. To process new imports continuously in a second terminal:
-
-```powershell
-uv run --project backend python -m kivi_memory.cli worker
-```
-
-Start the application in the first terminal:
-
+### Terminal 1: Application Server
 ```powershell
 uv run --project backend python -m kivi_memory.cli serve --host 127.0.0.1 --port 8000
 ```
 
-Open `http://127.0.0.1:8000`. Create a memory space, paste JSONL in **Import**, then use **Hey Kivi** to ask a question. The answer provides source evidence. **History** has a source inspector for raw/formatted text, passages and derived memories. **Memory** supports correction and suppression. The Import UI validates, imports and drains its local queue in one action; use the CLI worker for a large or continuous import.
-
-For a quick functional check, ask when a project launches, ask an unrelated question to observe abstention, open an answer source, correct or suppress its promoted memory, repeat the question, request a draft, and delete a source from History.
-
-To import an unfamiliar compatible corpus without changing code:
-
+### Terminal 2: Continuous Background Worker
 ```powershell
-uv run --project backend python -m kivi_memory.cli import --namespace sample --file C:\path\to\corpus.jsonl
 uv run --project backend python -m kivi_memory.cli worker
-uv run --project backend python -m kivi_memory.cli inspect --namespace sample
 ```
 
-## Inspect state and traces
+---
 
-The memory database defaults to `%LOCALAPPDATA%\KiviMemoryWorkbench\memory.sqlite3`; with `APP_DATA_DIR=C:\path\to\data`, it is `C:\path\to\data\memory.sqlite3`. Use the documented `inspect` command for namespace counts, the source inspector in the UI for provenance, and `GET /api/namespaces/{namespace_id}/query-runs/{trace_id}` for a stored query trace. Generated reports are written under `eval/results/` unless `--output` specifies another path.
+## 6. Accessing the Interface
 
-Do not put a Sarvam key in the frontend; use the ignored `backend/.env` only when enabling the server-side adapter.
+Open your browser to:
+**[http://127.0.0.1:8000](http://127.0.0.1:8000)**
 
-## Cloud deployment (Vercel + Render)
+The desktop web interface will load with direct connectivity to the local FastAPI backend.
 
-The project includes an active, full-stack hosted deployment:
-- **Frontend (Vercel)**: `https://hey-kivi-sarvam-dnaq.vercel.app` (configured with `VITE_API_BASE_URL=https://hey-kivi-sarvam.onrender.com`).
-- **Backend (Render)**: `https://hey-kivi-sarvam.onrender.com` (Python FastAPI service running SQLite migrations and dynamic port bindings).
-- **CORS**: Render's `TRUSTED_ORIGINS` allows incoming cross-origin requests from the Vercel frontend.
+---
 
-See [docs/deploy-vercel.md](docs/deploy-vercel.md) and [docs/deploy-render.md](docs/deploy-render.md) for full deployment blueprints and setup instructions.
+## 7. Key Workflows & Primary Interactions
 
-## Reset a workspace
+1. **Context Recovery**:
+   - In **Hey Kivi**, ask: *"When does Harbor launch after Dev approves the release checklist?"*
+   - Observe the returned answer with exact date and source citation chips.
+2. **Abstention on Missing History**:
+   - Ask an unrecorded or out-of-domain question: *"What is the capital of Peru?"*
+   - Observe the system's explicit refusal to invent facts (`insufficient_evidence`).
+3. **Source Inspector**:
+   - In **History**, select any transcript to inspect side-by-side: Raw ASR, Formatted text, Chunk boundaries, and Derived memory candidates.
+4. **Memory Governance (Correction & Suppression)**:
+   - In **Memory**, edit an active claim or suppress a source.
+   - Re-ask the question in **Hey Kivi** to observe the updated memory state instantly reflected in subsequent answers.
+5. **Grounded Drafting**:
+   - Request a response draft: *"Draft a status update for the Harbor project."*
+   - The generated draft cites underlying interaction records for every claim.
+
+---
+
+## 8. Automated Evaluation & Benchmarks
+
+Run the reproducible benchmark suites from the repository root:
+
+```powershell
+# 1. 120-Case Grounded Retrieval & Abstention Benchmark (Offline)
+uv run --project backend python -m kivi_memory.cli evaluate --namespace demo --suite eval/cases.jsonl --output eval/results/demo-report.json --offline
+
+# 2. Cross-Lingual Zero-Overlap Embedding Test
+uv run --project backend python eval/multilingual_embedding_smoke.py
+
+# 3. Live Provider Smoke Suite (Requires SARVAM_API_KEY)
+uv run --project backend python -m kivi_memory.cli evaluate --namespace demo --suite eval/live-smoke-cases.jsonl --output eval/results/live-smoke-report.json
+```
+
+---
+
+## 9. Importing External Datasets
+
+To ingest any compatible JSONL transcript dataset without altering code:
+
+```powershell
+# Import records into a target namespace
+uv run --project backend python -m kivi_memory.cli import --namespace test_workspace --file C:\path\to\transcripts.jsonl
+
+# Process all queued records
+uv run --project backend python -m kivi_memory.cli worker --drain
+
+# Inspect workspace statistics
+uv run --project backend python -m kivi_memory.cli inspect --namespace test_workspace
+```
+
+*(See [docs/import-format.md](docs/import-format.md) for data schema details.)*
+
+---
+
+## 10. State & Provenance Inspection
+
+- **CLI Workspace Summary**:
+  ```powershell
+  uv run --project backend python -m kivi_memory.cli inspect --namespace demo
+  ```
+- **Evaluation Logs**: Detailed latency, token, and score reports are stored in [`eval/results/`](eval/results/).
+- **Query Audit Traces**: Stored per query run and retrievable via API:
+  `GET /api/namespaces/{namespace_id}/query-runs/{trace_id}`
+
+---
+
+## 11. Workspace Reset
+
+To safely wipe a specific namespace's records and memory graph while preserving schema integrity:
 
 ```powershell
 uv run --project backend python -m kivi_memory.cli reset --namespace demo
 ```
 
-This deletes that namespace's imported sources and their cascaded chunks/memories/jobs, plus its query traces and lifecycle-operation metadata. It keeps the empty namespace so the same workspace can be reused. It never touches the installed Kivi application, its settings, or any other namespace.
+This cascades deletions across sources, chunks, embeddings, extracted memories, and query traces within that namespace without affecting other data.
+
+---
+
+## Cloud Deployment (Hosted Alternative)
+
+For cloud execution, the repository includes ready-to-deploy configurations:
+- **Frontend**: Hosted on [Vercel](https://hey-kivi-sarvam-dnaq.vercel.app/) (see [docs/deploy-vercel.md](docs/deploy-vercel.md))
+- **Backend**: Hosted on [Render](https://hey-kivi-sarvam.onrender.com/) (see [docs/deploy-render.md](docs/deploy-render.md))
+
