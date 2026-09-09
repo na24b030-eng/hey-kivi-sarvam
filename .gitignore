@@ -22,3 +22,6 @@
 *.sqlite3-shm
 *.sqlite3-wal
 **/__pycache__/
+
+.vercel
+.env*

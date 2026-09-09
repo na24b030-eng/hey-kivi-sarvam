@@ -37,7 +37,10 @@ class Settings(BaseSettings):
     embedding_min_similarity: float = Field(default=0.72, ge=-1.0, le=1.0)
     embedding_cache_dir: Path | None = None
     frontend_dist_dir: Path | None = None
-    trusted_origins: str = "http://127.0.0.1:8000,http://localhost:8000,http://127.0.0.1:5173"
+    trusted_origins: str = (
+        "http://127.0.0.1:8000,http://localhost:8000,http://127.0.0.1:5173,"
+        "https://*.vercel.app,https://hey-kivi-sarvam-dnaq.vercel.app"
+    )
 
     @property
     def db_url(self) -> str:
