@@ -16,6 +16,8 @@ from sqlalchemy import delete, func, select
 from .api import create_app
 from .db import (
     Embedding,
+    Entity,
+    EntityRelation,
     Job,
     Memory,
     MemoryOperation,
@@ -136,6 +138,8 @@ def command_reset(settings: Settings, namespace_name: str) -> int:
         ) or 0
         session.execute(delete(QueryRun).where(QueryRun.namespace_id == namespace.id))
         session.execute(delete(MemoryOperation).where(MemoryOperation.namespace_id == namespace.id))
+        session.execute(delete(EntityRelation).where(EntityRelation.namespace_id == namespace.id))
+        session.execute(delete(Entity).where(Entity.namespace_id == namespace.id))
         for source_id in source_ids:
             source = session.get(Source, source_id)
             if source:

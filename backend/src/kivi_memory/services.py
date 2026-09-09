@@ -15,6 +15,8 @@ from sqlalchemy.orm import Session
 from .contracts import TranscriptRecord
 from .db import (
     Embedding,
+    EntityMention,
+    EntityRelation,
     Job,
     Memory,
     MemoryOperation,
@@ -286,12 +288,43 @@ def process_one_job(session: Session, settings: Settings | None = None) -> dict[
                             dimensions=dimensions, vector=vector, content_hash=content_hash(part)))
         job.progress = 50
 
+        # --- Pillar 4: Semantic entity/relation extraction ---
+        if settings and settings.sarvam_api_key and settings.enable_semantic_extraction:
+            from .semantic import (
+                extract_entities_and_relations,
+                merge_entities,
+                persist_mentions,
+                persist_relations,
+                detect_contradictions,
+            )
+            semantic_graph = extract_entities_and_relations(settings, source.formatted_text, source.id)
+            if semantic_graph:
+                entity_map = merge_entities(session, source.namespace_id, source.id, semantic_graph.entities)
+                persist_mentions(session, source.id, entity_map, semantic_graph.relations)
+                persist_relations(session, source.namespace_id, source.id, entity_map, semantic_graph.relations)
+                # Detect contradictions and store as pending clarifications
+                contradictions = detect_contradictions(
+                    session, source.namespace_id, source.id,
+                    entity_map, semantic_graph.relations,
+                    time_window_hours=settings.contradiction_time_window_hours,
+                )
+                if contradictions:
+                    existing_ctx = json.loads(source.context_json) if source.context_json else {}
+                    existing_ctx["pending_clarifications"] = [c.to_dict() for c in contradictions]
+                    source.context_json = json.dumps(existing_ctx, ensure_ascii=False)
+        job.progress = 60
+
         # Temporal ordering: compare timestamps before superseding
         new_source_time = source.occurred_at or source.ingested_at
         if new_source_time is not None and new_source_time.tzinfo is None:
             new_source_time = new_source_time.replace(tzinfo=UTC)
 
+
         for kind, subject, predicate, value, scope in extract_memory_candidates(source):
+            # Pillar 4: Classify decay for this memory
+            from .semantic import classify_decay
+            mem_decay_class, mem_expires_at = classify_decay(kind, predicate, value)
+
             older = session.scalars(select(Memory).where(
                 Memory.namespace_id == source.namespace_id, Memory.subject == subject,
                 Memory.predicate == predicate, Memory.scope == scope, Memory.state == "active"
@@ -327,7 +360,8 @@ def process_one_job(session: Session, settings: Settings | None = None) -> dict[
                         ))
                 new_mem = Memory(
                     id=ident("mem"), namespace_id=source.namespace_id, kind=kind, subject=subject,
-                    predicate=predicate, value=value, scope=scope, state="active", source_id=source.id
+                    predicate=predicate, value=value, scope=scope, state="active", source_id=source.id,
+                    decay_class=mem_decay_class, expires_at=mem_expires_at,
                 )
                 session.add(new_mem)
                 session.flush()
@@ -342,7 +376,8 @@ def process_one_job(session: Session, settings: Settings | None = None) -> dict[
             else:
                 session.add(Memory(
                     id=ident("mem"), namespace_id=source.namespace_id, kind=kind, subject=subject,
-                    predicate=predicate, value=value, scope=scope, state="superseded", source_id=source.id
+                    predicate=predicate, value=value, scope=scope, state="superseded", source_id=source.id,
+                    decay_class=mem_decay_class, expires_at=mem_expires_at,
                 ))
 
         # Stale-attempt & eligibility recheck before publishing
@@ -497,6 +532,35 @@ def ask(session: Session, namespace: Namespace, question: str, mode: str, settin
         corrected_ids = {source.id for source in corrected_sources}
         evidence = corrected_sources + [source for source in evidence if source.id not in corrected_ids]
         evidence = evidence[:8]
+
+    # --- Pillar 4: Multi-hop graph expansion ---
+    from .retrieval import multi_hop_expand, apply_decay
+    bridge_sources = multi_hop_expand(
+        session, namespace.id,
+        evidence, question, settings,
+        max_bridge=settings.multi_hop_bridge_limit,
+    )
+    existing_ids = {s.id for s in evidence}
+    for src in bridge_sources:
+        if src.id not in existing_ids and src.id not in blocked_sources:
+            evidence.append(src)
+            existing_ids.add(src.id)
+    evidence = evidence[:10]  # Allow slightly more evidence for multi-hop
+
+    # --- Pillar 4: Apply time-based decay to candidate ranking ---
+    from datetime import datetime as _dt
+    _now_utc = _dt.now(UTC)
+    candidates = apply_decay(candidates, _now_utc)
+
+    # --- Pillar 4: Proactive contradiction detection ---
+    pending_clarifications: list[dict[str, Any]] = []
+    for src in evidence:
+        ctx = json.loads(src.context_json) if src.context_json else {}
+        clarifications = ctx.get("pending_clarifications", [])
+        for c in clarifications:
+            c_subject = c.get("subject", "")
+            if any(t in question.casefold() for t in tokens(c_subject) if t not in STOPWORDS):
+                pending_clarifications.append(c)
 
     revision = namespace.revision
     has_unprocessed = bool(
@@ -670,6 +734,10 @@ def ask(session: Session, namespace: Namespace, question: str, mode: str, settin
                 for candidate in candidates[:30]
             ],
         })
+
+    # --- Pillar 4: Attach proactive clarifications if any ---
+    if pending_clarifications:
+        result["clarifications"] = pending_clarifications
 
     result["trace_id"] = ident("query")
     run = QueryRun(

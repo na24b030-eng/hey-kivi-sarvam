@@ -7,7 +7,17 @@ type Source = { id: string; external_id: string; formatted_text: string; raw_asr
 type SourceDetail = Source & { chunks: { id: string; view: string; text: string }[]; memories: { id: string; kind: string; subject: string; predicate: string; value: string; state: string }[] }
 type Memory = { id: string; kind: string; subject: string; predicate: string; value: string; scope: string; state: string }
 type Evidence = { id: string; external_id: string; text: string; occurred_at?: string }
-type Answer = { status: string; answer: string; draft_text?: string; evidence: Evidence[]; uncertainties: string[] }
+type Clarification = {
+  subject: string
+  predicate: string
+  old_value: string
+  new_value: string
+  old_source_id: string
+  new_source_id: string
+  temporal_gap_hours: number
+  message: string
+}
+type Answer = { status: string; answer: string; draft_text?: string; evidence: Evidence[]; uncertainties: string[]; clarifications?: Clarification[] }
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '')
 const DEMO_STORE_KEY = 'kivi-memory-workbench:v1'
@@ -630,6 +640,19 @@ function Ask({ question, setQuestion, answer, busy, submit, sourceCount, memoryC
           <p className="eyebrow">{answer.status.replaceAll('_', ' ')}</p>
           <h2>{answer.draft_text ? 'Draft an update' : 'A useful answer, with a path back to what you said.'}</h2>
           <p className="answer-text">{answer.draft_text || answer.answer}</p>
+          {answer.clarifications && answer.clarifications.length > 0 && (
+            <div className="clarification-card" style={{ background: 'rgba(234, 179, 8, 0.08)', border: '1px solid rgba(234, 179, 8, 0.3)', borderRadius: '8px', padding: '1rem', margin: '1rem 0' }}>
+              <strong style={{ color: '#eab308', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <span>⚠️</span> Direct Contradiction Detected
+              </strong>
+              {answer.clarifications.map((c, i) => (
+                <div key={i} style={{ marginTop: '0.5rem' }}>
+                  <p style={{ margin: 0 }}>{c.message}</p>
+                  <small style={{ opacity: 0.7, fontSize: '0.8rem' }}>Recorded within {c.temporal_gap_hours} hours of each other.</small>
+                </div>
+              ))}
+            </div>
+          )}
           {answer.evidence.length > 0 && (
             <>
               <h3>Sources behind this answer</h3>

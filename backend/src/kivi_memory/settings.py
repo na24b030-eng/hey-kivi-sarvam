@@ -59,6 +59,12 @@ class Settings(BaseSettings):
     embedding_model: str = "intfloat/multilingual-e5-small"
     embedding_min_similarity: float = Field(default=0.72, ge=-1.0, le=1.0)
     embedding_cache_dir: Path | None = None
+    # Pillar 4: Semantic intelligence settings
+    enable_semantic_extraction: bool = True
+    multi_hop_max_depth: int = Field(default=2, ge=1, le=3)
+    multi_hop_bridge_limit: int = Field(default=4, ge=1, le=10)
+    decay_half_life_days: float = Field(default=1.0, ge=0.1, le=30.0)
+    contradiction_time_window_hours: float = Field(default=1.0, ge=0.0, le=24.0)
     frontend_dist_dir: Path | None = None
     trusted_origins: str = (
         "http://127.0.0.1:8000,http://localhost:8000,http://127.0.0.1:5173,"

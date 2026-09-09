@@ -7,6 +7,7 @@ from typing import Any
 from sqlalchemy import (
     Boolean,
     DateTime,
+    Float,
     ForeignKey,
     Integer,
     LargeBinary,
@@ -93,6 +94,50 @@ class Memory(Base):
     source_id: Mapped[str] = mapped_column(ForeignKey("sources.id", ondelete="CASCADE"), index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
     supersedes_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    decay_class: Mapped[str] = mapped_column(String(24), default="permanent")
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class Entity(Base):
+    __tablename__ = "entities"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    namespace_id: Mapped[str] = mapped_column(ForeignKey("namespaces.id"), index=True)
+    canonical_name: Mapped[str] = mapped_column(String(256), index=True)
+    entity_type: Mapped[str] = mapped_column(String(32), default="general")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class EntityAlias(Base):
+    __tablename__ = "entity_aliases"
+    __table_args__ = (UniqueConstraint("entity_id", "alias", name="uq_entity_alias"),)
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    entity_id: Mapped[str] = mapped_column(ForeignKey("entities.id", ondelete="CASCADE"), index=True)
+    alias: Mapped[str] = mapped_column(String(256))
+    source_id: Mapped[str] = mapped_column(ForeignKey("sources.id", ondelete="CASCADE"), index=True)
+
+
+class EntityMention(Base):
+    __tablename__ = "entity_mentions"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    entity_id: Mapped[str] = mapped_column(ForeignKey("entities.id", ondelete="CASCADE"), index=True)
+    source_id: Mapped[str] = mapped_column(ForeignKey("sources.id", ondelete="CASCADE"), index=True)
+    chunk_id: Mapped[str | None] = mapped_column(ForeignKey("source_chunks.id", ondelete="CASCADE"), nullable=True, index=True)
+    mention_text: Mapped[str] = mapped_column(String(512))
+    sentence_index: Mapped[int] = mapped_column(Integer, default=0)
+    role: Mapped[str] = mapped_column(String(32), default="subject")
+
+
+class EntityRelation(Base):
+    __tablename__ = "entity_relations"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    namespace_id: Mapped[str] = mapped_column(ForeignKey("namespaces.id"), index=True)
+    subject_entity_id: Mapped[str] = mapped_column(ForeignKey("entities.id", ondelete="CASCADE"), index=True)
+    predicate: Mapped[str] = mapped_column(String(256))
+    object_entity_id: Mapped[str | None] = mapped_column(ForeignKey("entities.id", ondelete="CASCADE"), nullable=True, index=True)
+    object_literal: Mapped[str | None] = mapped_column(Text, nullable=True)
+    source_id: Mapped[str] = mapped_column(ForeignKey("sources.id", ondelete="CASCADE"), index=True)
+    confidence: Mapped[float] = mapped_column(default=1.0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
 
 
 class MemoryOperation(Base):
