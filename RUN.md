@@ -1,12 +1,12 @@
-# Reviewer run guide
+# Local setup and operations
 
-**Primary review method: local.** Run the commands from the repository root in two PowerShell terminals. This path exercises migrations, the generated 500-record corpus, queue processing, evidence evaluation, and the built desktop UI.
+Run the commands from the repository root in two PowerShell terminals. This setup exercises migrations, the generated 500-record corpus, queue processing, evidence evaluation, and the built desktop UI.
 
 Tested runtime: **Python 3.12.13**, **uv 0.11.3**, **Node.js 24.15.0**, and **npm 11.12.1** on Windows. Python package versions are locked in `backend/uv.lock`; frontend package versions are locked in `frontend/package-lock.json`.
 
 ## Environment variables
 
-No environment variable is required for the offline local review. Copy `backend/.env.example` to `backend/.env` only to configure documented overrides. `SARVAM_API_KEY` is optional and enables generated answers; never place it in frontend code or commit the real `.env`. `APP_DATA_DIR` selects an isolated data directory, and `EMBEDDING_CACHE_DIR` can point to a previously downloaded local model cache.
+No environment variable is required for an offline local run. Copy `backend/.env.example` to `backend/.env` only to configure documented overrides. `SARVAM_API_KEY` is optional and enables generated answers; never place it in frontend code or commit the real `.env`. `APP_DATA_DIR` selects an isolated data directory, and `EMBEDDING_CACHE_DIR` can point to a previously downloaded local model cache.
 
 ## Install, initialize, and seed
 
@@ -62,14 +62,14 @@ uv run --project backend python -m kivi_memory.cli serve --host 127.0.0.1 --port
 
 Open `http://127.0.0.1:8000`. Create a memory space, paste JSONL in **Import**, then use **Hey Kivi** to ask a question. The answer provides source evidence. **History** has a source inspector for raw/formatted text, passages and derived memories. **Memory** supports correction and suppression. The Import UI validates, imports and drains its local queue in one action; use the CLI worker for a large or continuous import.
 
-Recommended review interactions: ask when a project launches, ask an unrelated question to observe abstention, open an answer source, correct or suppress its promoted memory, repeat the question, request a draft, and delete a source from History.
+For a quick functional check, ask when a project launches, ask an unrelated question to observe abstention, open an answer source, correct or suppress its promoted memory, repeat the question, request a draft, and delete a source from History.
 
 To import an unfamiliar compatible corpus without changing code:
 
 ```powershell
-uv run --project backend python -m kivi_memory.cli import --namespace reviewer --file C:\path\to\corpus.jsonl
+uv run --project backend python -m kivi_memory.cli import --namespace sample --file C:\path\to\corpus.jsonl
 uv run --project backend python -m kivi_memory.cli worker
-uv run --project backend python -m kivi_memory.cli inspect --namespace reviewer
+uv run --project backend python -m kivi_memory.cli inspect --namespace sample
 ```
 
 ## Inspect state and traces

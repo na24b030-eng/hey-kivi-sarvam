@@ -2,9 +2,9 @@
 
 Kivi Memory Workbench is a local, evidence-backed semantic-memory companion for transcript history. It preserves raw ASR and formatted text, indexes the history, derives cautious fact/preference candidates, and answers only with inspectable source evidence.
 
-The required Part One deliverables are [positioning_statement.md](positioning_statement.md) (85 words) and [vision.md](vision.md) (514 words).
+The product direction is summarized in [positioning_statement.md](positioning_statement.md) and [vision.md](vision.md).
 
-The primary review surface is the desktop UI served by FastAPI at `127.0.0.1`. Its final visual system follows the supplied Kivi Memory Figma review file: a warm off-white workspace, forest-green type, pale-green evidence surfaces, and the Hey Kivi → sourced answer → history/source-inspector workflow.
+The main interface is a desktop UI served by FastAPI at `127.0.0.1`. Its visual system uses a warm off-white workspace, forest-green type, pale-green evidence surfaces, and a direct path from a Hey Kivi answer to its source history.
 
 ## Product flow
 
@@ -55,7 +55,7 @@ That report verifies grounded source retrieval and provenance, not broad model q
 
 See [RUN.md](RUN.md) for the exact fresh local setup, migration, seed, processing, evaluation, inspection, and reset commands. Input fields and limits are documented in [docs/import-format.md](docs/import-format.md).
 
-Copy `backend/.env.example` to `backend/.env` only when you need local overrides. The real `.env`, databases, model cache, build output, and private interview notes are ignored. GitHub Actions runs the offline backend tests and lint plus frontend type-check/build on every push and pull request.
+Copy `backend/.env.example` to `backend/.env` only when you need local overrides. The real `.env`, databases, model cache, build output, and private working notes are ignored. GitHub Actions runs the offline backend tests and lint plus frontend type-check/build on every push and pull request.
 
 ## Deploy the frontend on Vercel
 
@@ -63,8 +63,8 @@ The repository includes root-level Vercel configuration for the Vite frontend. S
 
 ## Scope and limitations
 
-The default reviewer run is local and binds to loopback. A Vercel frontend cannot reach a backend bound only to `127.0.0.1`; a working public deployment therefore requires a separate HTTPS backend with persistent storage. The project does not integrate with the installed Kivi application, transcribe live audio, or expose any provider credential to the browser. A Sarvam API key is optional and is never included in this repository. The Sarvam adapter was validated with a harmless synthetic end-to-end query; returned model and usage metadata are retained in the query trace. The committed 120-case report remains an offline provenance run, not a live-provider quality benchmark.
+The default setup is local and binds to loopback. A Vercel frontend cannot reach a backend bound only to `127.0.0.1`; a working public deployment therefore requires a separate HTTPS backend with persistent storage. The project does not integrate with the installed Kivi application, transcribe live audio, or expose any provider credential to the browser. A Sarvam API key is optional and is never included in this repository. The Sarvam adapter was validated with a harmless synthetic end-to-end query; returned model and usage metadata are retained in the query trace. The committed 120-case report remains an offline provenance run, not a live-provider quality benchmark.
 
-## AI use
+## Development disclosure
 
 AI assistance was used for implementation, tests, documentation, and the fictional corpus. Design decisions, source-grounding constraints, and all reported local verification were reviewed against the running code. No personal transcript or secret was included in the repository.

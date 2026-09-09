@@ -1,6 +1,6 @@
 # Transcript import format — v1 contract
 
-Status: implemented by the local backend. The reviewer can use the normal desktop **Import** screen or the CLI documented in [RUN.md](../RUN.md). The contract below remains normative.
+Status: implemented by the local backend. Use the desktop **Import** screen or the CLI documented in [RUN.md](../RUN.md). The contract below is the canonical input format.
 
 Provide UTF-8 JSONL: one JSON object per line. Each object must contain `schema_version: 1`, a nonblank string `id`, and the string fields `raw_asr` and `formatted_text`. The normative shape is in `backend/schemas/transcript.schema.json`. A schema validator must enable date-time format checking; shape validation alone does not validate timestamps.
 
@@ -28,4 +28,4 @@ Unknown top-level metadata is preserved under the source context's `extra` key a
 
 Map its stable record ID to `id`, raw transcript to `raw_asr`, and formatted transcript to `formatted_text`; add `schema_version: 1`. Preserve ordinary available timestamps and app context. Omit unavailable optional fields. Put extra capture metadata under `context` or preserve it as additional fields. Do not require hand-labeled entities, topics, preferences or answers.
 
-Use `uv run --project backend python -m kivi_memory.cli import --namespace reviewer --file <corpus.jsonl>`, then start the worker documented in [RUN.md](../RUN.md). These steps accept an unfamiliar compatible corpus without modifying application code.
+Use `uv run --project backend python -m kivi_memory.cli import --namespace sample --file <corpus.jsonl>`, then start the worker documented in [RUN.md](../RUN.md). These steps accept any compatible corpus without modifying application code.

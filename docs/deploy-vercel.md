@@ -41,4 +41,4 @@ Restart the backend after changing this value. Add any preview URL you actively 
 
 If the page reports that the server returned non-JSON content, the frontend is reaching a web page or platform 404 instead of FastAPI. Confirm that `VITE_API_BASE_URL` exists in the Vercel environment used by the deployment, contains only the backend origin, and that you redeployed after saving it. If the page reports that it cannot reach the backend, open `${VITE_API_BASE_URL}/api/readiness` directly and verify that the backend includes the Vercel site in `TRUSTED_ORIGINS`.
 
-This assignment build has no user authentication. Use fictional or sanitized records on any public deployment. Add authentication and per-user authorization before exposing personal history.
+The current build has no user authentication. Use fictional or sanitized records on any public deployment. Add authentication and per-user authorization before exposing personal history.
