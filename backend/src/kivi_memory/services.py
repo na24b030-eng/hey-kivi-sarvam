@@ -15,8 +15,6 @@ from sqlalchemy.orm import Session
 from .contracts import TranscriptRecord
 from .db import (
     Embedding,
-    EntityMention,
-    EntityRelation,
     Job,
     Memory,
     MemoryOperation,
@@ -291,11 +289,11 @@ def process_one_job(session: Session, settings: Settings | None = None) -> dict[
         # --- Pillar 4: Semantic entity/relation extraction ---
         if settings and settings.sarvam_api_key and settings.enable_semantic_extraction:
             from .semantic import (
+                detect_contradictions,
                 extract_entities_and_relations,
                 merge_entities,
                 persist_mentions,
                 persist_relations,
-                detect_contradictions,
             )
             semantic_graph = extract_entities_and_relations(settings, source.formatted_text, source.id)
             if semantic_graph:
@@ -534,7 +532,7 @@ def ask(session: Session, namespace: Namespace, question: str, mode: str, settin
         evidence = evidence[:8]
 
     # --- Pillar 4: Multi-hop graph expansion ---
-    from .retrieval import multi_hop_expand, apply_decay
+    from .retrieval import apply_decay, multi_hop_expand
     bridge_sources = multi_hop_expand(
         session, namespace.id,
         evidence, question, settings,

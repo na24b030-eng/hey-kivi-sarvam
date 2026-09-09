@@ -9,14 +9,14 @@ import json
 import re
 import uuid
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from typing import Any
 
 import httpx
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from .db import Entity, EntityAlias, EntityMention, EntityRelation, now
+from .db import Entity, EntityAlias, EntityMention, EntityRelation
 from .settings import Settings
 
 
@@ -474,6 +474,6 @@ def _try_parse_date(text: str) -> datetime | None:
             try:
                 from dateutil.parser import parse as dateparse
                 return dateparse(match.group(1)).replace(tzinfo=UTC)
-            except Exception:
-                pass
+            except (ValueError, TypeError, OverflowError):
+                continue
     return None

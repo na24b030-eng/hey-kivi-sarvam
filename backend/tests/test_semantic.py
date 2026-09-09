@@ -10,8 +10,6 @@ from kivi_memory.db import (
     Entity,
     EntityAlias,
     EntityMention,
-    EntityRelation,
-    Memory,
     Source,
 )
 from kivi_memory.retrieval import (
@@ -19,21 +17,17 @@ from kivi_memory.retrieval import (
     apply_decay,
     extract_query_entities,
     multi_hop_expand,
-    tokens,
 )
 from kivi_memory.semantic import (
     Contradiction,
-    DecayHint,
+    Coreference,
     ExtractedEntity,
     ExtractedRelation,
-    SemanticGraph,
     classify_decay,
     detect_contradictions,
     merge_entities,
-    persist_mentions,
     persist_relations,
     resolve_coreferences,
-    Coreference,
 )
 from kivi_memory.settings import Settings
 
@@ -88,7 +82,7 @@ def test_coreference_resolution_empty():
 def test_entity_deduplication(tmp_path: Path):
     """Two sources mentioning the same entity name should merge to one Entity record."""
     app = _client(tmp_path)
-    ns = app.post("/api/namespaces", json={"name": "EntityDedup"}).json()
+    app.post("/api/namespaces", json={"name": "EntityDedup"})
 
     # Need a real session for direct DB operations
     from kivi_memory.db import build_session_factory
@@ -140,7 +134,7 @@ def test_decay_classify_preference():
 
 
 def test_decay_classify_schedule():
-    dc, exp = classify_decay("fact", "schedule", "October 15")
+    dc, _ = classify_decay("fact", "schedule", "October 15")
     assert dc == "scheduled"
 
 
@@ -151,7 +145,7 @@ def test_decay_classify_regular_fact():
 
 
 def test_decay_classify_meeting():
-    dc, exp = classify_decay("fact", "is", "meeting at 3pm")
+    dc, _ = classify_decay("fact", "is", "meeting at 3pm")
     assert dc == "scheduled"
 
 
