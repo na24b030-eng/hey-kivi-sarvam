@@ -8,7 +8,7 @@ An evidence-backed semantic memory engine for spoken interactions and transcript
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB.svg?style=flat-square)](https://www.python.org/)
 [![SQLite](https://img.shields.io/badge/Database-SQLite_WAL-003B57.svg?style=flat-square)](https://www.sqlite.org/)
 
-> **Foundational Strategy:** Read the **[Product Positioning](positioning.md)** ($\le$ 100 words) and **[Product Vision](vision.md)** ($\le$ 600 words).
+> **Foundational Strategy:** Read the **[Product Positioning](positioning.md)** and **[Product Vision](vision.md)**.
 
 ---
 
