@@ -59,6 +59,8 @@ Copy `backend/.env.example` to `backend/.env` only when you need local overrides
 
 ## Deploy the frontend on Vercel
 
+Live frontend: **[hey-kivi-sarvam-dnaq.vercel.app](https://hey-kivi-sarvam-dnaq.vercel.app/)**
+
 The repository includes root-level Vercel configuration for the Vite frontend. A Vercel deployment works immediately in browser-local demo mode using `localStorage`: create a memory space, import JSONL, ask source-backed questions, inspect evidence, correct memories, suppress memories, and delete sources. For the full FastAPI/Sarvam workflow, set `VITE_API_BASE_URL` to the HTTPS origin of a separately running backend and add the final Vercel origin to that backend's `TRUSTED_ORIGINS`. Follow the complete [Vercel deployment guide](docs/deploy-vercel.md).
 
 ## Scope and limitations
