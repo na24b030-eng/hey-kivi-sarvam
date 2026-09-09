@@ -10,16 +10,185 @@ type Evidence = { id: string; external_id: string; text: string; occurred_at?: s
 type Answer = { status: string; answer: string; draft_text?: string; evidence: Evidence[]; uncertainties: string[] }
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '')
+const DEMO_STORE_KEY = 'kivi-memory-workbench:v1'
+
+type DemoStore = {
+  namespaces: Namespace[]
+  sources: SourceDetail[]
+  memories: (Memory & { source_id?: string })[]
+}
+
+function loadDemoStore(): DemoStore {
+  const stored = window.localStorage.getItem(DEMO_STORE_KEY)
+  if (stored) return JSON.parse(stored) as DemoStore
+  const initial: DemoStore = {
+    namespaces: [],
+    sources: [],
+    memories: [],
+  }
+  saveDemoStore(initial)
+  return initial
+}
+
+function saveDemoStore(store: DemoStore) {
+  window.localStorage.setItem(DEMO_STORE_KEY, JSON.stringify(store))
+}
+
+function words(value: string) {
+  return new Set(value.toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu) || [])
+}
+
+function bestSources(store: DemoStore, namespaceId: string, question: string) {
+  const query = words(question)
+  return store.sources
+    .filter(source => source.eligible && source.processing_status === 'ready' && source.id.startsWith(`${namespaceId}:`))
+    .map(source => {
+      const haystack = words(`${source.formatted_text} ${source.raw_asr}`)
+      let score = 0
+      query.forEach(term => { if (haystack.has(term)) score += 1 })
+      return { source, score }
+    })
+    .sort((a, b) => b.score - a.score || (b.source.occurred_at || '').localeCompare(a.source.occurred_at || ''))
+    .filter(item => item.score > 0)
+    .slice(0, 3)
+    .map(item => item.source)
+}
+
+function deriveMemories(namespaceId: string, source: SourceDetail): (Memory & { source_id: string })[] {
+  const text = source.formatted_text || source.raw_asr
+  const snippets = text.split(/[.!?]\s+/).map(item => item.trim()).filter(Boolean).slice(0, 2)
+  return snippets.map((value, index) => ({
+    id: `${source.id}:mem:${index}`,
+    kind: index === 0 ? 'fact' : 'preference',
+    subject: 'user',
+    predicate: index === 0 ? 'mentioned' : 'may prefer',
+    value,
+    scope: 'workspace',
+    state: 'active',
+    source_id: source.id,
+  }))
+}
+
+async function demoApi<T>(path: string, options?: RequestInit): Promise<T> {
+  const store = loadDemoStore()
+  const method = options?.method || 'GET'
+  const payload = options?.body ? JSON.parse(String(options.body)) : {}
+  const namespaceMatch = path.match(/^\/api\/namespaces\/([^/]+)/)
+  const namespaceId = namespaceMatch?.[1]
+
+  if (path === '/api/namespaces' && method === 'GET') return store.namespaces as T
+  if (path === '/api/namespaces' && method === 'POST') {
+    const item = { id: `ns_${crypto.randomUUID()}`, name: payload.name || 'My memory', revision: 1 }
+    store.namespaces.push(item)
+    saveDemoStore(store)
+    return item as T
+  }
+  if (namespaceId && path.endsWith('/sources') && method === 'GET') {
+    return store.sources.filter(source => source.id.startsWith(`${namespaceId}:`)) as T
+  }
+  if (namespaceId && path.endsWith('/memories') && method === 'GET') {
+    return store.memories.filter(memory => memory.id.startsWith(`${namespaceId}:`)) as T
+  }
+  if (namespaceId && path.endsWith('/imports/validate') && method === 'POST') {
+    const lines = String(payload.jsonl || '').split(/\r?\n/).filter((line: string) => line.trim())
+    const errors: { line: number; message: string }[] = []
+    lines.forEach((line: string, index: number) => {
+      try {
+        const record = JSON.parse(line)
+        if (!record.id || !(record.raw_asr || record.formatted_text)) errors.push({ line: index + 1, message: 'Record needs id and transcript text.' })
+      } catch {
+        errors.push({ line: index + 1, message: 'Line is not valid JSON.' })
+      }
+    })
+    return { valid_count: lines.length - errors.length, invalid_count: errors.length, errors } as T
+  }
+  if (namespaceId && path.endsWith('/imports') && method === 'POST') {
+    const lines = String(payload.jsonl || '').split(/\r?\n/).filter((line: string) => line.trim())
+    let accepted = 0
+    lines.forEach((line: string) => {
+      const record = JSON.parse(line)
+      const source: SourceDetail = {
+        id: `${namespaceId}:src:${record.id}`,
+        external_id: record.id,
+        raw_asr: record.raw_asr || '',
+        formatted_text: record.formatted_text || record.raw_asr || '',
+        occurred_at: record.occurred_at,
+        app: record.app,
+        processing_status: 'ready',
+        eligible: true,
+        source_version: 1,
+        chunks: [{ id: `${namespaceId}:chunk:${record.id}`, view: 'formatted', text: record.formatted_text || record.raw_asr || '' }],
+        memories: [],
+      }
+      const derivedMemories = deriveMemories(namespaceId, source)
+      source.memories = derivedMemories
+      store.sources = store.sources.filter(item => item.id !== source.id).concat(source)
+      store.memories = store.memories.filter(item => item.source_id !== source.id).concat(derivedMemories)
+      accepted += 1
+    })
+    saveDemoStore(store)
+    return { accepted, conflicts: 0 } as T
+  }
+  if (path === '/api/worker/drain' && method === 'POST') return { state: 'idle', processed: 0 } as T
+  if (namespaceId && path.endsWith('/ask') && method === 'POST') {
+    const evidence = bestSources(store, namespaceId, payload.question || '')
+    if (!evidence.length) {
+      return { status: 'insufficient_evidence', answer: 'I could not find enough matching source evidence in this workspace.', evidence: [], uncertainties: ['Import a relevant transcript or ask about something already in history.'] } as T
+    }
+    const cited = evidence.map((source, index) => `${index + 1}. ${source.formatted_text || source.raw_asr}`).join('\n')
+    const draft = `Here is a grounded update based on the available transcript history:\n\n${cited}`
+    return {
+      status: 'answered_from_local_history',
+      answer: payload.mode === 'draft' ? '' : `Based on the matching transcript history, the strongest evidence is:\n\n${cited}`,
+      draft_text: payload.mode === 'draft' ? draft : undefined,
+      evidence: evidence.map(source => ({ id: source.id, external_id: source.external_id, text: source.formatted_text || source.raw_asr, occurred_at: source.occurred_at })),
+      uncertainties: [],
+    } as T
+  }
+  if (namespaceId && path.includes('/sources/') && method === 'GET') {
+    const sourceId = decodeURIComponent(path.split('/sources/')[1])
+    const source = store.sources.find(item => item.id === sourceId)
+    if (!source) throw new Error('Source was not found.')
+    return source as T
+  }
+  if (namespaceId && path.includes('/memories/') && path.endsWith('/suppressions') && method === 'POST') {
+    const memoryId = decodeURIComponent(path.split('/memories/')[1].split('/')[0])
+    const memory = store.memories.find(item => item.id === memoryId)
+    if (memory) memory.state = 'suppressed'
+    const namespace = store.namespaces.find(item => item.id === namespaceId)
+    if (namespace) namespace.revision += 1
+    saveDemoStore(store)
+    return { id: memoryId, state: 'suppressed', revision: namespace?.revision || 1 } as T
+  }
+  if (namespaceId && path.includes('/memories/') && path.endsWith('/corrections') && method === 'POST') {
+    const memoryId = decodeURIComponent(path.split('/memories/')[1].split('/')[0])
+    const memory = store.memories.find(item => item.id === memoryId)
+    if (memory) memory.value = payload.value
+    const namespace = store.namespaces.find(item => item.id === namespaceId)
+    if (namespace) namespace.revision += 1
+    saveDemoStore(store)
+    return { id: memoryId, state: 'active', revision: namespace?.revision || 1 } as T
+  }
+  if (namespaceId && path.includes('/sources/') && method === 'DELETE') {
+    const sourceId = decodeURIComponent(path.split('/sources/')[1].split('?')[0])
+    store.sources = store.sources.filter(item => item.id !== sourceId)
+    store.memories = store.memories.filter(item => item.source_id !== sourceId)
+    const namespace = store.namespaces.find(item => item.id === namespaceId)
+    if (namespace) namespace.revision += 1
+    saveDemoStore(store)
+    return { deleted: sourceId, revision: namespace?.revision || 1 } as T
+  }
+  throw new Error('This action needs the FastAPI backend. Set VITE_API_BASE_URL for the full server workflow.')
+}
 
 async function api<T>(path: string, options?: RequestInit): Promise<T> {
-  if (!API_BASE_URL && window.location.hostname.endsWith('.vercel.app')) {
-    throw new Error('Backend connection is not configured. Add VITE_API_BASE_URL in Vercel and redeploy this project.')
-  }
+  if (!API_BASE_URL && window.location.hostname.endsWith('.vercel.app')) return demoApi<T>(path, options)
   const endpoint = `${API_BASE_URL}${path}`
   let response: Response
   try {
     response = await fetch(endpoint, { headers: { 'Content-Type': 'application/json', ...(options?.headers || {}) }, ...options })
   } catch {
+    if (!API_BASE_URL && !['127.0.0.1', 'localhost'].includes(window.location.hostname)) return demoApi<T>(path, options)
     throw new Error(`Cannot reach the Kivi backend at ${API_BASE_URL || 'same-origin /api'}. Check VITE_API_BASE_URL, HTTPS availability, and backend TRUSTED_ORIGINS.`)
   }
   const responseText = await response.text()
@@ -27,6 +196,7 @@ async function api<T>(path: string, options?: RequestInit): Promise<T> {
   try {
     body = responseText ? JSON.parse(responseText) as Record<string, unknown> : {}
   } catch {
+    if (!API_BASE_URL && /<!doctype|<html/i.test(responseText)) return demoApi<T>(path, options)
     throw new Error(`The server at ${response.url || endpoint} returned non-JSON content. Set VITE_API_BASE_URL to the FastAPI origin, without /api.`)
   }
   if (!response.ok) {
@@ -63,16 +233,16 @@ function App() {
   const correct = async (memory: Memory) => { if (!namespace) return; const value = window.prompt('What should Kivi remember instead?', memory.value); if (!value?.trim()) return; setBusy(true); try { await api(`/api/namespaces/${namespace.id}/memories/${memory.id}/corrections`, { method: 'POST', body: JSON.stringify({ value, expected_revision: namespace.revision, operation_id: `ui-${crypto.randomUUID()}` }) }); await refreshData(); setNotice('Memory corrected. Future answers use the new value.') } catch (error) { setNotice((error as Error).message) } finally { setBusy(false) } }
   const deleteSource = async (source: Source) => { if (!namespace || !window.confirm(`Delete ${source.external_id}? Kivi will no longer be able to use its text.`)) return; setBusy(true); try { await api(`/api/namespaces/${namespace.id}/sources/${source.id}?expected_revision=${namespace.revision}&operation_id=ui-${crypto.randomUUID()}`, { method: 'DELETE' }); await refreshData(); setNotice('Source deleted and removed from future answers.') } catch (error) { setNotice((error as Error).message) } finally { setBusy(false) } }
   const inspect = async (source: Pick<Source, 'id'>) => { if (!namespace) return; setBusy(true); try { setSelected(await api<SourceDetail>(`/api/namespaces/${namespace.id}/sources/${source.id}`)) } catch (error) { setNotice((error as Error).message) } finally { setBusy(false) } }
-  if (!namespace) return <main className="welcome"><div className="welcome-mark">kivi<span>MEMORY</span></div><p className="eyebrow">YOUR PRIVATE WORKSPACE</p><h1>Give Kivi a memory.</h1><p>Bring in your transcript history, recover the context behind an idea, and keep every answer connected to what you actually said.</p><button onClick={createSpace} disabled={busy}>{busy ? 'Creating workspace…' : 'Create a memory space'}</button><small>Local by default. You stay in control of every source and memory.</small>{notice && <p className="notice">{notice}</p>}</main>
+  if (!namespace) return <main className="welcome"><div className="welcome-mark">kivi<span>MEMORY</span></div><p className="eyebrow">PRIVATE TRANSCRIPT MEMORY</p><h1>Give Kivi a memory.</h1><p>Import transcript history, recover the context behind an idea, and keep every answer connected to the exact source that supported it.</p><button onClick={createSpace} disabled={busy}>{busy ? 'Creating workspace...' : 'Create a memory space'}</button><small>{API_BASE_URL ? 'Connected to the FastAPI memory backend.' : 'Vercel demo mode stores this workspace in your browser. Connect VITE_API_BASE_URL for the full backend workflow.'}</small>{notice && <p className="notice">{notice}</p>}</main>
   const readySources = sources.filter(source => source.eligible && source.processing_status === 'ready').length
   const activeMemories = memories.filter(memory => memory.state === 'active').length
-  return <div className="app"><aside><div className="brand">kivi <small>MEMORY</small></div><p className="namespace">{namespace.name}</p><nav>{([['ask', 'Hey Kivi'], ['history', 'History'], ['memory', 'Memory'], ['import', 'Import']] as const).map(([id, label]) => <button key={id} className={view === id ? 'active' : ''} onClick={() => { setView(id); setSelected(null) }}>{label}</button>)}</nav><div className="workspace-health"><span className="health-dot" />Memory ready<div>{readySources} sources · {activeMemories} active memories</div></div><div className="space-controls"><label>WORKSPACE<select value={namespace.id} onChange={event => setNamespace(namespaces.find(item => item.id === event.target.value) || null)}>{namespaces.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label><button className="quiet" onClick={createSpace}>+ New space</button></div></aside><main className="content">{notice && <div className="notice">{notice}</div>}{view === 'ask' && <Ask question={question} setQuestion={setQuestion} answer={answer} busy={busy} submit={submitAsk} sourceCount={readySources} memoryCount={activeMemories} inspect={inspect} />}{view === 'history' && <History sources={sources} busy={busy} deleteSource={deleteSource} inspect={inspect} />}{view === 'memory' && <MemoryList memories={memories} busy={busy} suppress={suppress} correct={correct} />}{view === 'import' && <Import jsonl={jsonl} setJsonl={setJsonl} busy={busy} submit={importData} />}</main>{selected && <SourceInspector source={selected} onClose={() => setSelected(null)} />}</div>
+  return <div className="app"><aside><div className="brand">kivi <small>MEMORY</small></div><p className="namespace">{namespace.name}</p><nav>{([['ask', 'Hey Kivi'], ['history', 'History'], ['memory', 'Memory'], ['import', 'Import']] as const).map(([id, label]) => <button key={id} className={view === id ? 'active' : ''} onClick={() => { setView(id); setSelected(null) }}>{label}</button>)}</nav><div className="workspace-health"><span className="health-dot" />{API_BASE_URL ? 'Backend connected' : 'Browser workspace'}<div>{readySources} sources · {activeMemories} active memories</div></div><div className="space-controls"><label>WORKSPACE<select value={namespace.id} onChange={event => setNamespace(namespaces.find(item => item.id === event.target.value) || null)}>{namespaces.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label><button className="quiet" onClick={createSpace}>+ New space</button></div></aside><main className="content">{notice && <div className="notice">{notice}</div>}{view === 'ask' && <Ask question={question} setQuestion={setQuestion} answer={answer} busy={busy} submit={submitAsk} sourceCount={readySources} memoryCount={activeMemories} inspect={inspect} />}{view === 'history' && <History sources={sources} busy={busy} deleteSource={deleteSource} inspect={inspect} />}{view === 'memory' && <MemoryList memories={memories} busy={busy} suppress={suppress} correct={correct} />}{view === 'import' && <Import jsonl={jsonl} setJsonl={setJsonl} busy={busy} submit={importData} />}</main>{selected && <SourceInspector source={selected} onClose={() => setSelected(null)} />}</div>
 }
 
-function Ask({ question, setQuestion, answer, busy, submit, sourceCount, memoryCount, inspect }: { question: string; setQuestion: (value: string) => void; answer: Answer | null; busy: boolean; submit: (event: FormEvent, mode?: 'answer' | 'draft') => void; sourceCount: number; memoryCount: number; inspect: (source: Pick<Source, 'id'>) => void }) { return <><header><p className="eyebrow">INTENTIONAL MEMORY</p><h1>Pick up where<br />you left off.</h1><p>Find something you said. See what changed. Prepare your next response with the record beside you.</p></header><form className="askbox" onSubmit={event => submit(event)}><textarea value={question} onChange={event => setQuestion(event.target.value)} placeholder="Ask about something you dictated…" /><div><small>Your history stays within this workspace.</small><span><button type="submit" disabled={busy}>{busy ? 'Looking…' : 'Ask Kivi'}</button><button type="button" className="secondary" disabled={busy} onClick={event => submit(event, 'draft')}>Draft an update</button></span></div></form>{!answer && <><section className="starter"><p className="eyebrow">A PLACE TO START</p><button onClick={() => setQuestion('What changed in the latest project update?')}>What changed about the launch?</button><button onClick={() => setQuestion('What preferences have I mentioned?')}>What preferences have I mentioned?</button></section><section className="memory-stats"><article><strong>{sourceCount}</strong><span>searchable sources</span></article><article><strong>{memoryCount}</strong><span>active memory candidates</span></article><article><strong>1 click</strong><span>back to the source</span></article></section></>}{answer && <section className="answer"><p className="eyebrow">{answer.status.replace('_', ' ')}</p><h2>{answer.draft_text ? 'Draft an update' : 'A useful answer, with a path back to what you said.'}</h2><p className="answer-text">{answer.draft_text || answer.answer}</p>{answer.evidence.length > 0 && <><h3>Sources behind this answer</h3><div className="sources">{answer.evidence.map((source, index) => <button type="button" className="source-evidence" disabled={busy} onClick={() => inspect(source)} key={source.id}><strong>{index + 1} · {source.external_id}</strong><p>{source.text}</p><small>Inspect source →</small></button>)}</div></>}{answer.uncertainties.map(item => <p className="uncertainty" key={item}>{item}</p>)}</section>}</> }
+function Ask({ question, setQuestion, answer, busy, submit, sourceCount, memoryCount, inspect }: { question: string; setQuestion: (value: string) => void; answer: Answer | null; busy: boolean; submit: (event: FormEvent, mode?: 'answer' | 'draft') => void; sourceCount: number; memoryCount: number; inspect: (source: Pick<Source, 'id'>) => void }) { return <><header><p className="eyebrow">INTENTIONAL MEMORY</p><h1>Pick up where<br />you left off.</h1><p>Find something you said. See what changed. Prepare the next response with the record beside you.</p></header><form className="askbox" onSubmit={event => submit(event)}><textarea value={question} onChange={event => setQuestion(event.target.value)} placeholder="Ask about something you dictated..." /><div><small>Your history stays within this workspace.</small><span><button type="submit" disabled={busy}>{busy ? 'Looking...' : 'Ask Kivi'}</button><button type="button" className="secondary" disabled={busy} onClick={event => submit(event, 'draft')}>Draft an update</button></span></div></form>{!answer && <><section className="starter"><p className="eyebrow">A PLACE TO START</p><button onClick={() => setQuestion('What changed in the latest project update?')}>What changed about the launch?</button><button onClick={() => setQuestion('What preferences have I mentioned?')}>What preferences have I mentioned?</button></section><section className="memory-stats"><article><strong>{sourceCount}</strong><span>searchable sources</span></article><article><strong>{memoryCount}</strong><span>active memory candidates</span></article><article><strong>1 click</strong><span>back to the source</span></article></section></>}{answer && <section className="answer"><p className="eyebrow">{answer.status.replaceAll('_', ' ')}</p><h2>{answer.draft_text ? 'Draft an update' : 'A useful answer, with a path back to what you said.'}</h2><p className="answer-text">{answer.draft_text || answer.answer}</p>{answer.evidence.length > 0 && <><h3>Sources behind this answer</h3><div className="sources">{answer.evidence.map((source, index) => <button type="button" className="source-evidence" disabled={busy} onClick={() => inspect(source)} key={source.id}><strong>{index + 1} · {source.external_id}</strong><p>{source.text}</p><small>Inspect source</small></button>)}</div></>}{answer.uncertainties.map(item => <p className="uncertainty" key={item}>{item}</p>)}</section>}</> }
 function History({ sources, deleteSource, inspect, busy }: { sources: Source[]; deleteSource: (source: Source) => void; inspect: (source: Source) => void; busy: boolean }) { return <><header><p className="eyebrow">HISTORY</p><h1>What Kivi can look back on.</h1><p>Each entry keeps the raw dictation and its cleaned transcript together.</p></header>{sources.length ? <div className="cards">{sources.map(source => { const visibleStatus = source.eligible ? source.processing_status : 'replaced'; return <article className="card" key={source.id}><div><strong>{source.external_id} · v{source.source_version}</strong><span className={`status ${visibleStatus}`}>{visibleStatus}</span></div><p>{source.formatted_text || source.raw_asr || 'Empty transcript record'}</p><small>{source.occurred_at ? new Date(source.occurred_at).toLocaleString() : 'Time unknown'}{source.app ? ` · ${source.app}` : ''}</small><footer><button className="quiet" disabled={busy} onClick={() => inspect(source)}>Inspect source</button><button className="quiet danger" disabled={busy} onClick={() => deleteSource(source)}>Delete</button></footer></article> })}</div> : <Empty text="Import a transcript history to see it here." />}</> }
 function MemoryList({ memories, suppress, correct, busy }: { memories: Memory[]; suppress: (memory: Memory) => void; correct: (memory: Memory) => void; busy: boolean }) { return <><header><p className="eyebrow">SCOPED MEMORY</p><h1>Facts and preferences Kivi learned.</h1><p>Each item remains tied to the source that supported it.</p></header>{memories.length ? <div className="cards">{memories.map(memory => <article className="card" key={memory.id}><div><strong>{memory.kind}</strong><span className={`status ${memory.state}`}>{memory.state}</span></div><p>{memory.subject} · {memory.predicate} · <b>{memory.value}</b></p><small>Scope: {memory.scope}</small>{memory.state === 'active' && <footer><button className="quiet" disabled={busy} onClick={() => correct(memory)}>Correct</button><button className="quiet danger" disabled={busy} onClick={() => suppress(memory)}>Stop using</button></footer>}</article>)}</div> : <Empty text="Kivi has not promoted any conservative memory candidates yet. Sources are still searchable." />}</> }
-function Import({ jsonl, setJsonl, busy, submit }: { jsonl: string; setJsonl: (value: string) => void; busy: boolean; submit: (event: FormEvent) => void }) { return <><header><p className="eyebrow">IMPORT</p><h1>Bring in a transcript history.</h1><p>Paste UTF-8 JSONL using the documented v1 record format. Source text is retained exactly.</p></header><form className="import" onSubmit={submit}><textarea value={jsonl} onChange={event => setJsonl(event.target.value)} placeholder={'{"schema_version":1,"id":"note-001","raw_asr":"lantern launch monday","formatted_text":"Lantern launches Monday."}'} /><button disabled={busy}>{busy ? 'Importing…' : 'Validate, import, and process'}</button></form></> }
+function Import({ jsonl, setJsonl, busy, submit }: { jsonl: string; setJsonl: (value: string) => void; busy: boolean; submit: (event: FormEvent) => void }) { return <><header><p className="eyebrow">IMPORT</p><h1>Bring in a transcript history.</h1><p>Paste UTF-8 JSONL using the documented v1 record format. Source text is retained exactly.</p></header><form className="import" onSubmit={submit}><textarea value={jsonl} onChange={event => setJsonl(event.target.value)} placeholder={'{"schema_version":1,"id":"note-001","raw_asr":"lantern launch monday","formatted_text":"Lantern launches Monday."}'} /><button disabled={busy}>{busy ? 'Importing...' : 'Validate, import, and process'}</button></form></> }
 function Empty({ text }: { text: string }) { return <div className="empty">{text}</div> }
 function SourceInspector({ source, onClose }: { source: SourceDetail; onClose: () => void }) { return <aside className="inspector" aria-label="Source inspector"><button className="close" onClick={onClose}>×</button><p className="eyebrow">SOURCE INSPECTOR</p><h2>{source.external_id}</h2><p className="source-meta">{source.occurred_at ? new Date(source.occurred_at).toLocaleString() : 'Time unknown'}{source.app ? ` · ${source.app}` : ''}</p><h3>Formatted transcript</h3><p>{source.formatted_text || 'No formatted transcript supplied.'}</p><h3>Raw dictation</h3><p>{source.raw_asr || 'No raw ASR supplied.'}</p><h3>Indexed passages</h3>{source.chunks.length ? source.chunks.map(chunk => <p className="chunk" key={chunk.id}>{chunk.text}</p>) : <p>No passages indexed yet.</p>}<h3>Memories derived here</h3>{source.memories.length ? source.memories.map(memory => <p className="chunk" key={memory.id}>{memory.subject} · {memory.predicate} · {memory.value} <em>{memory.state}</em></p>) : <p>No conservative memory candidates were promoted.</p>}</aside> }
 

@@ -78,7 +78,7 @@ The memory database defaults to `%LOCALAPPDATA%\KiviMemoryWorkbench\memory.sqlit
 
 Do not put a Sarvam key in the frontend; use the ignored `backend/.env` only when enabling the server-side adapter.
 
-For a hosted static frontend, use the committed Vercel configuration and set `VITE_API_BASE_URL` to a separately hosted HTTPS backend. Add the deployed frontend's exact origin to that backend's `TRUSTED_ORIGINS`. Vercel does not replace the persistent FastAPI/SQLite/worker runtime; see [docs/deploy-vercel.md](docs/deploy-vercel.md).
+For a hosted static frontend, use the committed Vercel configuration. Without `VITE_API_BASE_URL`, the deployed site runs browser-local demo mode with `localStorage`. To connect the full FastAPI/SQLite/worker/Sarvam path, set `VITE_API_BASE_URL` to a separately hosted HTTPS backend and add the deployed frontend's exact origin to that backend's `TRUSTED_ORIGINS`; see [docs/deploy-vercel.md](docs/deploy-vercel.md).
 
 Reset only the named namespace after stopping the API and worker:
 
