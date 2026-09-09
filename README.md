@@ -67,6 +67,3 @@ The repository includes root-level Vercel configuration for the Vite frontend. A
 
 The default backend setup is local and binds to loopback. A Vercel frontend cannot reach a backend bound only to `127.0.0.1`, so browser-local mode is provided for static review and public demos. A full shared deployment still needs a separate HTTPS backend with persistent storage. The project does not integrate with the installed Kivi application, transcribe live audio, or expose any provider credential to the browser. A Sarvam API key is optional and is never included in this repository. The Sarvam adapter was validated with a harmless synthetic end-to-end query; returned model and usage metadata are retained in the query trace. The committed 120-case report remains an offline provenance run, not a live-provider quality benchmark.
 
-## Development disclosure
-
-AI assistance was used for implementation, tests, documentation, and the fictional corpus. Design decisions, source-grounding constraints, and all reported local verification were reviewed against the running code. No personal transcript or secret was included in the repository.
