@@ -57,19 +57,16 @@ See [RUN.md](RUN.md) for the exact fresh local setup, migration, seed, processin
 
 Copy `backend/.env.example` to `backend/.env` only when you need local overrides. The real `.env`, databases, model cache, build output, and private working notes are ignored. GitHub Actions runs the offline backend tests and lint plus frontend type-check/build on every push and pull request.
 
-## Deploy the frontend on Vercel
+## Live deployment (Vercel + Render)
 
-Live frontend: **[hey-kivi-sarvam-dnaq.vercel.app](https://hey-kivi-sarvam-dnaq.vercel.app/)**
+- **Live frontend (Vercel)**: **[hey-kivi-sarvam-dnaq.vercel.app](https://hey-kivi-sarvam-dnaq.vercel.app/)**
+- **Live backend (Render)**: **[hey-kivi-sarvam.onrender.com](https://hey-kivi-sarvam.onrender.com/)**
 
-The repository includes root-level Vercel configuration for the Vite frontend. A Vercel deployment works immediately in browser-local demo mode using `localStorage`: create a memory space, import JSONL, ask source-backed questions, inspect evidence, correct memories, suppress memories, and delete sources. For the full FastAPI/Sarvam workflow, set `VITE_API_BASE_URL` to the HTTPS origin of a separately running backend and add the final Vercel origin to that backend's `TRUSTED_ORIGINS`. Follow the complete [Vercel deployment guide](docs/deploy-vercel.md).
+The live frontend on Vercel is connected directly to the persistent FastAPI backend on Render via `VITE_API_BASE_URL=https://hey-kivi-sarvam.onrender.com`. The backend natively allows cross-origin requests from the Vercel app via configured `TRUSTED_ORIGINS`.
 
-## Deploy the backend on Render
-
-The repository includes a native Python Render blueprint (`render.yaml`) for deploying the FastAPI backend as a free web service:
-- Run migrations and serve on Render using native Python 3.
-- Set `TRUSTED_ORIGINS` to your Vercel URL (e.g. `https://hey-kivi-sarvam-dnaq.vercel.app`).
-- Set `VITE_API_BASE_URL` in Vercel to your Render service URL to connect the two.
-- Follow the complete [Render deployment guide](docs/deploy-render.md).
+For deployment details:
+- [Vercel deployment guide](docs/deploy-vercel.md)
+- [Render deployment guide](docs/deploy-render.md)
 
 ## Scope and limitations
 

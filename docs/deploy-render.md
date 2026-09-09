@@ -4,10 +4,18 @@ This guide provides step-by-step instructions to deploy the **FastAPI backend** 
 
 ```mermaid
 flowchart LR
-    User[User Browser] -->|HTTPS| Vercel["Vercel Frontend\n(Already Deployed)"]
-    Vercel -->|API Requests with VITE_API_BASE_URL| Render["Render Web Service\n(FastAPI / SQLite / E5 / Sarvam)"]
+    User[User Browser] -->|HTTPS| Vercel["Vercel Frontend\nhttps://hey-kivi-sarvam-dnaq.vercel.app"]
+    Vercel -->|API Requests with VITE_API_BASE_URL| Render["Render Web Service\nhttps://hey-kivi-sarvam.onrender.com"]
     Render -->|CORS Allowed via TRUSTED_ORIGINS| Vercel
 ```
+
+## Active Live Deployment
+
+The system is live and verified across both platforms:
+- **Live Frontend**: [https://hey-kivi-sarvam-dnaq.vercel.app](https://hey-kivi-sarvam-dnaq.vercel.app)
+- **Live Backend**: [https://hey-kivi-sarvam.onrender.com](https://hey-kivi-sarvam.onrender.com)
+- **Backend Health Check**: [https://hey-kivi-sarvam.onrender.com/api/health](https://hey-kivi-sarvam.onrender.com/api/health)
+- **Backend Readiness**: [https://hey-kivi-sarvam.onrender.com/api/readiness](https://hey-kivi-sarvam.onrender.com/api/readiness)
 
 ---
 
