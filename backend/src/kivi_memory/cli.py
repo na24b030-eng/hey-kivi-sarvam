@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import subprocess
 import sys
 import time
+import uuid
 from pathlib import Path
 
 import uvicorn
@@ -58,20 +60,25 @@ def command_import(settings: Settings, namespace_name: str, file_path: Path) -> 
         namespace = ensure_namespace(session, namespace_name)
         result = import_records(session, namespace, raw, settings.max_record_bytes, False)
     print(json.dumps(result, indent=2))
+    if result.get("invalid") or result.get("accepted", 0) == 0:
+        return 1
     return 0
 
 
 def command_worker(settings: Settings, once: bool, drain: bool) -> int:
     factory, _ = build_session_factory(settings)
+    failed_any = False
     while True:
         with factory() as session:
             result = process_one_job(session, settings)
         if result:
             print(json.dumps(result))
+            if result.get("state") == "failed":
+                failed_any = True
         if once:
-            return 0
+            return 1 if (result and result.get("state") == "failed") else 0
         if drain and not result:
-            return 0
+            return 1 if failed_any else 0
         if drain:
             continue
         time.sleep(1 if result else 2)
@@ -144,12 +151,52 @@ def command_reset(settings: Settings, namespace_name: str) -> int:
     return 0
 
 
-def command_evaluate(settings: Settings, namespace_name: str, suite: Path, output: Path) -> int:
+def command_evaluate(settings: Settings, namespace_name: str, suite: Path, output: Path, offline: bool = False) -> int:
+    if offline:
+        settings = settings.model_copy(update={"sarvam_api_key": None})
     factory, _ = build_session_factory(settings)
     with factory() as session:
         namespace = ensure_namespace(session, namespace_name)
         report = run_suite(session, namespace, suite, output, settings)
     print(json.dumps({key: report[key] for key in ("case_count", "passed", "evidence_accuracy")}, indent=2))
+    if report.get("passed", 0) < report.get("case_count", 0):
+        return 1
+    return 0
+
+
+def command_backfill_embeddings(settings: Settings, namespace_name: str | None = None) -> int:
+    from .embeddings import encode_passage, model_is_cached
+    if not model_is_cached(settings):
+        print(json.dumps({"error": "embedding_model_not_cached", "model": settings.embedding_model}))
+        return 1
+    factory, _ = build_session_factory(settings)
+    backfilled = 0
+    with factory() as session:
+        q = (
+            select(SourceChunk)
+            .outerjoin(Embedding, SourceChunk.id == Embedding.source_chunk_id)
+            .where(Embedding.id.is_(None))
+        )
+        if namespace_name:
+            q = q.join(Source, SourceChunk.source_id == Source.id).where(Source.namespace_id == namespace_name)
+        chunks = session.scalars(q).all()
+        for chunk in chunks:
+            encoded = encode_passage(settings, chunk.text)
+            if encoded:
+                vector, dimensions = encoded
+                session.add(
+                    Embedding(
+                        id=f"emb_{uuid.uuid4().hex}",
+                        source_chunk_id=chunk.id,
+                        model=settings.embedding_model,
+                        dimensions=dimensions,
+                        vector=vector,
+                        content_hash=hashlib.sha256(chunk.text.encode()).hexdigest(),
+                    )
+                )
+                backfilled += 1
+        session.commit()
+    print(json.dumps({"backfilled_embeddings": backfilled}))
     return 0
 
 
@@ -166,7 +213,8 @@ def main() -> int:
     seed = sub.add_parser("seed"); seed.add_argument("--namespace", default="demo")
     inspect = sub.add_parser("inspect"); inspect.add_argument("--namespace", required=True)
     reset = sub.add_parser("reset"); reset.add_argument("--namespace", required=True)
-    evaluate = sub.add_parser("evaluate"); evaluate.add_argument("--namespace", required=True); evaluate.add_argument("--suite", type=Path, required=True); evaluate.add_argument("--output", type=Path, required=True)
+    evaluate = sub.add_parser("evaluate"); evaluate.add_argument("--namespace", required=True); evaluate.add_argument("--suite", type=Path, required=True); evaluate.add_argument("--output", type=Path, required=True); evaluate.add_argument("--offline", action="store_true")
+    backfill = sub.add_parser("backfill-embeddings"); backfill.add_argument("--namespace", default=None)
     args = parser.parse_args()
     settings = Settings()
     if args.command == "doctor": return command_doctor(settings, args.download_embedding)
@@ -179,7 +227,8 @@ def main() -> int:
     if args.command == "seed": return command_seed(settings, args.namespace)
     if args.command == "inspect": return command_inspect(settings, args.namespace)
     if args.command == "reset": return command_reset(settings, args.namespace)
-    if args.command == "evaluate": return command_evaluate(settings, args.namespace, args.suite, args.output)
+    if args.command == "evaluate": return command_evaluate(settings, args.namespace, args.suite, args.output, args.offline)
+    if args.command == "backfill-embeddings": return command_backfill_embeddings(settings, args.namespace)
     return 1
 
 

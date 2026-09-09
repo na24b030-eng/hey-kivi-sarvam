@@ -36,7 +36,7 @@ uv run --project backend ruff check backend/src backend/tests
 After seeding and processing the demo namespace, run the reproducible 120-case status suite:
 
 ```powershell
-uv run --project backend python -m kivi_memory.cli evaluate --namespace demo --suite eval/cases.jsonl --output eval/results/demo-report.json
+uv run --project backend python -m kivi_memory.cli evaluate --namespace demo --suite eval/cases.jsonl --output eval/results/demo-report.json --offline
 ```
 
 Verify that the persisted E5 path can retrieve Hindi evidence from an English query without lexical overlap:

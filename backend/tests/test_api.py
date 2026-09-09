@@ -234,3 +234,97 @@ def test_spa_static_files_cannot_escape_the_frontend_directory(tmp_path: Path):
     assert missing_api.status_code == 404
     assert missing_api.headers["content-type"].startswith("application/json")
     assert missing_api.json()["code"] == "missing_api_route"
+
+
+def test_multiple_facts_extracted_from_single_source(tmp_path: Path):
+    app = client(tmp_path)
+    ns = app.post("/api/namespaces", json={"name": "MultiFacts"}).json()
+    record = json.dumps({
+        "schema_version": 1,
+        "id": "multi-source",
+        "raw_asr": "lantern launch monday we prefer email updates",
+        "formatted_text": "Lantern launches Monday. We prefer email updates.",
+    })
+    app.post(f"/api/namespaces/{ns['id']}/imports", json={"jsonl": record})
+    app.post("/api/worker/drain")
+
+    memories = app.get(f"/api/namespaces/{ns['id']}/memories").json()
+    assert len(memories) == 2
+    kinds = {m["kind"] for m in memories}
+    assert "fact" in kinds
+    assert "preference" in kinds
+
+
+def test_drain_reports_failure_count(tmp_path: Path):
+    app = client(tmp_path)
+    ns = app.post("/api/namespaces", json={"name": "DrainFailures"}).json()
+    record = json.dumps({
+        "schema_version": 1,
+        "id": "drain-test",
+        "raw_asr": "test drain",
+        "formatted_text": "Test drain.",
+    })
+    app.post(f"/api/namespaces/{ns['id']}/imports", json={"jsonl": record})
+    res = app.post("/api/worker/drain").json()
+    assert res["state"] == "idle"
+    assert res["processed"] == 1
+    assert res["failed"] == 0
+
+
+def test_readiness_checks_tables(tmp_path: Path):
+    app = client(tmp_path)
+    res = app.get("/api/readiness")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "ready"
+    assert data["database"] == "ready"
+    assert "queued_jobs" in data
+
+
+def test_api_key_required_when_configured(tmp_path: Path):
+    settings = Settings(app_data_dir=tmp_path, api_key="secret-token-12345", sarvam_api_key="")
+    app = TestClient(create_app(settings))
+
+    # Health is always public
+    health = app.get("/api/health")
+    assert health.status_code == 200
+
+    # Read/write endpoints require X-API-Key
+    unauth = app.get("/api/namespaces")
+    assert unauth.status_code == 401
+    assert unauth.json()["code"] == "authentication_required"
+
+    # With proper header, access is granted
+    auth = app.get("/api/namespaces", headers={"X-API-Key": "secret-token-12345"})
+    assert auth.status_code == 200
+
+
+def test_concurrent_revision_check_rejects_stale(tmp_path: Path):
+    app = client(tmp_path)
+    ns = app.post("/api/namespaces", json={"name": "CASRevision"}).json()
+    rec = json.dumps({
+        "schema_version": 1,
+        "id": "pref",
+        "raw_asr": "i prefer short emails",
+        "formatted_text": "I prefer short emails.",
+    })
+    app.post(f"/api/namespaces/{ns['id']}/imports", json={"jsonl": rec})
+    app.post("/api/worker/drain")
+    memory = app.get(f"/api/namespaces/{ns['id']}/memories").json()[0]
+    initial_rev = app.get("/api/namespaces").json()[0]["revision"]
+
+    # First modification passes with initial_rev
+    first = app.post(
+        f"/api/namespaces/{ns['id']}/memories/{memory['id']}/corrections",
+        json={"value": "concise", "expected_revision": initial_rev, "operation_id": "op-cas-11111"},
+    )
+    assert first.status_code == 200
+
+    # Second concurrent modification that still sends initial_rev must fail with 409 stale_namespace
+    second = app.post(
+        f"/api/namespaces/{ns['id']}/memories/{first.json()['id']}/corrections",
+        json={"value": "ultra-concise", "expected_revision": initial_rev, "operation_id": "op-cas-22222"},
+    )
+    assert second.status_code == 409
+    assert second.json()["code"] == "stale_namespace"
+

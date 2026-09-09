@@ -87,10 +87,33 @@ class CorrectionRequest(BaseModel):
     expected_revision: int = Field(ge=0)
     operation_id: str = Field(min_length=8, max_length=100)
 
+    @field_validator("value")
+    @classmethod
+    def nonblank_value(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("value must contain a non-whitespace character")
+        return value.strip()
+
+    @field_validator("operation_id")
+    @classmethod
+    def nonblank_operation_id(cls, value: str) -> str:
+        clean = value.strip()
+        if len(clean) < 8:
+            raise ValueError("operation_id must contain at least 8 non-whitespace characters")
+        return clean
+
 
 class SuppressionRequest(BaseModel):
     expected_revision: int = Field(ge=0)
     operation_id: str = Field(min_length=8, max_length=100)
+
+    @field_validator("operation_id")
+    @classmethod
+    def nonblank_operation_id(cls, value: str) -> str:
+        clean = value.strip()
+        if len(clean) < 8:
+            raise ValueError("operation_id must contain at least 8 non-whitespace characters")
+        return clean
 
 
 class ErrorEnvelope(BaseModel):

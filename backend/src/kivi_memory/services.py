@@ -4,17 +4,29 @@ import hashlib
 import json
 import re
 import uuid
-from datetime import timedelta
+from collections import defaultdict
+from datetime import UTC, timedelta
 from typing import Any
 
-from sqlalchemy import select, text
+import numpy as np
+from sqlalchemy import and_, func, or_, select, text, update
 from sqlalchemy.orm import Session
 
 from .contracts import TranscriptRecord
-from .db import Embedding, Job, Memory, Namespace, QueryRun, Source, SourceChunk, now
-from .embeddings import content_hash, encode_passage
+from .db import (
+    Embedding,
+    Job,
+    Memory,
+    MemoryOperation,
+    Namespace,
+    QueryRun,
+    Source,
+    SourceChunk,
+    now,
+)
+from .embeddings import content_hash, encode_passage, encode_query, vector_from_blob
 from .generation import synthesize
-from .retrieval import active_memories, search_sources, suppressed_source_ids
+from .retrieval import STOPWORDS, active_memories, search_sources, suppressed_source_ids, tokens
 from .settings import Settings
 
 
@@ -123,10 +135,14 @@ def import_records(
             metadata["language_hints"] = record.language_hints
         if record.model_extra:
             metadata["extra"] = record.model_extra
+
+        # Convert occurred_at to UTC to preserve absolute time across platforms and SQLite
+        occurred_at_utc = record.occurred_at.astimezone(UTC) if record.occurred_at else None
+
         source = Source(
             id=ident("src"), namespace_id=namespace.id, external_id=record.id,
             source_version=version, raw_asr=record.raw_asr, formatted_text=record.formatted_text,
-            occurred_at=record.occurred_at, timezone_name=record.timezone, app=record.app,
+            occurred_at=occurred_at_utc, timezone_name=record.timezone, app=record.app,
             context_json=json.dumps(metadata, ensure_ascii=False), checksum=digest,
             processing_status="queued",
         )
@@ -160,52 +176,107 @@ def chunk_text(value: str, length: int = 900) -> list[tuple[int, int, str]]:
 
 
 def extract_memory_candidates(source: Source) -> list[tuple[str, str, str, str, str]]:
-    """Conservative deterministic v1 extractor; source always remains available if it finds nothing."""
+    """Conservative deterministic multi-fact extractor.
+
+    Splits the formatted transcript into sentences to extract multiple independent
+    facts or preferences, deduplicated by subject, predicate, and scope.
+    """
     value = source.formatted_text.strip()
     if not value:
         return []
-    lower = value.casefold()
-    if any(token in lower for token in ("if ", "maybe", "what if", "?")):
-        return []
+
+    sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", value) if s.strip()]
     candidates: list[tuple[str, str, str, str, str]] = []
+    seen: set[tuple[str, str, str]] = set()
+
     patterns = [
-        (r"(?i)\b(.+?)\s+(?:launches|launch|is scheduled|scheduled)\s+(?:on|for)\s+(.+?)[.!]?$", "schedule"),
+        (r"(?i)\b(.+?)\s+(?:launches|launch|is scheduled|scheduled)(?:\s+on|\s+for)?\s+(.+?)[.!]?$", "schedule"),
         (r"(?i)\b(?:i|we)\s+(?:prefer|like|want)\s+(.+?)[.!]?$", "preference"),
         (r"(?i)\b(.+?)\s+is\s+(.+?)[.!]?$", "is"),
     ]
-    for pattern, predicate in patterns:
-        match = re.search(pattern, value)
-        if not match:
+
+    for sentence in sentences:
+        lower = sentence.casefold()
+        if any(token in lower for token in ("if ", "maybe", "what if", "?")):
             continue
-        if predicate == "preference":
-            candidates.append(("preference", "user", predicate, match.group(1).strip(), "general"))
-        else:
-            candidates.append(("fact", match.group(1).strip(), predicate, match.group(2).strip(), "general"))
-        break
+        for pattern, predicate in patterns:
+            match = re.search(pattern, sentence)
+            if not match:
+                continue
+            if predicate == "preference":
+                cand = ("preference", "user", predicate, match.group(1).strip(), "general")
+            else:
+                cand = ("fact", match.group(1).strip(), predicate, match.group(2).strip(), "general")
+            key = (cand[1], cand[2], cand[4])
+            if key not in seen:
+                seen.add(key)
+                candidates.append(cand)
+            break
+
     return candidates
 
 
 def process_one_job(session: Session, settings: Settings | None = None) -> dict[str, Any] | None:
-    job = session.scalar(select(Job).where(Job.state == "queued").order_by(Job.created_at).limit(1))
+    worker_id = ident("worker")
+    claim_time = now()
+    lease_expiry = claim_time + timedelta(minutes=2)
+
+    claim_subquery = (
+        select(Job.id)
+        .where(
+            or_(
+                Job.state == "queued",
+                and_(Job.state == "running", Job.lease_until < claim_time),
+            )
+        )
+        .order_by(Job.created_at)
+        .limit(1)
+        .scalar_subquery()
+    )
+
+    claim_stmt = (
+        update(Job)
+        .where(Job.id == claim_subquery)
+        .values(
+            state="running",
+            attempts=Job.attempts + 1,
+            progress=5,
+            lease_until=lease_expiry,
+            worker_id=worker_id,
+            error=None,
+        )
+    )
+    result = session.execute(claim_stmt)
+    if result.rowcount == 0:
+        return None
+    session.commit()
+
+    job = session.scalar(
+        select(Job).where(Job.worker_id == worker_id, Job.state == "running")
+    )
     if job is None:
         return None
-    job.state, job.attempts, job.progress, job.lease_until = "running", job.attempts + 1, 5, now() + timedelta(minutes=2)
-    session.commit()
+
     try:
         source = session.get(Source, job.source_id)
         if source is None or not source.eligible:
             job.state, job.progress = "cancelled", 100
             session.commit()
             return {"job_id": job.id, "state": job.state}
+
+        # Idempotent cleanup: remove any partial chunks from a previous failed attempt
+        stale_chunks = session.scalars(select(SourceChunk).where(SourceChunk.source_id == source.id)).all()
+        for c in stale_chunks:
+            session.delete(c)
+        if stale_chunks:
+            session.flush()
+
         group = hashlib.sha256(normalize(source.formatted_text or source.raw_asr).encode()).hexdigest()[:24]
         for view, value in (("raw", source.raw_asr), ("formatted", source.formatted_text)):
             for ordinal, (start, end, part) in enumerate(chunk_text(value)):
                 chunk = SourceChunk(id=ident("chunk"), source_id=source.id, view=view, ordinal=ordinal,
                     start_offset=start, end_offset=end, text=part, search_text=normalize(part), duplicate_group_id=group)
                 session.add(chunk)
-                # Persist the parent before adding a vector that references its ID.
-                # SQLAlchemy cannot infer ordering from two independently assigned
-                # string foreign keys, and SQLite correctly rejects the reverse order.
                 session.flush()
                 if settings:
                     encoded = encode_passage(settings, part)
@@ -214,21 +285,83 @@ def process_one_job(session: Session, settings: Settings | None = None) -> dict[
                         session.add(Embedding(id=ident("emb"), source_chunk_id=chunk.id, model=settings.embedding_model,
                             dimensions=dimensions, vector=vector, content_hash=content_hash(part)))
         job.progress = 50
+
+        # Temporal ordering: compare timestamps before superseding
+        new_source_time = source.occurred_at or source.ingested_at
+        if new_source_time is not None and new_source_time.tzinfo is None:
+            new_source_time = new_source_time.replace(tzinfo=UTC)
+
         for kind, subject, predicate, value, scope in extract_memory_candidates(source):
             older = session.scalars(select(Memory).where(
                 Memory.namespace_id == source.namespace_id, Memory.subject == subject,
                 Memory.predicate == predicate, Memory.scope == scope, Memory.state == "active"
             )).all()
+
+            # Skip duplicate if identical active memory already exists
+            if any(item.value == value for item in older):
+                continue
+
+            should_supersede = True
             for item in older:
-                if item.value != value:
-                    item.state = "superseded"
-            session.add(Memory(id=ident("mem"), namespace_id=source.namespace_id, kind=kind, subject=subject,
-                predicate=predicate, value=value, scope=scope, source_id=source.id))
-        source.processing_status = "ready"
+                existing_source = session.get(Source, item.source_id)
+                if existing_source:
+                    old_source_time = existing_source.occurred_at or existing_source.ingested_at
+                    if old_source_time is not None and old_source_time.tzinfo is None:
+                        old_source_time = old_source_time.replace(tzinfo=UTC)
+                    if new_source_time and old_source_time and new_source_time < old_source_time:
+                        # New record is chronologically older than active memory
+                        should_supersede = False
+                        break
+
+            if should_supersede:
+                for item in older:
+                    if item.value != value:
+                        item.state = "superseded"
+                        session.add(MemoryOperation(
+                            id=ident("op"),
+                            namespace_id=source.namespace_id,
+                            operation_id=f"auto_supersede_{uuid.uuid4().hex[:16]}",
+                            kind="auto_supersession",
+                            target_id=item.id,
+                            reason="newer_source_imported",
+                        ))
+                new_mem = Memory(
+                    id=ident("mem"), namespace_id=source.namespace_id, kind=kind, subject=subject,
+                    predicate=predicate, value=value, scope=scope, state="active", source_id=source.id
+                )
+                session.add(new_mem)
+                session.flush()
+                session.add(MemoryOperation(
+                    id=ident("op"),
+                    namespace_id=source.namespace_id,
+                    operation_id=f"auto_promote_{uuid.uuid4().hex[:16]}",
+                    kind="auto_promotion",
+                    target_id=new_mem.id,
+                    reason="extracted_from_source",
+                ))
+            else:
+                session.add(Memory(
+                    id=ident("mem"), namespace_id=source.namespace_id, kind=kind, subject=subject,
+                    predicate=predicate, value=value, scope=scope, state="superseded", source_id=source.id
+                ))
+
+        # Stale-attempt & eligibility recheck before publishing
+        current_job = session.get(Job, job.id)
+        if current_job is None or current_job.worker_id != worker_id or current_job.state != "running":
+            session.rollback()
+            return {"job_id": job.id, "state": "abandoned_due_to_lease_loss"}
+
+        current_source = session.get(Source, source.id)
+        if current_source is None or not current_source.eligible:
+            current_job.state, current_job.progress = "cancelled", 100
+            session.commit()
+            return {"job_id": job.id, "state": "cancelled"}
+
+        current_source.processing_status = "ready"
         namespace = session.get(Namespace, source.namespace_id)
         if namespace:
             namespace.revision += 1
-        job.state, job.progress, job.lease_until = "completed", 100, None
+        current_job.state, current_job.progress, current_job.lease_until = "completed", 100, None
         session.commit()
         return {"job_id": job.id, "state": job.state}
     except Exception as exc:
@@ -237,19 +370,113 @@ def process_one_job(session: Session, settings: Settings | None = None) -> dict[
         if job is None:
             raise
         job.state, job.error, job.lease_until = "failed", str(exc)[:500], None
+        source = session.get(Source, job.source_id) if job.source_id else None
+        if source:
+            source.processing_status = "failed"
         session.commit()
         return {"job_id": job.id, "state": job.state, "error": job.error}
 
 
-def lexical_tokens(query: str) -> list[str]:
-    return [token for token in re.findall(r"[\w'-]+", query.casefold()) if len(token) > 1]
+def select_best_chunks(
+    session: Session,
+    source: Source,
+    query_terms: list[str],
+    query_vector: Any,
+    settings: Settings,
+    max_chars: int,
+) -> tuple[str, bool]:
+    """Select the most relevant chunks for evidence rather than simple prefix truncation."""
+    chunks = session.scalars(
+        select(SourceChunk)
+        .where(SourceChunk.source_id == source.id)
+        .order_by(SourceChunk.ordinal)
+    ).all()
+
+    full_formatted = source.formatted_text.strip()
+    full_raw = source.raw_asr.strip()
+    full_text = full_formatted or full_raw
+
+    if not chunks:
+        if len(full_text) > max_chars:
+            return f"{full_text[:max_chars - 1].rstrip()}…", True
+        return full_text, False
+
+    formatted_chunks = [ch for ch in chunks if ch.view == "formatted"]
+    raw_chunks = [ch for ch in chunks if ch.view == "raw"]
+
+    def score_chunk(chunk: SourceChunk) -> float:
+        ch_tokens = tokens(chunk.search_text)
+        token_counts: dict[str, int] = defaultdict(int)
+        for t in ch_tokens:
+            token_counts[t] += 1
+        score = float(sum(token_counts[t] for t in query_terms))
+        if query_vector is not None:
+            emb = session.scalar(select(Embedding).where(Embedding.source_chunk_id == chunk.id))
+            if emb:
+                vec = vector_from_blob(emb.vector)
+                if vec.size == query_vector.size:
+                    score += max(0.0, float(np.dot(query_vector, vec))) * 5.0
+        return score
+
+    fmt_scored = [(score_chunk(ch), ch) for ch in formatted_chunks]
+    raw_scored = [(score_chunk(ch), ch) for ch in raw_chunks]
+
+    # If formatted chunks matched, use formatted chunks exclusively to avoid duplicating raw dictation
+    if any(s > 0 for s, _ in fmt_scored) or not raw_chunks:
+        candidate_pool = fmt_scored
+    elif any(s > 0 for s, _ in raw_scored):
+        candidate_pool = raw_scored
+    else:
+        candidate_pool = fmt_scored or raw_scored
+
+    candidate_pool.sort(key=lambda item: item[0], reverse=True)
+
+    selected: list[SourceChunk] = []
+    total_len = 0
+    for _, ch in candidate_pool:
+        remaining = max_chars - total_len
+        if remaining <= 0:
+            break
+        if len(ch.text) <= remaining:
+            selected.append(ch)
+            total_len += len(ch.text)
+        elif not selected:
+            # First chunk is larger than max_chars, truncate it
+            selected.append(ch)
+            total_len = len(ch.text)
+            break
+        else:
+            break
+
+    selected.sort(key=lambda ch: (ch.view != "formatted", ch.ordinal))
+
+    pieces = []
+    for ch in selected:
+        txt = ch.text.strip()
+        if len(txt) > max_chars:
+            txt = f"{txt[:max_chars - 1].rstrip()}…"
+        pieces.append(txt)
+
+    snippet = " […] ".join(pieces)
+    if len(snippet) > max_chars:
+        snippet = f"{snippet[:max_chars - 1].rstrip()}…"
+
+    is_truncated = len(snippet) < len(full_text)
+    return snippet, is_truncated
 
 
 def ask(session: Session, namespace: Namespace, question: str, mode: str, settings: Settings) -> dict[str, Any]:
+    raw_terms = tokens(question)
+    query_terms = [t for t in raw_terms if t not in STOPWORDS] or raw_terms
+    query_vector = encode_query(settings, question)
+
     relevant_memories = active_memories(session, namespace.id, question)
     corrected_memories = [memory for memory in relevant_memories if memory.supersedes_id]
-    blocked_sources = suppressed_source_ids(session, namespace.id, question)
+    preference_memories = [memory for memory in relevant_memories if memory.kind == "preference"]
+
+    blocked_sources = suppressed_source_ids(session, namespace.id, question, settings)
     blocked_sources.difference_update(memory.source_id for memory in corrected_memories)
+
     candidates = search_sources(
         session,
         namespace.id,
@@ -270,46 +497,82 @@ def ask(session: Session, namespace: Namespace, question: str, mode: str, settin
         corrected_ids = {source.id for source in corrected_sources}
         evidence = corrected_sources + [source for source in evidence if source.id not in corrected_ids]
         evidence = evidence[:8]
+
     revision = namespace.revision
+    has_unprocessed = bool(
+        session.scalar(
+            select(func.count(Source.id)).where(
+                Source.namespace_id == namespace.id,
+                Source.processing_status == "queued",
+            )
+        )
+    )
+
     if not evidence:
         result = {
-            "status": "insufficient_evidence", "answer": "I couldn't find supporting information in this memory.",
-            "claims": [], "evidence": [], "uncertainties": ["No eligible source matched the question."],
-            "coverage": {"mode": "focused", "complete": True}, "namespace_revision": revision,
+            "status": "insufficient_evidence",
+            "answer": "I couldn't find supporting information in this memory.",
+            "claims": [],
+            "evidence": [],
+            "uncertainties": ["No eligible source matched the question."],
+            "coverage": {
+                "mode": "focused",
+                "complete": True,
+                "sources_matched": len(candidates),
+                "sources_used": 0,
+                "has_unprocessed": has_unprocessed,
+            },
+            "namespace_revision": revision,
         }
     else:
         bounded_evidence: list[Source] = []
         snippets: list[str] = []
+        truncation_flags: list[bool] = []
         remaining_chars = settings.max_evidence_chars_total
+
         for source in evidence:
-            full_text = source.formatted_text.strip() or source.raw_asr.strip()
             limit = min(settings.max_evidence_chars_per_source, remaining_chars)
             if limit <= 0:
                 break
-            if len(full_text) > limit:
-                snippet = f"{full_text[: limit - 1].rstrip()}…"
-            else:
-                snippet = full_text
+            snippet, is_trunc = select_best_chunks(
+                session, source, query_terms, query_vector, settings, limit
+            )
             bounded_evidence.append(source)
             snippets.append(snippet)
+            truncation_flags.append(is_trunc)
             remaining_chars -= len(snippet)
+
         evidence = bounded_evidence
-        top = evidence[0]
+
+        # Prepare memory context for generation including both corrections and preferences
         memory_context = [
             {
                 "id": memory.id,
                 "source_id": memory.source_id,
                 "text": f"{memory.subject} {memory.predicate} {memory.value}",
                 "scope": memory.scope,
+                "kind": "correction",
             }
             for memory in corrected_memories
+        ] + [
+            {
+                "id": memory.id,
+                "source_id": memory.source_id,
+                "text": f"{memory.subject} {memory.predicate} {memory.value}",
+                "scope": memory.scope,
+                "kind": "preference",
+            }
+            for memory in preference_memories
+            if memory.id not in {m.id for m in corrected_memories}
         ]
+
         if corrected_memories and not settings.sarvam_api_key:
             answer = "\n".join(
                 f"Based on your correction: {memory.subject} {memory.predicate} {memory.value}."
                 for memory in corrected_memories
             )
             result = {"status": "answered", "answer": answer, "generation": "controlled_memory"}
+            citation_verified = True
         else:
             generated = synthesize(
                 settings,
@@ -320,53 +583,125 @@ def ask(session: Session, namespace: Namespace, question: str, mode: str, settin
             )
             if generated.error and generated.error != "model_not_configured":
                 result = {"status": "failed", "answer": "The model provider is unavailable. Your source history remains available below."}
+                citation_verified = False
             else:
                 if generated.text:
                     answer = generated.text
+                    gen_kind = "sarvam"
+                    # Validate citations produced by the model
+                    valid_ids = {s.id for s in evidence}
+                    cited_ids = set(re.findall(r"\[(?:source:)?([a-zA-Z0-9_\-]+)\]", answer))
+                    matching_citations = cited_ids & valid_ids
+
+                    if cited_ids and not matching_citations:
+                        # Model hallucinated source citations completely
+                        answer = "\n\n".join(snippets)
+                        gen_kind = "grounded_replay"
+                        citation_verified = False
+                    else:
+                        citation_verified = bool(matching_citations or not cited_ids)
                 elif mode == "draft":
                     answer = "\n".join(f"• {snippet}" for snippet in snippets[:3])
+                    gen_kind = "grounded_replay"
+                    citation_verified = True
                 else:
-                    answer = snippets[0]
+                    answer = "\n\n".join(snippets)
+                    gen_kind = "grounded_replay"
+                    citation_verified = True
+
                 result = {
-                    "status": "answered", "answer": answer,
-                    "generation": "sarvam" if generated.text else "grounded_replay",
-                    "provider": {"model": generated.model, "latency_ms": generated.latency_ms, "usage": generated.usage} if generated.text else None,
+                    "status": "answered",
+                    "answer": answer,
+                    "generation": gen_kind,
+                    "citation_verified": citation_verified,
+                    "provider": (
+                        {"model": generated.model, "latency_ms": generated.latency_ms, "usage": generated.usage}
+                        if generated.text and gen_kind == "sarvam"
+                        else None
+                    ),
                 }
+
         if mode == "draft":
             result["draft_text"] = result["answer"]
+
+        # Build accurate claim attributions
+        evidence_ids = [s.id for s in evidence]
+        found_ids = set(re.findall(r"\[(?:source:)?([a-zA-Z0-9_\-]+)\]", result["answer"]))
+        attributed_ids = [sid for sid in evidence_ids if sid in found_ids] or evidence_ids
+
         result.update({
             "claims": [{
                 "text": result["answer"],
-                "evidence_ids": [memory.id for memory in corrected_memories] or [top.id],
+                "evidence_ids": [memory.id for memory in corrected_memories] or attributed_ids,
                 "kind": "user_corrected_memory" if corrected_memories else "attributed_record",
             }],
-            "evidence": [{"id": source.id, "external_id": source.external_id, "text": snippet,
-                          "occurred_at": source.occurred_at.isoformat() if source.occurred_at else None}
-                         for source, snippet in zip(evidence, snippets)],
-            "applied_preferences": [{"id": item.id, "value": item.value, "scope": item.scope} for item in relevant_memories if item.kind == "preference"],
+            "evidence": [
+                {
+                    "id": source.id,
+                    "external_id": source.external_id,
+                    "text": snippet,
+                    "truncated": is_trunc,
+                    "occurred_at": source.occurred_at.isoformat() if source.occurred_at else None,
+                }
+                for source, snippet, is_trunc in zip(evidence, snippets, truncation_flags)
+            ],
+            "applied_preferences": [
+                {"id": item.id, "value": item.value, "scope": item.scope}
+                for item in relevant_memories if item.kind == "preference"
+            ],
             "uncertainties": ["Answers are grounded in the listed source evidence. Review source wording for high-stakes decisions."],
-            "coverage": {"mode": "focused", "complete": len(candidates) <= 8}, "namespace_revision": revision,
-            "retrieval": [{"source_id": candidate.source.id, "external_id": candidate.source.external_id,
-                           "lexical_rank": candidate.lexical_rank, "dense_rank": candidate.dense_rank,
-                           "rrf_score": round(candidate.score, 7)} for candidate in candidates[:30]],
+            "coverage": {
+                "mode": "focused",
+                "complete": len(candidates) <= 8 and not any(truncation_flags) and not has_unprocessed,
+                "sources_matched": len(candidates),
+                "sources_used": len(evidence),
+                "has_unprocessed": has_unprocessed,
+            },
+            "namespace_revision": revision,
+            "retrieval": [
+                {
+                    "source_id": candidate.source.id,
+                    "external_id": candidate.source.external_id,
+                    "lexical_rank": candidate.lexical_rank,
+                    "dense_rank": candidate.dense_rank,
+                    "retrieval_mode": candidate.retrieval_mode,
+                    "rrf_score": round(candidate.score, 7),
+                }
+                for candidate in candidates[:30]
+            ],
         })
+
     result["trace_id"] = ident("query")
-    run = QueryRun(id=result["trace_id"], namespace_id=namespace.id, question=question, status=result["status"],
-                   answer_json=json.dumps(result, ensure_ascii=False), revision=revision)
+    run = QueryRun(
+        id=result["trace_id"],
+        namespace_id=namespace.id,
+        question=question,
+        status=result["status"],
+        answer_json=json.dumps(result, ensure_ascii=False),
+        revision=revision,
+    )
     session.add(run)
     session.commit()
     return result
 
 
 def source_payload(source: Source) -> dict[str, Any]:
-    return {"id": source.id, "external_id": source.external_id, "raw_asr": source.raw_asr,
-            "formatted_text": source.formatted_text, "occurred_at": source.occurred_at,
-            "timezone": source.timezone_name, "app": source.app,
-            "context": json.loads(source.context_json),
-            "processing_status": source.processing_status, "eligible": source.eligible,
-            "source_version": source.source_version}
+    return {
+        "id": source.id,
+        "external_id": source.external_id,
+        "raw_asr": source.raw_asr,
+        "formatted_text": source.formatted_text,
+        "occurred_at": source.occurred_at,
+        "timezone": source.timezone_name,
+        "app": source.app,
+        "context": json.loads(source.context_json) if source.context_json else {},
+        "processing_status": source.processing_status,
+        "eligible": source.eligible,
+        "source_version": source.source_version,
+    }
 
 
 def database_status(session: Session) -> dict[str, Any]:
     session.execute(text("SELECT 1"))
     return {"database": "ready"}
+

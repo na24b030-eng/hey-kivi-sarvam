@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 from platformdirs import user_data_dir
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ENV_FILE = Path(__file__).resolve().parents[2] / ".env"
@@ -20,6 +21,28 @@ class Settings(BaseSettings):
     database_url: str | None = None
     chat_base_url: str = "https://api.sarvam.ai/v1"
     sarvam_api_key: str | None = None
+    api_key: str | None = None
+
+    @field_validator("app_data_dir", mode="before")
+    @classmethod
+    def _parse_app_data_dir(cls, v: Any) -> Path:
+        if not v or str(v).strip() in ("", "."):
+            return Path(user_data_dir("KiviMemoryWorkbench")).resolve()
+        return Path(v).resolve()
+
+    @field_validator("embedding_cache_dir", mode="before")
+    @classmethod
+    def _parse_embedding_cache_dir(cls, v: Any) -> Path | None:
+        if not v or not str(v).strip():
+            return None
+        return Path(v).resolve()
+
+    @field_validator("sarvam_api_key", "api_key", "database_url", "model_reasoning_effort", mode="before")
+    @classmethod
+    def _empty_str_to_none(cls, v: Any) -> Any:
+        if isinstance(v, str) and not v.strip():
+            return None
+        return v
     chat_model: str = "sarvam-105b"
     provider_input_inr_per_million: float = Field(default=29.28, ge=0)
     provider_output_inr_per_million: float = Field(default=73.2, ge=0)

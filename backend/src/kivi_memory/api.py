@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import uuid
 from pathlib import Path
@@ -9,7 +10,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
-from sqlalchemy import select
+from sqlalchemy import func, select, text, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -31,6 +32,7 @@ from .db import (
     build_session_factory,
     get_session,
 )
+from .embeddings import model_is_cached
 from .services import (
     ask,
     ensure_namespace,
@@ -61,8 +63,27 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_origins=sorted(literal_origins),
         allow_origin_regex=origin_regex,
         allow_methods=["GET", "POST", "DELETE"],
-        allow_headers=["Content-Type", "X-Request-ID"],
+        allow_headers=["Content-Type", "X-Request-ID", "X-API-Key"],
     )
+
+    if settings.api_key:
+        @app.middleware("http")
+        async def api_key_auth(request: Request, call_next):
+            # Exempt health and non-api routes
+            if request.url.path.startswith("/api") and request.url.path != "/api/health":
+                client_key = request.headers.get("x-api-key")
+                if not client_key or client_key != settings.api_key:
+                    req_id = request.headers.get("x-request-id") or f"req_{uuid.uuid4().hex}"
+                    return JSONResponse(
+                        status_code=401,
+                        content={
+                            "code": "authentication_required",
+                            "message": "Valid X-API-Key header required.",
+                            "request_id": req_id,
+                            "retryable": False,
+                        },
+                    )
+            return await call_next(request)
 
     def session_dep():
         yield from get_session(factory)
@@ -107,6 +128,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         kind: str,
         target_id: str,
         request: Request,
+        payload_hash: str | None = None,
     ) -> bool:
         operation = db.scalar(
             select(MemoryOperation).where(MemoryOperation.operation_id == operation_id)
@@ -124,10 +146,33 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 "This operation ID was already used for a different change.",
                 request,
             )
+        if payload_hash and operation.payload_hash and operation.payload_hash != payload_hash:
+            fail(
+                409,
+                "operation_payload_mismatch",
+                "This operation ID was already used with a different request payload.",
+                request,
+            )
         return True
 
-    def record_operation(db: Session, namespace_id: str, operation_id: str, kind: str, target_id: str) -> None:
-        db.add(MemoryOperation(id=f"op_{uuid.uuid4().hex}", namespace_id=namespace_id, operation_id=operation_id, kind=kind, target_id=target_id))
+    def record_operation(
+        db: Session,
+        namespace_id: str,
+        operation_id: str,
+        kind: str,
+        target_id: str,
+        payload_hash: str | None = None,
+    ) -> None:
+        db.add(
+            MemoryOperation(
+                id=f"op_{uuid.uuid4().hex}",
+                namespace_id=namespace_id,
+                operation_id=operation_id,
+                kind=kind,
+                target_id=target_id,
+                payload_hash=payload_hash,
+            )
+        )
 
     @app.get("/api/health")
     def health():
@@ -136,8 +181,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/api/readiness")
     def readiness(request: Request, db: Session = Depends(session_dep)):
         try:
-            db.execute(__import__("sqlalchemy").text("SELECT 1"))
-            return {"status": "ready", "database": "ready", "provider_configured": bool(settings.sarvam_api_key)}
+            tables = set(db.scalars(text("SELECT name FROM sqlite_master WHERE type='table'")).all())
+            required = {"namespaces", "sources", "source_chunks", "memories", "jobs", "embeddings", "memory_operations", "query_runs"}
+            missing = required - tables
+            if missing:
+                fail(503, "schema_incomplete", f"Missing database tables: {sorted(missing)}", request, retryable=True)
+            queued = db.scalar(select(func.count(Job.id)).where(Job.state == "queued")) or 0
+            return {
+                "status": "ready",
+                "database": "ready",
+                "provider_configured": bool(settings.sarvam_api_key),
+                "embedding_model_cached": model_is_cached(settings),
+                "queued_jobs": queued,
+            }
         except SQLAlchemyError:
             fail(503, "database_unavailable", "The database is unavailable.", request, retryable=True)
 
@@ -191,9 +247,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def worker_drain(db: Session = Depends(session_dep)):
         """Process queued local jobs in one request after a desktop paste import."""
         processed = 0
-        while process_one_job(db, settings):
-            processed += 1
-        return {"state": "idle", "processed": processed}
+        failed = 0
+        while True:
+            res = process_one_job(db, settings)
+            if not res:
+                break
+            if res.get("state") == "failed":
+                failed += 1
+            else:
+                processed += 1
+        return {"state": "idle", "processed": processed, "failed": failed}
 
     @app.get("/api/namespaces/{namespace_id}/sources")
     def list_sources(namespace_id: str, request: Request, q: str = "", db: Session = Depends(session_dep)):
@@ -228,21 +291,46 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.post("/api/namespaces/{namespace_id}/memories/{memory_id}/corrections")
     def correct_memory(namespace_id: str, memory_id: str, payload: CorrectionRequest, request: Request, db: Session = Depends(session_dep)):
         namespace = namespace_or_404(namespace_id, db, request)
+        clean_value = payload.value.strip()
+        payload_hash = hashlib.sha256(clean_value.encode()).hexdigest()
+
         if replayed_operation(
-            db, payload.operation_id, namespace_id, "correct", memory_id, request
+            db, payload.operation_id, namespace_id, "correct", memory_id, request, payload_hash=payload_hash
         ):
             return {"id": memory_id, "revision": namespace.revision, "state": "already_applied"}
-        if namespace.revision != payload.expected_revision:
-            fail(409, "stale_namespace", "Memory changed while you were editing it.", request, details={"revision": namespace.revision})
+
         memory = db.get(Memory, memory_id)
         if not memory or memory.namespace_id != namespace_id:
             fail(404, "missing_memory", "Memory was not found.", request)
+        if memory.state != "active":
+            fail(409, "memory_not_active", "Only active memories can be corrected.", request)
+
+        # Atomic revision update
+        update_res = db.execute(
+            update(Namespace)
+            .where(Namespace.id == namespace_id, Namespace.revision == payload.expected_revision)
+            .values(revision=Namespace.revision + 1)
+        )
+        if update_res.rowcount == 0:
+            cur = db.get(Namespace, namespace_id)
+            fail(409, "stale_namespace", "Memory changed while you were editing it.", request, details={"revision": cur.revision if cur else None})
+
         memory.state = "superseded"
-        replacement = Memory(id=f"mem_{uuid.uuid4().hex}", namespace_id=namespace_id, kind=memory.kind, subject=memory.subject, predicate=memory.predicate, value=payload.value, scope=memory.scope, source_id=memory.source_id, supersedes_id=memory.id)
+        replacement = Memory(
+            id=f"mem_{uuid.uuid4().hex}",
+            namespace_id=namespace_id,
+            kind=memory.kind,
+            subject=memory.subject,
+            predicate=memory.predicate,
+            value=clean_value,
+            scope=memory.scope,
+            source_id=memory.source_id,
+            supersedes_id=memory.id,
+        )
         db.add(replacement)
-        record_operation(db, namespace_id, payload.operation_id, "correct", memory_id)
-        namespace.revision += 1
+        record_operation(db, namespace_id, payload.operation_id, "correct", memory_id, payload_hash=payload_hash)
         db.commit()
+        db.refresh(namespace)
         return {"id": replacement.id, "revision": namespace.revision, "state": "active"}
 
     @app.post("/api/namespaces/{namespace_id}/memories/{memory_id}/suppressions")
@@ -252,35 +340,77 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             db, payload.operation_id, namespace_id, "suppress", memory_id, request
         ):
             return {"id": memory_id, "revision": namespace.revision, "state": "already_applied"}
-        if namespace.revision != payload.expected_revision:
-            fail(409, "stale_namespace", "Memory changed while you were editing it.", request, details={"revision": namespace.revision})
+
         memory = db.get(Memory, memory_id)
         if not memory or memory.namespace_id != namespace_id:
             fail(404, "missing_memory", "Memory was not found.", request)
+
+        # Atomic revision update
+        update_res = db.execute(
+            update(Namespace)
+            .where(Namespace.id == namespace_id, Namespace.revision == payload.expected_revision)
+            .values(revision=Namespace.revision + 1)
+        )
+        if update_res.rowcount == 0:
+            cur = db.get(Namespace, namespace_id)
+            fail(409, "stale_namespace", "Memory changed while you were editing it.", request, details={"revision": cur.revision if cur else None})
+
         memory.state = "suppressed"
         record_operation(db, namespace_id, payload.operation_id, "suppress", memory_id)
-        namespace.revision += 1
         db.commit()
+        db.refresh(namespace)
         return {"id": memory.id, "revision": namespace.revision, "state": memory.state}
 
     @app.delete("/api/namespaces/{namespace_id}/sources/{source_id}")
     def delete_source(namespace_id: str, source_id: str, expected_revision: int, operation_id: str, request: Request, db: Session = Depends(session_dep)):
         namespace = namespace_or_404(namespace_id, db, request)
-        if not 8 <= len(operation_id) <= 100:
+        if not 8 <= len(operation_id.strip()) <= 100:
             fail(422, "invalid_operation_id", "Operation ID must contain 8 to 100 characters.", request)
         if replayed_operation(
             db, operation_id, namespace_id, "delete_source", source_id, request
         ):
             return {"deleted": source_id, "revision": namespace.revision, "state": "already_applied"}
-        if namespace.revision != expected_revision:
-            fail(409, "stale_namespace", "History changed while you were deleting it.", request, details={"revision": namespace.revision})
+
         source = db.get(Source, source_id)
         if not source or source.namespace_id != namespace_id:
             fail(404, "missing_source", "Source was not found.", request)
+
+        # Atomic revision update
+        update_res = db.execute(
+            update(Namespace)
+            .where(Namespace.id == namespace_id, Namespace.revision == expected_revision)
+            .values(revision=Namespace.revision + 1)
+        )
+        if update_res.rowcount == 0:
+            cur = db.get(Namespace, namespace_id)
+            fail(409, "stale_namespace", "History changed while you were deleting it.", request, details={"revision": cur.revision if cur else None})
+
+        # Redact deleted source content comprehensively from all stored query runs (Item 12)
+        query_runs = db.scalars(select(QueryRun).where(QueryRun.namespace_id == namespace_id)).all()
+        for qrun in query_runs:
+            try:
+                qdata = json.loads(qrun.answer_json)
+                evidence_list = qdata.get("evidence", [])
+                matched = False
+                for ev in evidence_list:
+                    if ev.get("id") == source_id:
+                        ev["text"] = "[source deleted]"
+                        matched = True
+                if matched:
+                    qdata["answer"] = "[This answer referenced a deleted source and has been redacted.]"
+                    qdata["status"] = "redacted"
+                    for claim in qdata.get("claims", []):
+                        if source_id in claim.get("evidence_ids", []):
+                            claim["text"] = "[redacted]"
+                    qrun.status = "redacted"
+                    qrun.answer_json = json.dumps(qdata, ensure_ascii=False)
+            except (json.JSONDecodeError, KeyError, TypeError, ValueError):
+                continue
+
         record_operation(db, namespace_id, operation_id, "delete_source", source_id)
         db.delete(source)
-        namespace.revision += 1
         db.commit()
+        db.refresh(namespace)
         return {"deleted": source_id, "revision": namespace.revision}
 
     @app.get("/api/namespaces/{namespace_id}/query-runs/{run_id}")

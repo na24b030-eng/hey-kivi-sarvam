@@ -104,6 +104,7 @@ class MemoryOperation(Base):
     kind: Mapped[str] = mapped_column(String(32), index=True)
     target_id: Mapped[str] = mapped_column(String(64), index=True)
     reason: Mapped[str] = mapped_column(String(256), default="user_request")
+    payload_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
 
 
@@ -118,6 +119,7 @@ class Job(Base):
     progress: Mapped[int] = mapped_column(Integer, default=0)
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
     lease_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    worker_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)
 
@@ -144,6 +146,7 @@ def make_engine(settings: Settings):
             cursor = connection.cursor()
             cursor.execute("PRAGMA foreign_keys = ON")
             cursor.execute("PRAGMA journal_mode = WAL")
+            cursor.execute("PRAGMA busy_timeout = 5000")
             cursor.close()
     return engine
 

@@ -28,11 +28,21 @@ def run_suite(session: Session, namespace: Namespace, suite_path: Path, output_p
         required_source = case.get("required_external_id")
         source_passed = required_source is None or required_source in returned_sources
         expected_text = case.get("expected_text")
-        text_passed = expected_text is None or expected_text in answer.get("answer", "") or any(expected_text in item.get("text", "") for item in answer.get("evidence", []))
+        if expected == "insufficient_evidence":
+            status_passed = answer["status"] == "insufficient_evidence"
+            text_passed = True
+            source_passed = len(answer.get("evidence", [])) == 0
+        else:
+            status_passed = answer["status"] == expected
+            answer_has_text = expected_text is None or (expected_text.casefold() in answer.get("answer", "").casefold())
+            evidence_has_text = expected_text is None or any(expected_text.casefold() in item.get("text", "").casefold() for item in answer.get("evidence", []))
+            text_passed = answer_has_text and evidence_has_text
+
+        case_passed = status_passed and source_passed and text_passed
         results.append({"id": case["id"], "category": case.get("category", "unspecified"), "expected_status": expected,
                         "actual_status": answer["status"], "required_external_id": required_source,
                         "source_passed": source_passed, "text_passed": text_passed,
-                        "passed": answer["status"] == expected and source_passed and text_passed,
+                        "passed": case_passed,
                         "latency_ms": round((perf_counter() - started) * 1000, 2), "trace_id": answer["trace_id"],
                         "provider": answer.get("provider")})
     passed = sum(1 for result in results if result["passed"])

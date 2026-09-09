@@ -1,969 +1,1633 @@
 {
-  "created_at": "2026-09-08T03:39:12.119006+00:00",
+  "created_at": "2026-09-09T13:48:21.378004+00:00",
   "suite": "eval\\cases.jsonl",
+  "suite_sha256": "3562d606dadcee2fd2885c06bec051801374eeeb11b81647d53f283d0d4e8d17",
   "case_count": 120,
   "passed": 120,
-  "status_accuracy": 1.0,
+  "evidence_accuracy": 1.0,
+  "category_summary": {
+    "asr_disagreement": {
+      "cases": 6,
+      "passed": 6
+    },
+    "code_switched": {
+      "cases": 11,
+      "passed": 11
+    },
+    "customer_budget": {
+      "cases": 12,
+      "passed": 12
+    },
+    "draft": {
+      "cases": 10,
+      "passed": 10
+    },
+    "household": {
+      "cases": 8,
+      "passed": 8
+    },
+    "hypothetical": {
+      "cases": 11,
+      "passed": 11
+    },
+    "meeting_episode": {
+      "cases": 11,
+      "passed": 11
+    },
+    "negative_unrelated": {
+      "cases": 10,
+      "passed": 10
+    },
+    "preference": {
+      "cases": 7,
+      "passed": 7
+    },
+    "project_schedule": {
+      "cases": 12,
+      "passed": 12
+    },
+    "project_update": {
+      "cases": 7,
+      "passed": 7
+    },
+    "study": {
+      "cases": 5,
+      "passed": 5
+    },
+    "travel": {
+      "cases": 10,
+      "passed": 10
+    }
+  },
+  "latency_ms": {
+    "p50": 20.87,
+    "p95": 25.96
+  },
+  "database_bytes": 6074368,
+  "embedding_model": "intfloat/multilingual-e5-small",
+  "provider_configured": false,
+  "provider_usage": "unknown_without_a_live_provider_response",
+  "provider_cost": "unknown_without_a_live_provider_response",
   "results": [
     {
       "id": "case-001",
+      "category": "project_schedule",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-001",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 60.95,
-      "trace_id": "query_027e19f544e04b47b4d46c9b900cc808"
+      "latency_ms": 35.52,
+      "trace_id": "query_69f732639c984b1898829b4f3bcf36d9",
+      "provider": null
     },
     {
       "id": "case-002",
+      "category": "customer_budget",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-002",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.29,
-      "trace_id": "query_70a8b7c1aee04d528c47bc98633d8f08"
+      "latency_ms": 21.59,
+      "trace_id": "query_21148226debe4a6b90b69b89a2347c9d",
+      "provider": null
     },
     {
       "id": "case-003",
+      "category": "meeting_episode",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-003",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.7,
-      "trace_id": "query_a439ac3b77dd4c9eaceffb5b9945c788"
+      "latency_ms": 20.99,
+      "trace_id": "query_85a132bdcb964fd4b96b5078abf917e5",
+      "provider": null
     },
     {
       "id": "case-004",
+      "category": "preference",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-004",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.64,
-      "trace_id": "query_8e3d04a9de244a71844079e635b8308f"
+      "latency_ms": 20.58,
+      "trace_id": "query_6394cd11bf914baea0fe2b541cf88869",
+      "provider": null
     },
     {
       "id": "case-005",
+      "category": "travel",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-005",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.97,
-      "trace_id": "query_d6ab76aa43af4ce3b9f1cf4d7361e99f"
+      "latency_ms": 19.6,
+      "trace_id": "query_b7595e3ce07f4d85980ba9f50e95637a",
+      "provider": null
     },
     {
       "id": "case-006",
+      "category": "study",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-006",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.71,
-      "trace_id": "query_819c5f9da60a4b1ca97345327b09581b"
+      "latency_ms": 19.4,
+      "trace_id": "query_cc076215fe144c5aab2f731a2339335f",
+      "provider": null
     },
     {
       "id": "case-007",
+      "category": "household",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-007",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.95,
-      "trace_id": "query_98d229d9361c40609f97949d88ae3fc0"
+      "latency_ms": 22.09,
+      "trace_id": "query_5cd7e85444464d4d87cb8bd9e8ed48f9",
+      "provider": null
     },
     {
       "id": "case-008",
+      "category": "project_update",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-008",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.82,
-      "trace_id": "query_78faf04c2f3e4a5d9e930c18c7b35e36"
+      "latency_ms": 19.35,
+      "trace_id": "query_04e98e79a46c4a70aa1af1e0be2bca91",
+      "provider": null
     },
     {
       "id": "case-009",
+      "category": "hypothetical",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-009",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.28,
-      "trace_id": "query_2a71b31db35d42059ce384af2dbe0af5"
+      "latency_ms": 39.86,
+      "trace_id": "query_57453fa9a58b41458c4134f91aa83390",
+      "provider": null
     },
     {
       "id": "case-010",
+      "category": "draft",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-010",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.86,
-      "trace_id": "query_bf5b9d2e2450406aa09c5c42626dab1f"
+      "latency_ms": 21.58,
+      "trace_id": "query_9fc940cb22ee4f6f87ac768875c2d9c8",
+      "provider": null
     },
     {
       "id": "case-011",
+      "category": "asr_disagreement",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-011",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.02,
-      "trace_id": "query_1ff98743423b416c9269fa0776424083"
+      "latency_ms": 19.33,
+      "trace_id": "query_b4a286aa435a4e8baadd27be64e2b021",
+      "provider": null
     },
     {
       "id": "case-012",
+      "category": "code_switched",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-012",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.79,
-      "trace_id": "query_8b211150b5bc4b8b9967a842e117c465"
+      "latency_ms": 19.11,
+      "trace_id": "query_bc6cbf8929594b7aa0b7865b6a9c5dc9",
+      "provider": null
     },
     {
       "id": "case-013",
+      "category": "project_schedule",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-013",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 40.82,
-      "trace_id": "query_ad889694f5234e31bdcf3687c4e7fdc2"
+      "latency_ms": 21.94,
+      "trace_id": "query_004e8c0056244d1ca1eb1ccf66d4f5c4",
+      "provider": null
     },
     {
       "id": "case-014",
+      "category": "customer_budget",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-014",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.04,
-      "trace_id": "query_19fb6394b3044027ac7503a6597c024d"
+      "latency_ms": 23.75,
+      "trace_id": "query_b5b4272c2f56491cabf156bcea44ab79",
+      "provider": null
     },
     {
       "id": "case-015",
+      "category": "meeting_episode",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-015",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.56,
-      "trace_id": "query_2a009a87a72948ba972f8dd44b911451"
+      "latency_ms": 21.23,
+      "trace_id": "query_70f55d0a9b81423eaadea970f0e6c3cf",
+      "provider": null
     },
     {
       "id": "case-016",
+      "category": "preference",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-016",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.65,
-      "trace_id": "query_a12a9fccbb544c75b05886d010a353ec"
+      "latency_ms": 20.93,
+      "trace_id": "query_6b2d866a205746b89ee87b55dfa44d51",
+      "provider": null
     },
     {
       "id": "case-017",
+      "category": "travel",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-017",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 13.43,
-      "trace_id": "query_a34dd0524be84dc480428744d0941641"
+      "latency_ms": 20.4,
+      "trace_id": "query_f3d87ba0bff64d739934d19d02450e18",
+      "provider": null
     },
     {
       "id": "case-018",
+      "category": "study",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-018",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.48,
-      "trace_id": "query_17647a824c294233a949c323aca27937"
+      "latency_ms": 21.51,
+      "trace_id": "query_5233afb870674b2e8eb41c6b49a27d26",
+      "provider": null
     },
     {
       "id": "case-019",
+      "category": "household",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-019",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 13.23,
-      "trace_id": "query_8ddf3daf357a446eb19b1251b6e42a77"
+      "latency_ms": 19.85,
+      "trace_id": "query_ef9dbe48d7204d4585c965fd8c91d812",
+      "provider": null
     },
     {
       "id": "case-020",
+      "category": "project_update",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-020",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.97,
-      "trace_id": "query_00ed4aa98bc44d309bc6c2268f9496e0"
+      "latency_ms": 19.02,
+      "trace_id": "query_22bb5e19ce1b4c378ac3b7ec21025eb1",
+      "provider": null
     },
     {
       "id": "case-021",
+      "category": "hypothetical",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-021",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.31,
-      "trace_id": "query_ad1f9b4ecd5a4afab90720a375e13e99"
+      "latency_ms": 22.35,
+      "trace_id": "query_18c7715cba354af586a98e65c9085034",
+      "provider": null
     },
     {
       "id": "case-022",
+      "category": "draft",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-022",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.53,
-      "trace_id": "query_8c4c49d8edca4016b194586c43cf7f8e"
+      "latency_ms": 24.41,
+      "trace_id": "query_d3e34b011c614f6ea49cb46c0a4274b3",
+      "provider": null
     },
     {
       "id": "case-023",
+      "category": "asr_disagreement",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-023",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 13.12,
-      "trace_id": "query_38e4057737c34fa69f841070e59c56f6"
+      "latency_ms": 22.07,
+      "trace_id": "query_5793f4967499464fa4ae706559f69ca0",
+      "provider": null
     },
     {
       "id": "case-024",
+      "category": "code_switched",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-024",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.58,
-      "trace_id": "query_0be40960d532421f898b3a2497f520a4"
+      "latency_ms": 19.29,
+      "trace_id": "query_5bb1931a0a75445d9de4026d94b990ed",
+      "provider": null
     },
     {
       "id": "case-025",
+      "category": "project_schedule",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-025",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.32,
-      "trace_id": "query_9c0e98c5da0b49ac8fc255502bc0ed8c"
+      "latency_ms": 22.65,
+      "trace_id": "query_cd5e3067c7a740c1b92ba19c8713e74a",
+      "provider": null
     },
     {
       "id": "case-026",
+      "category": "customer_budget",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-026",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.83,
-      "trace_id": "query_f9d60b985bda43c890270fe6189af441"
+      "latency_ms": 21.06,
+      "trace_id": "query_289b9678c73940d6998275e64d5407ec",
+      "provider": null
     },
     {
       "id": "case-027",
+      "category": "meeting_episode",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-027",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.56,
-      "trace_id": "query_592b88aeaabd44019220342de2e456e0"
+      "latency_ms": 20.53,
+      "trace_id": "query_0d2f00aefb294d36b32d3449df473f9b",
+      "provider": null
     },
     {
       "id": "case-028",
+      "category": "travel",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-029",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 14.01,
-      "trace_id": "query_0b92268a45db4b0cb6f3f8e72e294f92"
+      "latency_ms": 20.45,
+      "trace_id": "query_6c58af2f8108464f8e5479790395a512",
+      "provider": null
     },
     {
       "id": "case-029",
+      "category": "study",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-030",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.32,
-      "trace_id": "query_04a60a425f724ec98d358a7fd3839f62"
+      "latency_ms": 21.03,
+      "trace_id": "query_d99a9f8897db455a84ce17f25c344a82",
+      "provider": null
     },
     {
       "id": "case-030",
+      "category": "project_update",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-032",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.08,
-      "trace_id": "query_b53c8fa73452406bacf72bb81b224a3d"
+      "latency_ms": 20.29,
+      "trace_id": "query_02276a27dd1941369be3078f6bfd88e2",
+      "provider": null
     },
     {
       "id": "case-031",
+      "category": "hypothetical",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-033",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 13.02,
-      "trace_id": "query_f3fe1e4e3eb54823a8f4c343400f586c"
+      "latency_ms": 20.67,
+      "trace_id": "query_f8285a5ae93949e9b9f9ab5567b01659",
+      "provider": null
     },
     {
       "id": "case-032",
+      "category": "code_switched",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-036",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.3,
-      "trace_id": "query_3243da5d677f4d289ea024e273f71787"
+      "latency_ms": 22.16,
+      "trace_id": "query_f552e855500949e39fe31a3ddc6af27c",
+      "provider": null
     },
     {
       "id": "case-033",
+      "category": "project_schedule",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-037",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.11,
-      "trace_id": "query_f8d854c3d8f64983afefeade7a202037"
+      "latency_ms": 44.04,
+      "trace_id": "query_171f929d80b54e869cadca1f6c3d8a03",
+      "provider": null
     },
     {
       "id": "case-034",
+      "category": "customer_budget",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-038",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 13.54,
-      "trace_id": "query_9f07549a4c314616961b9242befa8766"
+      "latency_ms": 20.53,
+      "trace_id": "query_0236bd6fa3c345edbebc4f525cfb7572",
+      "provider": null
     },
     {
       "id": "case-035",
+      "category": "meeting_episode",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-039",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.84,
-      "trace_id": "query_b6449fea40584e719c33180b4d93981b"
+      "latency_ms": 20.73,
+      "trace_id": "query_71aab12d08ff45b7b5dc93f4789cc01f",
+      "provider": null
     },
     {
       "id": "case-036",
+      "category": "preference",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-040",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.17,
-      "trace_id": "query_d3bb956aa52643a099ea364aa355c566"
+      "latency_ms": 20.57,
+      "trace_id": "query_01e1808c35c34c21b7b62d8544ef3797",
+      "provider": null
     },
     {
       "id": "case-037",
+      "category": "travel",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-041",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.98,
-      "trace_id": "query_c79f8925b8574d23aa8a8d249169ec31"
+      "latency_ms": 20.15,
+      "trace_id": "query_fb204a52825d409e8dbe2e22b316243c",
+      "provider": null
     },
     {
       "id": "case-038",
+      "category": "household",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-043",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.53,
-      "trace_id": "query_67e9b997e65544b587a5b2dbd895c796"
+      "latency_ms": 24.16,
+      "trace_id": "query_2edcbf58651d4093a8290c27c59969d2",
+      "provider": null
     },
     {
       "id": "case-039",
+      "category": "project_update",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-044",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.94,
-      "trace_id": "query_d6409fb269ff404784d425b95cf6f3d3"
+      "latency_ms": 21.62,
+      "trace_id": "query_8bc0ee8cd55845e3acc5ad77b9a83d40",
+      "provider": null
     },
     {
       "id": "case-040",
+      "category": "hypothetical",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-045",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.16,
-      "trace_id": "query_69f19c3369b944ee8682f91fe486087d"
+      "latency_ms": 20.46,
+      "trace_id": "query_bf75d39d4d03413e8f8f7d329838cb32",
+      "provider": null
     },
     {
       "id": "case-041",
+      "category": "draft",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-046",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.66,
-      "trace_id": "query_ea5201b9ae644342a7deec45d598d735"
+      "latency_ms": 20.26,
+      "trace_id": "query_1c1b1b3c800248b58bd43c03066c4b04",
+      "provider": null
     },
     {
       "id": "case-042",
+      "category": "code_switched",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-048",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 36.33,
-      "trace_id": "query_9ee45b14253048f7b0460b174994cdac"
+      "latency_ms": 20.47,
+      "trace_id": "query_17d9a3907a32410787e6738feb46668d",
+      "provider": null
     },
     {
       "id": "case-043",
+      "category": "project_schedule",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-049",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.67,
-      "trace_id": "query_c2d70d6a23074e128816cc19c80e1a70"
+      "latency_ms": 23.42,
+      "trace_id": "query_bd932284fb364874a78482fc86baa44e",
+      "provider": null
     },
     {
       "id": "case-044",
+      "category": "customer_budget",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-050",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 23.18,
-      "trace_id": "query_f91e1add667b4c548fadaedeaf833659"
+      "latency_ms": 23.15,
+      "trace_id": "query_c97ea5d994cc47d2b8db7c02a3b66b84",
+      "provider": null
     },
     {
       "id": "case-045",
+      "category": "preference",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-052",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.64,
-      "trace_id": "query_c6ffd41964754f5a90bc3c64bb230b9c"
+      "latency_ms": 23.31,
+      "trace_id": "query_44241ac8cd094de79938503ea0c0db96",
+      "provider": null
     },
     {
       "id": "case-046",
+      "category": "travel",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-053",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.24,
-      "trace_id": "query_3e4061f2b85643b7a9add2ed27668caf"
+      "latency_ms": 23.04,
+      "trace_id": "query_2b49e48874a24025ada67f395d0b343c",
+      "provider": null
     },
     {
       "id": "case-047",
+      "category": "study",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-054",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.49,
-      "trace_id": "query_6fcae5457e7b4008b2bfd67f5c4baa80"
+      "latency_ms": 23.26,
+      "trace_id": "query_6a8f16eecbbc4c3bb2f18c5b3868dfbb",
+      "provider": null
     },
     {
       "id": "case-048",
+      "category": "household",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-055",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.5,
-      "trace_id": "query_d20afbd5516c427c816dbbe47e9681c2"
+      "latency_ms": 23.47,
+      "trace_id": "query_641fd9318b744bb9a7ea7ec1d05f1441",
+      "provider": null
     },
     {
       "id": "case-049",
+      "category": "project_update",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-056",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.18,
-      "trace_id": "query_c2e478499283444ea23229374556030f"
+      "latency_ms": 20.54,
+      "trace_id": "query_cac5c323f36047ada636c95a357b6a3e",
+      "provider": null
     },
     {
       "id": "case-050",
+      "category": "hypothetical",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-057",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.36,
-      "trace_id": "query_b274631518914ff2890adcf476cb4b7d"
+      "latency_ms": 21.26,
+      "trace_id": "query_c6e73a5f17b3452e83c4c5e8c6d7f850",
+      "provider": null
     },
     {
       "id": "case-051",
+      "category": "draft",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-058",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.08,
-      "trace_id": "query_c69ca70bf2a546afa3a6d4d1fd2a7d99"
+      "latency_ms": 20.8,
+      "trace_id": "query_c9d62653be404955be628f5549c481e4",
+      "provider": null
     },
     {
       "id": "case-052",
+      "category": "asr_disagreement",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-059",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.73,
-      "trace_id": "query_8608b260c08a4f4c95d63ebe75fe1675"
+      "latency_ms": 20.49,
+      "trace_id": "query_ed6d107f11d74616a5e4b4d6d27d4e1a",
+      "provider": null
     },
     {
       "id": "case-053",
+      "category": "code_switched",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-060",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.58,
-      "trace_id": "query_3863dde11d6e46fbb84c0552889ac85c"
+      "latency_ms": 19.92,
+      "trace_id": "query_d812c1a3c23048af981eabb76775b177",
+      "provider": null
     },
     {
       "id": "case-054",
+      "category": "project_schedule",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-061",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.14,
-      "trace_id": "query_09f8fba319674c7aad7dbd3956d9d5e1"
+      "latency_ms": 22.69,
+      "trace_id": "query_42fa8ceb7dcf4332a83192d839e4c2ee",
+      "provider": null
     },
     {
       "id": "case-055",
+      "category": "customer_budget",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-062",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.32,
-      "trace_id": "query_7361577116394b42a5b4800117cd577b"
+      "latency_ms": 22.56,
+      "trace_id": "query_675a2c040fac422d8eaa999e39f1db3b",
+      "provider": null
     },
     {
       "id": "case-056",
+      "category": "meeting_episode",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-063",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.6,
-      "trace_id": "query_f40577471a984795ae052a568d87a50c"
+      "latency_ms": 22.23,
+      "trace_id": "query_580016487dbb481c9512b8126859c09f",
+      "provider": null
     },
     {
       "id": "case-057",
+      "category": "preference",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-064",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.86,
-      "trace_id": "query_5aa988a3402a457a949fbe54928aba1c"
+      "latency_ms": 22.33,
+      "trace_id": "query_0ce1cc10f4064dc39a43638a0bf97ae3",
+      "provider": null
     },
     {
       "id": "case-058",
+      "category": "travel",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-065",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 13.54,
-      "trace_id": "query_38965fae6cae4567b5422dcef91fc55d"
+      "latency_ms": 44.75,
+      "trace_id": "query_83dcc747c4e5454194c97acf7c6a2d5e",
+      "provider": null
     },
     {
       "id": "case-059",
+      "category": "household",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-067",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 13.47,
-      "trace_id": "query_935312810fa94caf92ac826e09fdfbce"
+      "latency_ms": 21.49,
+      "trace_id": "query_0906e3f426a049a890462e46f9424eb4",
+      "provider": null
     },
     {
       "id": "case-060",
+      "category": "hypothetical",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-069",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.41,
-      "trace_id": "query_fe967eb2209c4534be148ba4073039ed"
+      "latency_ms": 20.95,
+      "trace_id": "query_a709066d5d994b1680ea63f741a2739f",
+      "provider": null
     },
     {
       "id": "case-061",
+      "category": "draft",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-070",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 13.55,
-      "trace_id": "query_cb851797392b4270b54a57b0817b3897"
+      "latency_ms": 21.82,
+      "trace_id": "query_893bc6213b9f474d993c51f9c623c584",
+      "provider": null
     },
     {
       "id": "case-062",
+      "category": "code_switched",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-072",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.47,
-      "trace_id": "query_62309e71272044f7ba79a3c373d0cb8a"
+      "latency_ms": 20.39,
+      "trace_id": "query_78d3a9fcf11d4b33b090c2f3bbbd7464",
+      "provider": null
     },
     {
       "id": "case-063",
+      "category": "project_schedule",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-073",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.95,
-      "trace_id": "query_bdd04dba803e4ee09951c546f88b5959"
+      "latency_ms": 19.79,
+      "trace_id": "query_93c1470fda584609ab9b66f2ff3e2b40",
+      "provider": null
     },
     {
       "id": "case-064",
+      "category": "customer_budget",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-074",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.06,
-      "trace_id": "query_1581654fdce2481a9f9860165aabac65"
+      "latency_ms": 21.05,
+      "trace_id": "query_2e8c0296139f4e2b854abbef6235c741",
+      "provider": null
     },
     {
       "id": "case-065",
+      "category": "meeting_episode",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-075",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 16.43,
-      "trace_id": "query_388bbe2165e743a9ac2729c4d13f130b"
+      "latency_ms": 20.57,
+      "trace_id": "query_f9cba90e437f4352a3f9dcd0ea42c289",
+      "provider": null
     },
     {
       "id": "case-066",
+      "category": "preference",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-076",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.22,
-      "trace_id": "query_2c3091760d4b4882932158550e2e9a5c"
+      "latency_ms": 23.12,
+      "trace_id": "query_3a9985cf6da84ba1bb20746943fcf304",
+      "provider": null
     },
     {
       "id": "case-067",
+      "category": "travel",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-077",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.88,
-      "trace_id": "query_b513ddc905c144aebb5371b6c4342472"
+      "latency_ms": 23.56,
+      "trace_id": "query_c921f06377b74cf58c54d18fbec7860c",
+      "provider": null
     },
     {
       "id": "case-068",
+      "category": "household",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-079",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 33.25,
-      "trace_id": "query_443456aa02e94d8ba8a7ced22b026298"
+      "latency_ms": 19.73,
+      "trace_id": "query_3de7a038c2424dc4b2201ca1acd91808",
+      "provider": null
     },
     {
       "id": "case-069",
+      "category": "hypothetical",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-081",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.65,
-      "trace_id": "query_c044129859704df2b2f8efd4e853a6cc"
+      "latency_ms": 22.73,
+      "trace_id": "query_80bf7f3f8d0841a7bab3c92e24cf1bb3",
+      "provider": null
     },
     {
       "id": "case-070",
+      "category": "draft",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-082",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.93,
-      "trace_id": "query_1eec821d5d924bdfa5ec10ca293af392"
+      "latency_ms": 19.83,
+      "trace_id": "query_d0bde7a661d04cbb87c2b92c4b4a4748",
+      "provider": null
     },
     {
       "id": "case-071",
+      "category": "asr_disagreement",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-083",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.66,
-      "trace_id": "query_09d02531fc1c4296a559179db95eb54c"
+      "latency_ms": 19.71,
+      "trace_id": "query_6ec2601dc8cf4eccaaead6a01c3a01bd",
+      "provider": null
     },
     {
       "id": "case-072",
+      "category": "code_switched",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-084",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.12,
-      "trace_id": "query_244d2de0e70a4e6a878c62beae5a5069"
+      "latency_ms": 20.35,
+      "trace_id": "query_55616bf56b5c4f56a0079612ad0c1fa1",
+      "provider": null
     },
     {
       "id": "case-073",
+      "category": "project_schedule",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-085",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.47,
-      "trace_id": "query_c6effa6648174b108a4a80a7a207dfd9"
+      "latency_ms": 24.54,
+      "trace_id": "query_7b80f0913b984e0792a08ccfebec9e69",
+      "provider": null
     },
     {
       "id": "case-074",
+      "category": "customer_budget",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-086",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.5,
-      "trace_id": "query_62f6a365da414a4ab0f339d735b48528"
+      "latency_ms": 21.35,
+      "trace_id": "query_5c4fbc90c9e44ad0a04b795ce61e4b40",
+      "provider": null
     },
     {
       "id": "case-075",
+      "category": "meeting_episode",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-087",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.23,
-      "trace_id": "query_0bfd3b6627dc443e8fc2ad20698aa677"
+      "latency_ms": 20.41,
+      "trace_id": "query_49c9a0b8fc784029b9170d5126e5612a",
+      "provider": null
     },
     {
       "id": "case-076",
+      "category": "travel",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-089",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.6,
-      "trace_id": "query_33898c538325427dbf2c5d650b837060"
+      "latency_ms": 20.39,
+      "trace_id": "query_1314f564af8a40cf8114e3c5349af7b7",
+      "provider": null
     },
     {
       "id": "case-077",
+      "category": "project_update",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-092",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.12,
-      "trace_id": "query_b56966fbfd8546ca8201cbccc1943a5d"
+      "latency_ms": 20.07,
+      "trace_id": "query_c0a34d95043340e1826b3473817aff16",
+      "provider": null
     },
     {
       "id": "case-078",
+      "category": "hypothetical",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-093",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 13.06,
-      "trace_id": "query_a8a35136c3aa4bfb8cc57a95e894d5ca"
+      "latency_ms": 20.09,
+      "trace_id": "query_1b6fb7b8ccf74bc19cc8f456b9f2ba6e",
+      "provider": null
     },
     {
       "id": "case-079",
+      "category": "draft",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-094",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 38.58,
-      "trace_id": "query_659bf8e9c7204501a2fcfbd416c8f811"
+      "latency_ms": 22.64,
+      "trace_id": "query_2c4f404ec39f4c0cb5a4ea8476609906",
+      "provider": null
     },
     {
       "id": "case-080",
+      "category": "asr_disagreement",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-095",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.18,
-      "trace_id": "query_25b922337fd64435a6b072240b187c46"
+      "latency_ms": 19.61,
+      "trace_id": "query_f40a8b55f6e44ba8abd28c0bde80ba0b",
+      "provider": null
     },
     {
       "id": "case-081",
+      "category": "code_switched",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-096",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.78,
-      "trace_id": "query_d1af10f70f3343fba06af73f39cf4913"
+      "latency_ms": 20.12,
+      "trace_id": "query_6e7325c460fb4091af9a74ee37c3c2cd",
+      "provider": null
     },
     {
       "id": "case-082",
+      "category": "project_schedule",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-097",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.02,
-      "trace_id": "query_8d8907f4e2b5452fa9a72194bd48012c"
+      "latency_ms": 37.99,
+      "trace_id": "query_50b2783410c446958b3db25e455669c9",
+      "provider": null
     },
     {
       "id": "case-083",
+      "category": "customer_budget",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-098",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.28,
-      "trace_id": "query_282fb013e2b94d01b0e4c74729b18315"
+      "latency_ms": 22.31,
+      "trace_id": "query_8a3413616cad477889d137856ae7329d",
+      "provider": null
     },
     {
       "id": "case-084",
+      "category": "meeting_episode",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-099",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.39,
-      "trace_id": "query_c933193028c0453da71745fd91929d9f"
+      "latency_ms": 23.9,
+      "trace_id": "query_0e96e986712c44fa90d77d432f2699cc",
+      "provider": null
     },
     {
       "id": "case-085",
+      "category": "household",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-103",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.12,
-      "trace_id": "query_83aa6004321449b0ae66a5d2cfea3cac"
+      "latency_ms": 22.23,
+      "trace_id": "query_5428c1444bff428e9c91e78d97886c11",
+      "provider": null
     },
     {
       "id": "case-086",
+      "category": "draft",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-106",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.09,
-      "trace_id": "query_20acb7bb55354d9989e08cb5e81ec455"
+      "latency_ms": 19.78,
+      "trace_id": "query_de1b1254ec38429f9681c146f5cee585",
+      "provider": null
     },
     {
       "id": "case-087",
+      "category": "code_switched",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-108",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.6,
-      "trace_id": "query_969c515a69e44d498f41cb8b6d5965d5"
+      "latency_ms": 20.16,
+      "trace_id": "query_26ca0b943b6c40cf84369da82c78d2cf",
+      "provider": null
     },
     {
       "id": "case-088",
+      "category": "project_schedule",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-109",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.7,
-      "trace_id": "query_a084aace04e3409eb6171c524726e7a7"
+      "latency_ms": 20.69,
+      "trace_id": "query_7a98f3c364c04a1a8c32b937490c0602",
+      "provider": null
     },
     {
       "id": "case-089",
+      "category": "customer_budget",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-110",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.1,
-      "trace_id": "query_b5e9db51ddd24667b59cc9add3f06129"
+      "latency_ms": 20.31,
+      "trace_id": "query_d915228018164eb8b38920b61884c857",
+      "provider": null
     },
     {
       "id": "case-090",
+      "category": "meeting_episode",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-111",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.14,
-      "trace_id": "query_ee2fca02353d4fe3a4c361748bbd5119"
+      "latency_ms": 21.47,
+      "trace_id": "query_571a81041dc24e6884f0c41a34aa6b37",
+      "provider": null
     },
     {
       "id": "case-091",
+      "category": "preference",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-112",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.24,
-      "trace_id": "query_836d989dea634fc4ac6b566c6e6ff8cb"
+      "latency_ms": 22.27,
+      "trace_id": "query_c6ed6afaf4c842adadd29fc0a6c702b0",
+      "provider": null
     },
     {
       "id": "case-092",
+      "category": "project_update",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-116",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.34,
-      "trace_id": "query_edd93111878445668767da51ea11218e"
+      "latency_ms": 19.23,
+      "trace_id": "query_22e897871bc74c9f897c50c4f8148822",
+      "provider": null
     },
     {
       "id": "case-093",
+      "category": "hypothetical",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-117",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.8,
-      "trace_id": "query_0e04120b0f86469f87b8a4f04aadcd66"
+      "latency_ms": 19.96,
+      "trace_id": "query_5387abdec8ed4c9c8bd4d6c8e640ac24",
+      "provider": null
     },
     {
       "id": "case-094",
+      "category": "code_switched",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-120",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 35.11,
-      "trace_id": "query_d7225a73ff114949bc5816f827c6360c"
+      "latency_ms": 19.71,
+      "trace_id": "query_afdf9584fd6e4295b9e45714cf8b3bcc",
+      "provider": null
     },
     {
       "id": "case-095",
+      "category": "project_schedule",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-121",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.68,
-      "trace_id": "query_891607195de4423a8412f67e0be915c0"
+      "latency_ms": 21.73,
+      "trace_id": "query_389f4d04fd3e486f877f34b037719595",
+      "provider": null
     },
     {
       "id": "case-096",
+      "category": "customer_budget",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-122",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.25,
-      "trace_id": "query_b58d5f1ccd5e4a2c855951bb7a699c78"
+      "latency_ms": 20.77,
+      "trace_id": "query_fa25c17f2c564ec887a3de1875299952",
+      "provider": null
     },
     {
       "id": "case-097",
+      "category": "meeting_episode",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-123",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.24,
-      "trace_id": "query_d61280c4d5ec4d6fac6af9319e7f67ae"
+      "latency_ms": 19.86,
+      "trace_id": "query_48b1f3cd9cb14fae8b93d28b34cb06f3",
+      "provider": null
     },
     {
       "id": "case-098",
+      "category": "travel",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-125",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 13.1,
-      "trace_id": "query_2e4e8df750434869bae2eae9ab350043"
+      "latency_ms": 23.42,
+      "trace_id": "query_1ea9a89126174aa4a0f1db4d5164f833",
+      "provider": null
     },
     {
       "id": "case-099",
+      "category": "study",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-126",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.38,
-      "trace_id": "query_5abc5e21ae7f4164848fa6d248ecc21d"
+      "latency_ms": 20.77,
+      "trace_id": "query_6e3fbcae60304364afcdbff7d195b0a8",
+      "provider": null
     },
     {
       "id": "case-100",
+      "category": "household",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-127",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 13.25,
-      "trace_id": "query_04252a45ec2f42bcb26f68e4289fb278"
+      "latency_ms": 23.71,
+      "trace_id": "query_402529b4f8d445b8a72c7b71b30df65d",
+      "provider": null
     },
     {
       "id": "case-101",
+      "category": "hypothetical",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-129",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.44,
-      "trace_id": "query_928ef60c152e4dd09c993a1cc852e040"
+      "latency_ms": 21.13,
+      "trace_id": "query_57d62022c68d485f9a4d0f68ff773ea1",
+      "provider": null
     },
     {
       "id": "case-102",
+      "category": "draft",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-130",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.63,
-      "trace_id": "query_4fca364914bf4783b204aafa39b12aee"
+      "latency_ms": 19.95,
+      "trace_id": "query_bc3c9657b6af4874bce7957bd5256acc",
+      "provider": null
     },
     {
       "id": "case-103",
+      "category": "code_switched",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-132",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.8,
-      "trace_id": "query_3b558128ce2249bab5ba6ecd300ccecc"
+      "latency_ms": 21.73,
+      "trace_id": "query_abdfccf3fe064747b9577a5c9803dc33",
+      "provider": null
     },
     {
       "id": "case-104",
+      "category": "project_schedule",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-133",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.09,
-      "trace_id": "query_51c2ec3cf4764f62b7ca4596a9adff59"
+      "latency_ms": 21.43,
+      "trace_id": "query_35d2339ec584404183c5c369b884f818",
+      "provider": null
     },
     {
       "id": "case-105",
+      "category": "customer_budget",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-134",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.91,
-      "trace_id": "query_846d5cb1db0f4549bba7b2cf92b77c94"
+      "latency_ms": 25.21,
+      "trace_id": "query_9cafa06f12b04b1c96d5fa2facc8a5f9",
+      "provider": null
     },
     {
       "id": "case-106",
+      "category": "meeting_episode",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-135",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.95,
-      "trace_id": "query_f4b220c10cad47dcb6326d48976ca763"
+      "latency_ms": 20.5,
+      "trace_id": "query_f8e1e42d95894788a37bb5b0a24c94b7",
+      "provider": null
     },
     {
       "id": "case-107",
+      "category": "travel",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-137",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.69,
-      "trace_id": "query_7ee9f2afcc2b4a69b5aefea00d8f29f0"
+      "latency_ms": 38.32,
+      "trace_id": "query_ebc8b7b24b0544b684595c76fdee3973",
+      "provider": null
     },
     {
       "id": "case-108",
+      "category": "hypothetical",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-141",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.91,
-      "trace_id": "query_d4d7427a2fba4b8db0c61798a50dc2a4"
+      "latency_ms": 25.96,
+      "trace_id": "query_a3f454a50cb84ddebf482f46e726fd49",
+      "provider": null
     },
     {
       "id": "case-109",
+      "category": "draft",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-142",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.1,
-      "trace_id": "query_3f6bac65e8904d44898adad0e53d86cc"
+      "latency_ms": 21.37,
+      "trace_id": "query_297b13852ee74084b5acaabe079db9ac",
+      "provider": null
     },
     {
       "id": "case-110",
+      "category": "asr_disagreement",
       "expected_status": "answered",
       "actual_status": "answered",
+      "required_external_id": "synthetic-143",
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.73,
-      "trace_id": "query_bd78219e597b44d794da551c04ffe399"
+      "latency_ms": 20.97,
+      "trace_id": "query_1dc0e0d043fa445da831207bbc91d871",
+      "provider": null
     },
     {
       "id": "case-111",
-      "expected_status": "answered",
-      "actual_status": "answered",
+      "category": "negative_unrelated",
+      "expected_status": "insufficient_evidence",
+      "actual_status": "insufficient_evidence",
+      "required_external_id": null,
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.64,
-      "trace_id": "query_83e051eb2a0e49f8b01c6434ffe5e24e"
+      "latency_ms": 18.03,
+      "trace_id": "query_9708bebeba1048c9b1811a3c150587e6",
+      "provider": null
     },
     {
       "id": "case-112",
-      "expected_status": "answered",
-      "actual_status": "answered",
+      "category": "negative_unrelated",
+      "expected_status": "insufficient_evidence",
+      "actual_status": "insufficient_evidence",
+      "required_external_id": null,
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.89,
-      "trace_id": "query_86e563b099f94e0293278695bc9af7c3"
+      "latency_ms": 20.31,
+      "trace_id": "query_7655d31ccc5d4ddc8e4618395f731819",
+      "provider": null
     },
     {
       "id": "case-113",
-      "expected_status": "answered",
-      "actual_status": "answered",
+      "category": "negative_unrelated",
+      "expected_status": "insufficient_evidence",
+      "actual_status": "insufficient_evidence",
+      "required_external_id": null,
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.88,
-      "trace_id": "query_da1843f7e3da415b839e0120fa1e28a3"
+      "latency_ms": 19.93,
+      "trace_id": "query_747ff10234cd4982b8cd78b9062dea73",
+      "provider": null
     },
     {
       "id": "case-114",
-      "expected_status": "answered",
-      "actual_status": "answered",
+      "category": "negative_unrelated",
+      "expected_status": "insufficient_evidence",
+      "actual_status": "insufficient_evidence",
+      "required_external_id": null,
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 11.58,
-      "trace_id": "query_6470093cb9674b0fb9d31d913e388c15"
+      "latency_ms": 17.58,
+      "trace_id": "query_2121cfc0c7834fc5ac8500f07e25bd3c",
+      "provider": null
     },
     {
       "id": "case-115",
-      "expected_status": "answered",
-      "actual_status": "answered",
+      "category": "negative_unrelated",
+      "expected_status": "insufficient_evidence",
+      "actual_status": "insufficient_evidence",
+      "required_external_id": null,
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 14.24,
-      "trace_id": "query_0018f8392af6412286ced31cfe81486d"
+      "latency_ms": 17.09,
+      "trace_id": "query_07da41186296477eaf9b8b9d74007e49",
+      "provider": null
     },
     {
       "id": "case-116",
-      "expected_status": "answered",
-      "actual_status": "answered",
+      "category": "negative_unrelated",
+      "expected_status": "insufficient_evidence",
+      "actual_status": "insufficient_evidence",
+      "required_external_id": null,
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.38,
-      "trace_id": "query_1325022c711d4ee598dad2df0ad8054c"
+      "latency_ms": 18.63,
+      "trace_id": "query_a4a7d572f1c74545a38410161ceea078",
+      "provider": null
     },
     {
       "id": "case-117",
-      "expected_status": "answered",
-      "actual_status": "answered",
+      "category": "negative_unrelated",
+      "expected_status": "insufficient_evidence",
+      "actual_status": "insufficient_evidence",
+      "required_external_id": null,
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 10.69,
-      "trace_id": "query_4df10da9e29a4832b2a03f3044056c2c"
+      "latency_ms": 18.15,
+      "trace_id": "query_86fe8e7940c64d45bf0411579b1647f6",
+      "provider": null
     },
     {
       "id": "case-118",
-      "expected_status": "answered",
-      "actual_status": "answered",
+      "category": "negative_unrelated",
+      "expected_status": "insufficient_evidence",
+      "actual_status": "insufficient_evidence",
+      "required_external_id": null,
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.22,
-      "trace_id": "query_7bc8797fad944c03805c9ce39c29f0ca"
+      "latency_ms": 19.92,
+      "trace_id": "query_647fbf624b374778a61ec5361c81398f",
+      "provider": null
     },
     {
       "id": "case-119",
-      "expected_status": "answered",
-      "actual_status": "answered",
+      "category": "negative_unrelated",
+      "expected_status": "insufficient_evidence",
+      "actual_status": "insufficient_evidence",
+      "required_external_id": null,
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.33,
-      "trace_id": "query_bc7eaf9bb04543a094bb52acd9560b61"
+      "latency_ms": 18.02,
+      "trace_id": "query_99d14497af884bf8b686d8b917bb277d",
+      "provider": null
     },
     {
       "id": "case-120",
-      "expected_status": "answered",
-      "actual_status": "answered",
+      "category": "negative_unrelated",
+      "expected_status": "insufficient_evidence",
+      "actual_status": "insufficient_evidence",
+      "required_external_id": null,
+      "source_passed": true,
+      "text_passed": true,
       "passed": true,
-      "latency_ms": 12.27,
-      "trace_id": "query_a24503dfaae44d3bbd0a268239309305"
+      "latency_ms": 19.14,
+      "trace_id": "query_4fb61581afd549a6b22ba27d03fd76e7",
+      "provider": null
     }
   ]
 }

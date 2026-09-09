@@ -1,17 +1,25 @@
 """Transparent hybrid candidate ranking for the initial local corpus scale."""
 from __future__ import annotations
 
+import hashlib
 import re
 from collections import defaultdict
 from dataclasses import dataclass
+from datetime import UTC, datetime
 
 import numpy as np
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .db import Embedding, Memory, Source, SourceChunk
-from .embeddings import encode_query, vector_from_blob
+from .embeddings import encode_passage, encode_query, vector_from_blob
 from .settings import Settings
+
+STOPWORDS = {
+    "a", "about", "an", "and", "are", "as", "at", "be", "by", "for", "from",
+    "how", "i", "in", "is", "it", "of", "on", "or", "that", "the", "this",
+    "to", "was", "what", "when", "where", "which", "who", "why", "will", "with",
+}
 
 
 def tokens(value: str) -> list[str]:
@@ -38,6 +46,7 @@ class Candidate:
     lexical_rank: int | None
     dense_rank: int | None
     score: float
+    retrieval_mode: str | None = None
 
 
 def search_sources(
@@ -53,7 +62,9 @@ def search_sources(
     When vectors are absent the deterministic character n-gram score keeps a local
     reviewer run usable. It is a fallback, never represented as multilingual E5.
     """
-    query_terms, query_grams = tokens(question), char_ngrams(question)
+    all_query_terms = tokens(question)
+    query_terms = [t for t in all_query_terms if t not in STOPWORDS] or all_query_terms
+    query_grams = char_ngrams(question)
     excluded_source_ids = excluded_source_ids or set()
     sources = session.scalars(
         select(Source).where(
@@ -67,6 +78,7 @@ def search_sources(
     dense: list[tuple[float, Source]] = []
     query_vector = encode_query(settings, question)
     dense_scores: dict[str, float] = {}
+    dense_modes: dict[str, str] = {}
     if query_vector is not None:
         rows = session.execute(
             select(Embedding, SourceChunk, Source)
@@ -84,54 +96,112 @@ def search_sources(
                 continue
             vector = vector_from_blob(embedding.vector)
             if vector.size == query_vector.size:
-                dense_scores[source.id] = max(dense_scores.get(source.id, -1.0), float(np.dot(query_vector, vector)))
+                sim = float(np.dot(query_vector, vector))
+                if sim > dense_scores.get(source.id, -1.0):
+                    dense_scores[source.id] = sim
+                    dense_modes[source.id] = "embedding"
     for source in sources:
         material = f"{source.formatted_text} {source.raw_asr}".casefold()
-        lexical_score = sum(material.count(term) for term in query_terms)
-        source_grams = char_ngrams(material)
-        union = len(query_grams | source_grams)
-        uses_embedding = source.id in dense_scores
-        dense_score = dense_scores.get(source.id, len(query_grams & source_grams) / union if union else 0.0)
+        mat_tokens = tokens(material)
+        token_counts: dict[str, int] = defaultdict(int)
+        for t in mat_tokens:
+            token_counts[t] += 1
+        lexical_score = sum(token_counts[term] for term in query_terms)
         if lexical_score:
-            lexical.append((lexical_score, source))
-        # Trigram overlap is only an offline safety-net. Incidental overlap in
-        # common words must not turn an unknown question into a cited answer.
-        if dense_score >= (settings.embedding_min_similarity if uses_embedding else 0.10):
-            dense.append((dense_score, source))
+            lexical.append((float(lexical_score), source))
+
+        if source.id in dense_scores:
+            d_score = dense_scores[source.id]
+            if d_score >= settings.embedding_min_similarity:
+                dense.append((d_score, source))
+        else:
+            source_grams = char_ngrams(material)
+            union = len(query_grams | source_grams)
+            trigram_score = len(query_grams & source_grams) / union if union else 0.0
+            if trigram_score >= 0.30:
+                dense.append((trigram_score, source))
+                dense_modes[source.id] = "trigram_fallback"
+
     lexical.sort(key=lambda row: row[0], reverse=True)
     dense.sort(key=lambda row: row[0], reverse=True)
     ranks: dict[str, list[int | None]] = defaultdict(lambda: [None, None])
     source_by_id = {source.id: source for source in sources}
-    for rank, (_, source) in enumerate(lexical[:limit], start=1): ranks[source.id][0] = rank
-    for rank, (_, source) in enumerate(dense[:limit], start=1): ranks[source.id][1] = rank
-    ranked = []
+    for rank, (_, source) in enumerate(lexical[:limit], start=1):
+        ranks[source.id][0] = rank
+    for rank, (_, source) in enumerate(dense[:limit], start=1):
+        ranks[source.id][1] = rank
+    ranked: list[Candidate] = []
     for source_id, (lex_rank, dense_rank) in ranks.items():
         score = sum(1 / (60 + rank) for rank in (lex_rank, dense_rank) if rank is not None)
-        ranked.append(Candidate(source_by_id[source_id], lex_rank, dense_rank, score))
-    return sorted(ranked, key=lambda item: (item.score, item.source.occurred_at or item.source.ingested_at), reverse=True)[:limit]
+        mode = dense_modes.get(source_id)
+        ranked.append(Candidate(source_by_id[source_id], lex_rank, dense_rank, score, mode))
+
+    def _sort_key(item: Candidate):
+        dt = item.source.occurred_at or item.source.ingested_at
+        if dt is not None and dt.tzinfo is None:
+            dt = dt.replace(tzinfo=UTC)
+        return (item.score, dt or datetime.min.replace(tzinfo=UTC))
+
+    sorted_candidates = sorted(ranked, key=_sort_key, reverse=True)
+
+    # Deduplicate candidates by content digest to collapse repeated transcripts
+    seen_groups: set[str] = set()
+    deduped: list[Candidate] = []
+    for candidate in sorted_candidates:
+        group_id = hashlib.sha256(
+            f"{candidate.source.formatted_text or candidate.source.raw_asr}".strip().casefold().encode()
+        ).hexdigest()[:24]
+        if group_id in seen_groups:
+            continue
+        seen_groups.add(group_id)
+        deduped.append(candidate)
+
+    return deduped[:limit]
 
 
 def active_memories(session: Session, namespace_id: str, question: str) -> list[Memory]:
-    query = set(tokens(question))
+    raw_terms = tokens(question)
+    query = set(raw_terms) - STOPWORDS or set(raw_terms)
     memories = session.scalars(select(Memory).where(Memory.namespace_id == namespace_id, Memory.state == "active")).all()
-    return [memory for memory in memories if query & set(tokens(f"{memory.subject} {memory.predicate} {memory.value}"))]
+    matched: list[Memory] = []
+    for memory in memories:
+        mem_tokens = set(tokens(f"{memory.subject} {memory.predicate} {memory.value}")) - STOPWORDS
+        if query & mem_tokens:
+            matched.append(memory)
+    return matched
 
 
-def suppressed_source_ids(session: Session, namespace_id: str, question: str) -> set[str]:
+def suppressed_source_ids(
+    session: Session,
+    namespace_id: str,
+    question: str,
+    settings: Settings | None = None,
+) -> set[str]:
     """Return sources whose matching promoted memory was explicitly suppressed.
 
     Source history remains inspectable. The exclusion only prevents a suppressed
     memory statement from being replayed as an answer to a matching question.
     """
-    query = set(tokens(question))
+    raw_terms = tokens(question)
+    query = set(raw_terms) - STOPWORDS or set(raw_terms)
     memories = session.scalars(
         select(Memory).where(
             Memory.namespace_id == namespace_id,
             Memory.state == "suppressed",
         )
     ).all()
-    return {
-        memory.source_id
-        for memory in memories
-        if query & set(tokens(f"{memory.subject} {memory.predicate} {memory.value}"))
-    }
+    blocked: set[str] = set()
+    query_vector = encode_query(settings, question) if settings else None
+    for memory in memories:
+        mem_text = f"{memory.subject} {memory.predicate} {memory.value}"
+        mem_tokens = set(tokens(mem_text)) - STOPWORDS
+        if query & mem_tokens:
+            blocked.add(memory.source_id)
+            continue
+        if query_vector is not None and settings:
+            encoded = encode_passage(settings, mem_text)
+            if encoded:
+                vec = vector_from_blob(encoded[0])
+                if vec.size == query_vector.size and float(np.dot(query_vector, vec)) >= settings.embedding_min_similarity:
+                    blocked.add(memory.source_id)
+    return blocked

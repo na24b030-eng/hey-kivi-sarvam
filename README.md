@@ -74,8 +74,8 @@ For deployment details:
 - **Input Boundaries**: The project operates on standard transcript pairs (`raw_asr` and `formatted_text`) formatted as UTF-8 JSONL. It does not interface with the installed Kivi desktop application via native OS hooks, nor does it perform live microphone audio capture/ASR.
 - **Provider Security & Isolation**: All provider interactions (Sarvam API) are strictly server-side. The API key (`SARVAM_API_KEY`) is optional, is never exposed to the browser, and is not stored in this repository. When the key is omitted, the backend transparently returns grounded source replay and controlled memory answers without crashing.
 - **Evaluation Scope**: 
-  - The offline 120-case retrieval benchmark (`eval/results/evidence-report.json`) verifies evidence retrieval and source provenance (120/120 passed).
-  - The live smoke suite (`eval/results/live-smoke-report.json`) exercises real provider integration across 12 distinct corpus categories using `sarvam-105b` (12/12 passed, 7,624 tokens, 1.12 s p50 latency).
+  - The offline 120-case retrieval benchmark (`eval/results/demo-report.json`) verifies evidence retrieval and source provenance (120/120 passed, including negative abstention cases).
+  - The live smoke suite (`eval/results/live-smoke-report.json`) exercises real provider integration across all corpus categories and negative queries using `sarvam-105b` (13/13 passed).
   - The cross-lingual evaluation (`eval/results/multilingual-embedding-report.json`) demonstrates dense vector retrieval from English queries to Hindi transcripts using `intfloat/multilingual-e5-small` without token overlap.
   - These suites validate grounded provenance, multilingual vector matching, and provider integration; they are not intended as broad academic quality benchmarks for general NLP reasoning.
 - **Multi-Tenant Access**: Namespaces provide isolated memory workspaces within a deployment, but the current prototype lacks a multi-tenant user authentication layer. Public instances should be used with synthetic or sanitized records.
