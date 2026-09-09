@@ -78,7 +78,7 @@ The memory database defaults to `%LOCALAPPDATA%\KiviMemoryWorkbench\memory.sqlit
 
 Do not put a Sarvam key in the frontend; use the ignored `backend/.env` only when enabling the server-side adapter.
 
-For the hosted Railway deployment, use Railway's native Railpack builder, attach a volume at `/data`, set `APP_DATA_DIR=/data` and `FRONTEND_DIST_DIR=/app/frontend/dist`, and set `SARVAM_API_KEY` in Railway service variables. The start command runs migrations automatically; see [docs/deploy-railway.md](docs/deploy-railway.md).
+For a hosted static frontend, use the committed Vercel configuration and set `VITE_API_BASE_URL` to a separately hosted HTTPS backend. Add the deployed frontend's exact origin to that backend's `TRUSTED_ORIGINS`. Vercel does not replace the persistent FastAPI/SQLite/worker runtime; see [docs/deploy-vercel.md](docs/deploy-vercel.md).
 
 Reset only the named namespace after stopping the API and worker:
 

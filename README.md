@@ -57,13 +57,13 @@ See [RUN.md](RUN.md) for the exact fresh local setup, migration, seed, processin
 
 Copy `backend/.env.example` to `backend/.env` only when you need local overrides. The real `.env`, databases, model cache, build output, and private interview notes are ignored. GitHub Actions runs the offline backend tests and lint plus frontend type-check/build on every push and pull request.
 
-## Deploy on Railway
+## Deploy the frontend on Vercel
 
-Railway can build this repository natively with Railpack; Docker is not required. Attach a Railway Volume at `/data`, set `APP_DATA_DIR=/data` and `FRONTEND_DIST_DIR=/app/frontend/dist`, and add `SARVAM_API_KEY` only in Railway's protected service variables. The Railway start command applies Alembic migrations before it starts the FastAPI service, which also serves the compiled React UI. Follow the complete [Railway deployment guide](docs/deploy-railway.md).
+The repository includes root-level Vercel configuration for the Vite frontend. Set `VITE_API_BASE_URL` to the HTTPS origin of a separately running FastAPI backend, and add the final Vercel origin to the backend's `TRUSTED_ORIGINS`. Vercel hosts the static frontend only; the current SQLite database, worker, E5 model and server-side Sarvam key remain on the backend host. Follow the complete [Vercel deployment guide](docs/deploy-vercel.md).
 
 ## Scope and limitations
 
-The default reviewer run is local and binds to loopback; the Railway guide is an optional packaging path. The project does not integrate with the installed Kivi application, transcribe live audio, or expose any provider credential to the browser. A Sarvam API key is optional and is never included in this repository. The Sarvam adapter was validated with a harmless synthetic end-to-end query; returned model and usage metadata are retained in the query trace. The committed 120-case report remains an offline provenance run, not a live-provider quality benchmark.
+The default reviewer run is local and binds to loopback. A Vercel frontend cannot reach a backend bound only to `127.0.0.1`; a working public deployment therefore requires a separate HTTPS backend with persistent storage. The project does not integrate with the installed Kivi application, transcribe live audio, or expose any provider credential to the browser. A Sarvam API key is optional and is never included in this repository. The Sarvam adapter was validated with a harmless synthetic end-to-end query; returned model and usage metadata are retained in the query trace. The committed 120-case report remains an offline provenance run, not a live-provider quality benchmark.
 
 ## AI use
 

@@ -9,8 +9,10 @@ type Memory = { id: string; kind: string; subject: string; predicate: string; va
 type Evidence = { id: string; external_id: string; text: string; occurred_at?: string }
 type Answer = { status: string; answer: string; draft_text?: string; evidence: Evidence[]; uncertainties: string[] }
 
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '')
+
 async function api<T>(path: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(path, { headers: { 'Content-Type': 'application/json', ...(options?.headers || {}) }, ...options })
+  const response = await fetch(`${API_BASE_URL}${path}`, { headers: { 'Content-Type': 'application/json', ...(options?.headers || {}) }, ...options })
   const body = await response.json()
   if (!response.ok) throw new Error(body.message || body.detail?.message || 'Request failed')
   return body as T
