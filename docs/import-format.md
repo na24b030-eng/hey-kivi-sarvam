@@ -1,6 +1,6 @@
 # Transcript import format — v1 contract
 
-Status: implemented by the local backend. Use the desktop **Import** screen or the CLI documented in [RUN.md](../RUN.md). The contract below is the canonical input format.
+Status: implemented by the backend (both locally and on the live Render service). Use the **Import** screen in the web/desktop UI or the CLI documented in [RUN.md](../RUN.md). The contract below is the canonical input format.
 
 Provide UTF-8 JSONL: one JSON object per line. Each object must contain `schema_version: 1`, a nonblank string `id`, and the string fields `raw_asr` and `formatted_text`. The normative shape is in `backend/schemas/transcript.schema.json`. A schema validator must enable date-time format checking; shape validation alone does not validate timestamps.
 

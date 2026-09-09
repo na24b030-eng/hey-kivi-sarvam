@@ -6,7 +6,12 @@ Tested runtime: **Python 3.12.13**, **uv 0.11.3**, **Node.js 24.15.0**, and **np
 
 ## Environment variables
 
-No environment variable is required for an offline local run. Copy `backend/.env.example` to `backend/.env` only to configure documented overrides. `SARVAM_API_KEY` is optional and enables generated answers; never place it in frontend code or commit the real `.env`. `APP_DATA_DIR` selects an isolated data directory, and `EMBEDDING_CACHE_DIR` can point to a previously downloaded local model cache.
+No environment variable is required for an offline local run. Copy `backend/.env.example` to `backend/.env` only to configure documented overrides:
+- `SARVAM_API_KEY`: Optional; enables server-side generated answers via `sarvam-105b`. Never place it in frontend code or commit `.env`.
+- `APP_DATA_DIR`: Selects an isolated data directory for SQLite database storage.
+- `EMBEDDING_CACHE_DIR`: Points to a local SentenceTransformers model cache for `intfloat/multilingual-e5-small`.
+- `HOST` and `PORT`: Override the server host and port (defaults to `127.0.0.1` and `8000` locally; Render passes `0.0.0.0` and `$PORT`).
+- `TRUSTED_ORIGINS`: Comma-separated list of allowed frontend origins (defaults include `http://127.0.0.1:8000`, `http://localhost:8000`, `https://*.vercel.app`, and `https://hey-kivi-sarvam-dnaq.vercel.app`).
 
 ## Install, initialize, and seed
 
@@ -78,9 +83,16 @@ The memory database defaults to `%LOCALAPPDATA%\KiviMemoryWorkbench\memory.sqlit
 
 Do not put a Sarvam key in the frontend; use the ignored `backend/.env` only when enabling the server-side adapter.
 
-For hosted deployment, the frontend is deployed on Vercel and the backend is deployed on Render. In Vercel, `VITE_API_BASE_URL` points to the Render service origin (`https://hey-kivi-sarvam.onrender.com`), while the Render backend allows the Vercel frontend via `TRUSTED_ORIGINS`. See [docs/deploy-vercel.md](docs/deploy-vercel.md) and [docs/deploy-render.md](docs/deploy-render.md).
+## Cloud deployment (Vercel + Render)
 
-Reset only the named namespace after stopping the API and worker:
+The project includes an active, full-stack hosted deployment:
+- **Frontend (Vercel)**: `https://hey-kivi-sarvam-dnaq.vercel.app` (configured with `VITE_API_BASE_URL=https://hey-kivi-sarvam.onrender.com`).
+- **Backend (Render)**: `https://hey-kivi-sarvam.onrender.com` (Python FastAPI service running SQLite migrations and dynamic port bindings).
+- **CORS**: Render's `TRUSTED_ORIGINS` allows incoming cross-origin requests from the Vercel frontend.
+
+See [docs/deploy-vercel.md](docs/deploy-vercel.md) and [docs/deploy-render.md](docs/deploy-render.md) for full deployment blueprints and setup instructions.
+
+## Reset a workspace
 
 ```powershell
 uv run --project backend python -m kivi_memory.cli reset --namespace demo

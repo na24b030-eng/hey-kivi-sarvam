@@ -1,10 +1,10 @@
 # Kivi Memory Workbench
 
-Kivi Memory Workbench is a local, evidence-backed semantic-memory companion for transcript history. It preserves raw ASR and formatted text, indexes the history, derives cautious fact/preference candidates, and answers only with inspectable source evidence.
+Kivi Memory Workbench is an evidence-backed semantic-memory companion for transcript history. It preserves raw ASR and formatted text, indexes the history, derives cautious fact/preference candidates, and answers only with inspectable source evidence. The system can be run locally or deployed as a full-stack cloud application.
 
 The product direction is summarized in [positioning_statement.md](positioning_statement.md) and [vision.md](vision.md).
 
-The main interface is a desktop UI served by FastAPI at `127.0.0.1`. Its visual system uses a warm off-white workspace, forest-green type, pale-green evidence surfaces, and a direct path from a Hey Kivi answer to its source history.
+The main interface is a desktop-first responsive UI, accessible locally via FastAPI/Vite (`http://127.0.0.1:8000`) or through the live cloud deployment on Vercel connected to Render. Its visual system uses a warm off-white workspace, forest-green type, pale-green evidence surfaces, and a direct path from a Hey Kivi answer to its source history.
 
 ## Product flow
 
@@ -22,8 +22,8 @@ The main interface is a desktop UI served by FastAPI at `127.0.0.1`. Its visual 
 
 ## Architecture
 
-- **UI:** React, TypeScript, Vite; desktop-first layout.
-- **API/worker:** FastAPI, Pydantic and a local durable worker queue.
+- **UI:** React, TypeScript, Vite; desktop-first responsive layout (locally served or hosted on Vercel).
+- **API/worker:** FastAPI, Pydantic, and a durable worker queue; supports both local operation and cloud hosting on Render.
 - **Persistence:** SQLite/WAL, SQLAlchemy, Alembic migrations.
 - **Memory:** source records, chunks, embeddings, derived memories, and content-minimized lifecycle operations.
 - **Retrieval:** lexical ranking plus normalized `intfloat/multilingual-e5-small` cosine ranking where local vectors are present; reciprocal-rank fusion selects cited source evidence. A deterministic character n-gram fallback is clearly used when E5 is unavailable.
@@ -70,5 +70,13 @@ For deployment details:
 
 ## Scope and limitations
 
-The default backend setup is local and binds to loopback. A Vercel frontend cannot reach a backend bound only to `127.0.0.1`, so browser-local mode is provided for static review and public demos. A full shared deployment still needs a separate HTTPS backend with persistent storage. The project does not integrate with the installed Kivi application, transcribe live audio, or expose any provider credential to the browser. A Sarvam API key is optional and is never included in this repository. The Sarvam adapter was validated with a harmless synthetic end-to-end query; returned model and usage metadata are retained in the query trace. The committed 120-case report remains an offline provenance run, not a live-provider quality benchmark.
+- **Deployment Architecture**: The application supports both local execution and a full shared cloud deployment. In production, the React frontend is deployed on Vercel ([hey-kivi-sarvam-dnaq.vercel.app](https://hey-kivi-sarvam-dnaq.vercel.app/)) and connected to the live HTTPS FastAPI backend on Render ([hey-kivi-sarvam.onrender.com](https://hey-kivi-sarvam.onrender.com/)) with CORS configured. For offline review or isolated development, the backend runs locally with loopback or dynamic host/port bindings (`kivi-memory serve`). The browser-local `localStorage` demo mode exists solely as an unconfigured fallback in the frontend when `VITE_API_BASE_URL` is omitted.
+- **Input Boundaries**: The project operates on standard transcript pairs (`raw_asr` and `formatted_text`) formatted as UTF-8 JSONL. It does not interface with the installed Kivi desktop application via native OS hooks, nor does it perform live microphone audio capture/ASR.
+- **Provider Security & Isolation**: All provider interactions (Sarvam API) are strictly server-side. The API key (`SARVAM_API_KEY`) is optional, is never exposed to the browser, and is not stored in this repository. When the key is omitted, the backend transparently returns grounded source replay and controlled memory answers without crashing.
+- **Evaluation Scope**: 
+  - The offline 120-case retrieval benchmark (`eval/results/evidence-report.json`) verifies evidence retrieval and source provenance (120/120 passed).
+  - The live smoke suite (`eval/results/live-smoke-report.json`) exercises real provider integration across 12 distinct corpus categories using `sarvam-105b` (12/12 passed, 7,624 tokens, 1.12 s p50 latency).
+  - The cross-lingual evaluation (`eval/results/multilingual-embedding-report.json`) demonstrates dense vector retrieval from English queries to Hindi transcripts using `intfloat/multilingual-e5-small` without token overlap.
+  - These suites validate grounded provenance, multilingual vector matching, and provider integration; they are not intended as broad academic quality benchmarks for general NLP reasoning.
+- **Multi-Tenant Access**: Namespaces provide isolated memory workspaces within a deployment, but the current prototype lacks a multi-tenant user authentication layer. Public instances should be used with synthetic or sanitized records.
 

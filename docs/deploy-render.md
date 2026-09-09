@@ -66,8 +66,8 @@ Fill in the following fields:
 | **Branch** | `main` (or your active branch) |
 | **Root Directory** | *(leave empty)* |
 | **Runtime** | **Python 3** |
-| **Build Command** | `pip install uv && uv sync --project backend --locked` |
-| **Start Command** | `uv run --project backend python -m kivi_memory.cli migrate && uv run --project backend python -m kivi_memory.cli serve --host 0.0.0.0 --port $PORT` |
+| **Build Command** | `pip install uv && uv sync --project backend --locked` *(or `cd backend && pip install -e .`)* |
+| **Start Command** | `uv run --project backend python -m kivi_memory.cli migrate && uv run --project backend python -m kivi_memory.cli serve --host 0.0.0.0 --port $PORT` *(or `python -m kivi_memory.cli migrate && python -m kivi_memory.cli serve --host 0.0.0.0 --port $PORT`)* |
 | **Instance Type** | **Free** |
 
 ### Step 3: Add Environment Variables

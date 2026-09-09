@@ -2,18 +2,19 @@
 
 This deployment publishes the React/Vite frontend from the existing GitHub repository. The committed `vercel.json` supplies the install command, production build and output directory. The application currently has no client-side URL routes, so no catch-all rewrite is needed.
 
-The frontend has two deployment modes. With no environment variable, it runs a browser-local demo using `localStorage`. That mode is enough to open the Vercel URL, create a workspace, import JSONL, ask source-backed questions, inspect evidence, correct memories, suppress memories, and delete sources. With `VITE_API_BASE_URL`, the same UI calls the FastAPI backend for persistent storage, embeddings, worker processing, lifecycle provenance, and optional Sarvam generation.
+The frontend supports two operating modes:
+1. **Live Backend Mode (Active Production State)**: With `VITE_API_BASE_URL=https://hey-kivi-sarvam.onrender.com`, the Vercel frontend communicates directly with the persistent FastAPI backend on Render. This provides SQLite persistence, worker queue execution, embeddings, query tracing, and optional Sarvam generation.
+2. **Browser-Local Fallback**: If `VITE_API_BASE_URL` is not provided (e.g. for standalone forks or static review), the UI falls back to storing workspaces and records in browser `localStorage`.
 
-## Optional backend
+## Connected Render Backend
 
-Vercel serves this frontend as static files. It does not host this project's persistent FastAPI API, SQLite database, background worker or local E5 model. Browser-local demo mode does not need a backend. For the full backend workflow, run the backend on a host with:
+The production frontend on Vercel is connected to the live backend hosted on Render:
+- **Render Backend URL**: `https://hey-kivi-sarvam.onrender.com`
+- **Health Check**: `https://hey-kivi-sarvam.onrender.com/api/health`
+- **Readiness Probe**: `https://hey-kivi-sarvam.onrender.com/api/readiness`
+- **CORS**: Configured on Render via `TRUSTED_ORIGINS` to allow `https://hey-kivi-sarvam-dnaq.vercel.app` and `https://*.vercel.app`.
 
-- a stable public HTTPS origin, such as Render: `https://hey-kivi-sarvam.onrender.com`;
-- persistent storage for `APP_DATA_DIR`;
-- the documented migration and start commands from `RUN.md`;
-- `SARVAM_API_KEY` stored only in backend environment variables when generated answers are enabled.
-
-A backend bound to `127.0.0.1` on your computer is unreachable from the deployed site. See [docs/deploy-render.md](deploy-render.md) for deploying the backend on Render.
+For instructions on deploying or managing the backend on Render, see [docs/deploy-render.md](deploy-render.md).
 
 ## Create the Vercel project
 
