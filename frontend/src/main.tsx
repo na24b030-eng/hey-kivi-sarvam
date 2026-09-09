@@ -12,9 +12,24 @@ type Answer = { status: string; answer: string; draft_text?: string; evidence: E
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '')
 
 async function api<T>(path: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, { headers: { 'Content-Type': 'application/json', ...(options?.headers || {}) }, ...options })
-  const body = await response.json()
-  if (!response.ok) throw new Error(body.message || body.detail?.message || 'Request failed')
+  const endpoint = `${API_BASE_URL}${path}`
+  let response: Response
+  try {
+    response = await fetch(endpoint, { headers: { 'Content-Type': 'application/json', ...(options?.headers || {}) }, ...options })
+  } catch {
+    throw new Error(`Cannot reach the Kivi backend at ${API_BASE_URL || 'same-origin /api'}. Check VITE_API_BASE_URL, HTTPS availability, and backend TRUSTED_ORIGINS.`)
+  }
+  const responseText = await response.text()
+  let body: Record<string, unknown> = {}
+  try {
+    body = responseText ? JSON.parse(responseText) as Record<string, unknown> : {}
+  } catch {
+    throw new Error(`The server at ${response.url || endpoint} returned non-JSON content. Set VITE_API_BASE_URL to the FastAPI origin, without /api.`)
+  }
+  if (!response.ok) {
+    const detail = body.detail as Record<string, unknown> | undefined
+    throw new Error(String(body.message || detail?.message || `Backend request failed with HTTP ${response.status}.`))
+  }
   return body as T
 }
 
