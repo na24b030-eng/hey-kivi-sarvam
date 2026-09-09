@@ -2,6 +2,8 @@
 
 This deployment runs the existing React client and FastAPI API as one service. It uses Railway's native **Railpack** builder, so no Dockerfile or Docker Desktop is needed. The browser makes same-origin API requests, and the server keeps the Sarvam key private.
 
+This assignment build has no user authentication. Treat a public Railway domain as a short-lived demonstration and import only fictional or sanitized records. Add authentication and per-user authorization before using it with personal history.
+
 ## Create the service
 
 1. In Railway, create a new project and select the GitHub repository `na24b030-eng/hey-kivi-sarvam`.
