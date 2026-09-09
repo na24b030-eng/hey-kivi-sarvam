@@ -3,7 +3,7 @@
 This deployment publishes the React/Vite frontend from the existing GitHub repository. The committed `vercel.json` supplies the install command, production build and output directory. The application currently has no client-side URL routes, so no catch-all rewrite is needed.
 
 The frontend supports two operating modes:
-1. **Live Backend Mode (Active Production State)**: With `VITE_API_BASE_URL=https://hey-kivi-sarvam.onrender.com`, the Vercel frontend communicates directly with the persistent FastAPI backend on Render. This provides SQLite persistence, worker queue execution, embeddings, query tracing, and optional Sarvam generation.
+1. **Live Backend Mode (Active Production State)**: With `VITE_API_BASE_URL=https://hey-kivi-sarvam.onrender.com`, the Vercel frontend communicates directly with the FastAPI backend on Render. This provides SQLite persistence, worker queue execution, embeddings, query tracing, and optional Sarvam generation.
 2. **Browser-Local Fallback**: If `VITE_API_BASE_URL` is not provided (e.g. for standalone forks or static review), the UI falls back to storing workspaces and records in browser `localStorage`.
 
 ## Connected Render Backend
@@ -12,7 +12,7 @@ The production frontend on Vercel is connected to the live backend hosted on Ren
 - **Render Backend URL**: `https://hey-kivi-sarvam.onrender.com`
 - **Health Check**: `https://hey-kivi-sarvam.onrender.com/api/health`
 - **Readiness Probe**: `https://hey-kivi-sarvam.onrender.com/api/readiness`
-- **CORS**: Configured on Render via `TRUSTED_ORIGINS` to allow `https://hey-kivi-sarvam-dnaq.vercel.app` and `https://*.vercel.app`.
+- **CORS**: Configured on Render via `TRUSTED_ORIGINS` to allow `https://hey-kivi-sarvam-dnaq.vercel.app`.
 
 For instructions on deploying or managing the backend on Render, see [docs/deploy-render.md](deploy-render.md).
 

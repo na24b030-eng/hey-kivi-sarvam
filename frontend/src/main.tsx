@@ -186,12 +186,13 @@ async function api<T>(path: string, options?: RequestInit): Promise<T> {
   const endpoint = `${API_BASE_URL}${path}`
   let response: Response
   try {
-    response = await fetch(endpoint, { headers: { 'Content-Type': 'application/json', ...(options?.headers || {}) }, ...options })
+    response = await fetch(endpoint, { ...options, headers: { 'Content-Type': 'application/json', ...(options?.headers || {}) } })
   } catch {
     if (!API_BASE_URL && !['127.0.0.1', 'localhost'].includes(window.location.hostname)) return demoApi<T>(path, options)
     throw new Error(`Cannot reach the Kivi backend at ${API_BASE_URL || 'same-origin /api'}. Check VITE_API_BASE_URL, HTTPS availability, and backend TRUSTED_ORIGINS.`)
   }
   const responseText = await response.text()
+  if (response.ok && !responseText.trim()) throw new Error('The backend returned an empty response. Please try again.')
   let body: Record<string, unknown> = {}
   try {
     body = responseText ? JSON.parse(responseText) as Record<string, unknown> : {}
@@ -225,7 +226,24 @@ function App() {
     setSources(nextSources); setMemories(nextMemories); setNamespaces(nextNamespaces); setNamespace(nextNamespaces.find(item => item.id === current.id) || current)
   }
   useEffect(() => { refreshNamespaces().catch(error => setNotice(error.message)) }, [])
-  useEffect(() => { refreshData().catch(error => setNotice(error.message)) }, [namespace?.id])
+  useEffect(() => {
+    let cancelled = false
+    setAnswer(null); setSelected(null); setQuestion(''); setJsonl('')
+    setSources([]); setMemories([])
+    if (namespace) {
+      const currentId = namespace.id
+      Promise.all([
+        api<Source[]>(`/api/namespaces/${currentId}/sources`),
+        api<Memory[]>(`/api/namespaces/${currentId}/memories`),
+        api<Namespace[]>('/api/namespaces'),
+      ]).then(([nextSources, nextMemories, nextNamespaces]) => {
+        if (cancelled) return
+        setSources(nextSources); setMemories(nextMemories); setNamespaces(nextNamespaces)
+        setNamespace(nextNamespaces.find(item => item.id === currentId) || null)
+      }).catch(error => { if (!cancelled) setNotice(error.message) })
+    }
+    return () => { cancelled = true }
+  }, [namespace?.id])
   const createSpace = async () => { const used = new Set(namespaces.map(item => item.name.toLocaleLowerCase())); let number = Math.max(2, namespaces.length + 1); let name = namespaces.length ? `Memory ${number}` : 'My memory'; while (used.has(name.toLocaleLowerCase())) { number += 1; name = `Memory ${number}` } setBusy(true); try { const item = await api<Namespace>('/api/namespaces', { method: 'POST', body: JSON.stringify({ name }) }); setNamespace(item); setNotice(`Memory space “${item.name}” created.`) } catch (error) { setNotice((error as Error).message) } finally { setBusy(false) } }
   const submitAsk = async (event: FormEvent, mode: 'answer' | 'draft' = 'answer') => { event.preventDefault(); if (!namespace || !question.trim()) return; setBusy(true); setNotice(''); try { setAnswer(await api<Answer>(`/api/namespaces/${namespace.id}/ask`, { method: 'POST', body: JSON.stringify({ question, mode }) })) } catch (error) { setNotice((error as Error).message) } finally { setBusy(false) } }
   const importData = async (event: FormEvent) => { event.preventDefault(); if (!namespace || !jsonl.trim()) return; setBusy(true); try { const preview = await api<{ valid_count: number; invalid_count: number; errors: { line: number; message: string }[] }>(`/api/namespaces/${namespace.id}/imports/validate`, { method: 'POST', body: JSON.stringify({ jsonl }) }); if (preview.invalid_count) throw new Error(`Line ${preview.errors[0]?.line || '?'} is invalid. Fix the JSONL before importing.`); if (!preview.valid_count) throw new Error('No valid records found. Review the JSONL fields.'); const result = await api<{ accepted: number; conflicts: number }>(`/api/namespaces/${namespace.id}/imports`, { method: 'POST', body: JSON.stringify({ jsonl }) }); await api('/api/worker/drain', { method: 'POST' }); await refreshData(); if (result.accepted) setJsonl(''); setNotice(result.conflicts ? `Processed ${result.accepted} records; ${result.conflicts} changed IDs need explicit replacement.` : `Imported and processed ${result.accepted} records.`) } catch (error) { setNotice((error as Error).message) } finally { setBusy(false) } }

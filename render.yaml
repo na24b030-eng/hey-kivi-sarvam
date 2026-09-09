@@ -11,6 +11,6 @@ services:
       - key: PYTHON_VERSION
         value: "3.12.13"
       - key: TRUSTED_ORIGINS
-        value: "http://127.0.0.1:8000,http://localhost:8000,https://*.vercel.app"
+        value: "https://hey-kivi-sarvam-dnaq.vercel.app"
       - key: SARVAM_API_KEY
         sync: false

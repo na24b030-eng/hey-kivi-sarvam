@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     frontend_dist_dir: Path | None = None
     trusted_origins: str = (
         "http://127.0.0.1:8000,http://localhost:8000,http://127.0.0.1:5173,"
-        "https://*.vercel.app,https://hey-kivi-sarvam-dnaq.vercel.app"
+        "https://hey-kivi-sarvam-dnaq.vercel.app"
     )
 
     @property

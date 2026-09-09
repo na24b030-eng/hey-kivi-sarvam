@@ -62,7 +62,7 @@ Copy `backend/.env.example` to `backend/.env` only when you need local overrides
 - **Live frontend (Vercel)**: **[hey-kivi-sarvam-dnaq.vercel.app](https://hey-kivi-sarvam-dnaq.vercel.app/)**
 - **Live backend (Render)**: **[hey-kivi-sarvam.onrender.com](https://hey-kivi-sarvam.onrender.com/)**
 
-The live frontend on Vercel is connected directly to the persistent FastAPI backend on Render via `VITE_API_BASE_URL=https://hey-kivi-sarvam.onrender.com`. The backend natively allows cross-origin requests from the Vercel app via configured `TRUSTED_ORIGINS`.
+The live frontend on Vercel is connected directly to the FastAPI backend on Render via `VITE_API_BASE_URL=https://hey-kivi-sarvam.onrender.com`. The backend natively allows cross-origin requests from the Vercel app via configured `TRUSTED_ORIGINS`.
 
 For deployment details:
 - [Vercel deployment guide](docs/deploy-vercel.md)

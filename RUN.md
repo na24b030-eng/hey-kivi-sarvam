@@ -11,7 +11,7 @@ No environment variable is required for an offline local run. Copy `backend/.env
 - `APP_DATA_DIR`: Selects an isolated data directory for SQLite database storage.
 - `EMBEDDING_CACHE_DIR`: Points to a local SentenceTransformers model cache for `intfloat/multilingual-e5-small`.
 - `HOST` and `PORT`: Override the server host and port (defaults to `127.0.0.1` and `8000` locally; Render passes `0.0.0.0` and `$PORT`).
-- `TRUSTED_ORIGINS`: Comma-separated list of allowed frontend origins (defaults include `http://127.0.0.1:8000`, `http://localhost:8000`, `https://*.vercel.app`, and `https://hey-kivi-sarvam-dnaq.vercel.app`).
+- `TRUSTED_ORIGINS`: Comma-separated list of allowed frontend origins (defaults include `http://127.0.0.1:8000`, `http://localhost:8000`, `https://hey-kivi-sarvam-dnaq.vercel.app`).
 
 ## Install, initialize, and seed
 

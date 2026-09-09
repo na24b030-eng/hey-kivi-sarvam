@@ -131,7 +131,7 @@ You should see:
    ```
 5. Click **Validate, import, and process**.
 6. Switch to **Hey Kivi** and ask: `When does Project Lantern launch?`
-7. The answer will be retrieved from your persistent Render backend with source citation!
+7. The answer will be retrieved from your Render backend with source citation!
 
 ---
 
