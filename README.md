@@ -63,6 +63,14 @@ Live frontend: **[hey-kivi-sarvam-dnaq.vercel.app](https://hey-kivi-sarvam-dnaq.
 
 The repository includes root-level Vercel configuration for the Vite frontend. A Vercel deployment works immediately in browser-local demo mode using `localStorage`: create a memory space, import JSONL, ask source-backed questions, inspect evidence, correct memories, suppress memories, and delete sources. For the full FastAPI/Sarvam workflow, set `VITE_API_BASE_URL` to the HTTPS origin of a separately running backend and add the final Vercel origin to that backend's `TRUSTED_ORIGINS`. Follow the complete [Vercel deployment guide](docs/deploy-vercel.md).
 
+## Deploy the backend on Render
+
+The repository includes a native Python Render blueprint (`render.yaml`) for deploying the FastAPI backend as a free web service:
+- Run migrations and serve on Render using native Python 3.
+- Set `TRUSTED_ORIGINS` to your Vercel URL (e.g. `https://hey-kivi-sarvam-dnaq.vercel.app`).
+- Set `VITE_API_BASE_URL` in Vercel to your Render service URL to connect the two.
+- Follow the complete [Render deployment guide](docs/deploy-render.md).
+
 ## Scope and limitations
 
 The default backend setup is local and binds to loopback. A Vercel frontend cannot reach a backend bound only to `127.0.0.1`, so browser-local mode is provided for static review and public demos. A full shared deployment still needs a separate HTTPS backend with persistent storage. The project does not integrate with the installed Kivi application, transcribe live audio, or expose any provider credential to the browser. A Sarvam API key is optional and is never included in this repository. The Sarvam adapter was validated with a harmless synthetic end-to-end query; returned model and usage metadata are retained in the query trace. The committed 120-case report remains an offline provenance run, not a live-provider quality benchmark.

@@ -48,9 +48,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(title="Kivi Memory Workbench", version="0.1.0")
     app.state.session_factory = factory
     app.state.engine = engine
+    literal_origins = [o for o in settings.origins if not ("*" in o and o != "*")]
+    wildcard_origins = [o for o in settings.origins if "*" in o and o != "*"]
+    origin_regex = None
+    if wildcard_origins:
+        import re
+        patterns = [re.escape(w).replace(r"\*", r"[a-zA-Z0-9_\-\.]+") for w in wildcard_origins]
+        origin_regex = f"^({'|'.join(patterns)})$"
+
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=sorted(settings.origins),
+        allow_origins=sorted(literal_origins),
+        allow_origin_regex=origin_regex,
         allow_methods=["GET", "POST", "DELETE"],
         allow_headers=["Content-Type", "X-Request-ID"],
     )

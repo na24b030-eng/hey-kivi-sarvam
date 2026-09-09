@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
@@ -157,7 +158,9 @@ def main() -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     doctor = sub.add_parser("doctor"); doctor.add_argument("--download-embedding", action="store_true")
     sub.add_parser("migrate")
-    serve = sub.add_parser("serve"); serve.add_argument("--host", default="127.0.0.1"); serve.add_argument("--port", type=int, default=8000)
+    serve = sub.add_parser("serve")
+    serve.add_argument("--host", default=os.environ.get("HOST", "127.0.0.1"))
+    serve.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8000")))
     worker = sub.add_parser("worker"); worker.add_argument("--once", action="store_true"); worker.add_argument("--drain", action="store_true")
     imp = sub.add_parser("import"); imp.add_argument("--namespace", required=True); imp.add_argument("--file", type=Path, required=True)
     seed = sub.add_parser("seed"); seed.add_argument("--namespace", default="demo")
