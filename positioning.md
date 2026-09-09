@@ -1,0 +1,3 @@
+# Product positioning
+
+Kivi can become a reliable memory for the things people intentionally say while they work. It should help them find earlier context, understand what changed, and prepare the next response without guessing. Facts, events, and preferences should stay connected to their original scope and source. Drafts, quotations, and uncertain statements need more careful treatment. Hey Kivi should turn that memory into useful, source-backed answers, while ordinary dictation remains focused on accurate writing. Clear evidence, correction, and deletion are what make the experience trustworthy.

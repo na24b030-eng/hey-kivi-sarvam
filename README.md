@@ -8,6 +8,8 @@ An evidence-backed semantic memory engine for spoken interactions and transcript
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB.svg?style=flat-square)](https://www.python.org/)
 [![SQLite](https://img.shields.io/badge/Database-SQLite_WAL-003B57.svg?style=flat-square)](https://www.sqlite.org/)
 
+> **Foundational Strategy:** Read the **[Product Positioning](positioning.md)** ($\le$ 100 words) and **[Product Vision](vision.md)** ($\le$ 600 words).
+
 ---
 
 ## Highlights
@@ -142,7 +144,7 @@ For complete operational instructions, evaluation commands, and blind dataset im
 - **[docs/import-format.md](docs/import-format.md)**: Specifications for the JSONL transcript schema.
 - **[docs/deploy-render.md](docs/deploy-render.md)**: Deploying the backend on Render.
 - **[docs/deploy-vercel.md](docs/deploy-vercel.md)**: Deploying the frontend on Vercel.
-- **[positioning_statement.md](positioning_statement.md)**: Product positioning statement.
+- **[positioning.md](positioning.md)** (or [positioning_statement.md](positioning_statement.md)): Product positioning statement.
 - **[vision.md](vision.md)**: Long-term product vision.
 
 
