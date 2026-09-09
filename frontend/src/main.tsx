@@ -12,6 +12,9 @@ type Answer = { status: string; answer: string; draft_text?: string; evidence: E
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '')
 
 async function api<T>(path: string, options?: RequestInit): Promise<T> {
+  if (!API_BASE_URL && window.location.hostname.endsWith('.vercel.app')) {
+    throw new Error('Backend connection is not configured. Add VITE_API_BASE_URL in Vercel and redeploy this project.')
+  }
   const endpoint = `${API_BASE_URL}${path}`
   let response: Response
   try {

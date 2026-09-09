@@ -18,7 +18,7 @@ A backend bound to `127.0.0.1` on your computer is unreachable from the deployed
 1. In Vercel, choose **Add New → Project** and import `na24b030-eng/hey-kivi-sarvam` from GitHub.
 2. Keep the repository root as the Vercel **Root Directory**. The root `vercel.json` already selects Vite and runs `npm --prefix frontend ci` followed by `npm --prefix frontend run build`.
 3. Under **Environment Variables**, add `VITE_API_BASE_URL` for Production and Preview. Set it to the backend origin without `/api` or a trailing slash, for example `https://api.example.com`.
-4. Deploy. Vercel publishes `frontend/dist`. The build deliberately fails with a clear message if `VITE_API_BASE_URL` is missing or is not an HTTPS origin.
+4. Deploy. Vercel publishes `frontend/dist`. If `VITE_API_BASE_URL` is missing, the frontend opens with a clear backend-configuration message instead of sending API requests to Vercel. An invalid configured URL still fails the build.
 
 Vite exposes `VITE_*` variables in browser code. Put only the backend's public URL in `VITE_API_BASE_URL`; never put `SARVAM_API_KEY` or another secret there.
 
