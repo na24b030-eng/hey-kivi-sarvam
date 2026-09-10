@@ -64,7 +64,7 @@ npm --prefix frontend run build
 The SQLite schema is managed through 5 Alembic migrations:
 
 ```powershell
-# Run all migrations (0001 → 0005, including the knowledge graph tables)
+# Run all migrations (0001–0005, including the knowledge graph tables)
 uv run --project backend python -m kivi_memory.cli migrate
 
 # Download the multilingual embedding model (runs once, ~450MB)

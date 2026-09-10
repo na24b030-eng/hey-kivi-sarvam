@@ -173,7 +173,7 @@ For the full operational guide (eval commands, blind imports, resets), see **[RU
 │   │   ├── db.py               # SQLAlchemy models (11 tables)
 │   │   ├── settings.py         # All configuration with validation
 │   │   └── cli.py              # CLI commands (serve, migrate, seed, evaluate, etc.)
-│   ├── migrations/             # Alembic migrations (0001-0005)
+│   ├── migrations/             # Alembic migrations (0001–0005)
 │   ├── tests/                  # 55 pytest tests
 │   └── schemas/                # JSON Schema for transcript validation
 ├── frontend/

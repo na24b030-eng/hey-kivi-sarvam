@@ -105,7 +105,7 @@ Once Render is deployed:
 ## Good to Know
 
 ### Cold Starts
-Render's free tier sleeps after 15 min of inactivity. First request takes ~30-50s to wake up. After that, responses are fast.
+Render's free tier sleeps after 15 min of inactivity. First request takes ~30–50s to wake up. After that, responses are fast.
 
 ### CORS Errors
 If you see `Blocked by CORS policy`, make sure `TRUSTED_ORIGINS` includes your exact Vercel domain. Restart the Render service after changing env vars.
@@ -117,5 +117,5 @@ Free tier disk is ephemeral (cleared on redeploy). For persistent SQLite across 
 
 ### What Runs on Boot
 The start command does two things in sequence:
-1. `migrate`: Runs all Alembic migrations (0001-0005), creating all 11 tables
+1. `migrate`: Runs all Alembic migrations (0001–0005), creating all 11 tables
 2. `serve`: Starts the FastAPI server on `0.0.0.0:$PORT`
