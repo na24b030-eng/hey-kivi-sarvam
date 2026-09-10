@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-09-09T13:48:21.378004+00:00",
+  "created_at": "2026-09-10T17:28:36.349767+00:00",
   "suite": "eval\\cases.jsonl",
   "suite_sha256": "3562d606dadcee2fd2885c06bec051801374eeeb11b81647d53f283d0d4e8d17",
   "case_count": 120,
@@ -60,10 +60,10 @@
     }
   },
   "latency_ms": {
-    "p50": 20.87,
-    "p95": 25.96
+    "p50": 22.66,
+    "p95": 31.4
   },
-  "database_bytes": 6074368,
+  "database_bytes": 7090176,
   "embedding_model": "intfloat/multilingual-e5-small",
   "provider_configured": false,
   "provider_usage": "unknown_without_a_live_provider_response",
@@ -78,8 +78,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 35.52,
-      "trace_id": "query_69f732639c984b1898829b4f3bcf36d9",
+      "latency_ms": 42.09,
+      "trace_id": "query_97d30452c2be426ba83aee0aa5191411",
       "provider": null
     },
     {
@@ -91,8 +91,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.59,
-      "trace_id": "query_21148226debe4a6b90b69b89a2347c9d",
+      "latency_ms": 28.65,
+      "trace_id": "query_0191e01425d544038704c388b11e00d3",
       "provider": null
     },
     {
@@ -104,8 +104,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.99,
-      "trace_id": "query_85a132bdcb964fd4b96b5078abf917e5",
+      "latency_ms": 30.97,
+      "trace_id": "query_de4684f09b1c44689b669e5c37987db2",
       "provider": null
     },
     {
@@ -117,8 +117,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.58,
-      "trace_id": "query_6394cd11bf914baea0fe2b541cf88869",
+      "latency_ms": 24.85,
+      "trace_id": "query_ad9185b82834456a85412d5a3eed1894",
       "provider": null
     },
     {
@@ -130,8 +130,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.6,
-      "trace_id": "query_b7595e3ce07f4d85980ba9f50e95637a",
+      "latency_ms": 24.33,
+      "trace_id": "query_e99b0743fc774fdd84c116e8daefce7d",
       "provider": null
     },
     {
@@ -143,8 +143,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.4,
-      "trace_id": "query_cc076215fe144c5aab2f731a2339335f",
+      "latency_ms": 21.5,
+      "trace_id": "query_8a06e0ac814642dab76e938db440a37b",
       "provider": null
     },
     {
@@ -156,8 +156,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 22.09,
-      "trace_id": "query_5cd7e85444464d4d87cb8bd9e8ed48f9",
+      "latency_ms": 21.47,
+      "trace_id": "query_7771bc3d1899463d90cc83b5eaa9a1dc",
       "provider": null
     },
     {
@@ -169,8 +169,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.35,
-      "trace_id": "query_04e98e79a46c4a70aa1af1e0be2bca91",
+      "latency_ms": 48.99,
+      "trace_id": "query_0b1f88be5b7c4dd7aeb9b3b027a037d1",
       "provider": null
     },
     {
@@ -182,8 +182,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 39.86,
-      "trace_id": "query_57453fa9a58b41458c4134f91aa83390",
+      "latency_ms": 25.86,
+      "trace_id": "query_2fe188decc4e4af891e2e18f1f085db6",
       "provider": null
     },
     {
@@ -195,8 +195,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.58,
-      "trace_id": "query_9fc940cb22ee4f6f87ac768875c2d9c8",
+      "latency_ms": 27.47,
+      "trace_id": "query_4b11b1f981a34241bdcb8af719ffd89e",
       "provider": null
     },
     {
@@ -208,8 +208,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.33,
-      "trace_id": "query_b4a286aa435a4e8baadd27be64e2b021",
+      "latency_ms": 22.67,
+      "trace_id": "query_bc18a82e20f141dda60683d00b008482",
       "provider": null
     },
     {
@@ -221,8 +221,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.11,
-      "trace_id": "query_bc6cbf8929594b7aa0b7865b6a9c5dc9",
+      "latency_ms": 26.4,
+      "trace_id": "query_22f2f5da7c5c4216882787b6f4ca21b1",
       "provider": null
     },
     {
@@ -234,8 +234,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.94,
-      "trace_id": "query_004e8c0056244d1ca1eb1ccf66d4f5c4",
+      "latency_ms": 24.99,
+      "trace_id": "query_1c86288f42414cb696117f98dab26e58",
       "provider": null
     },
     {
@@ -247,8 +247,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 23.75,
-      "trace_id": "query_b5b4272c2f56491cabf156bcea44ab79",
+      "latency_ms": 23.33,
+      "trace_id": "query_fc01cd98c61941a6853e6540f5ca4aa2",
       "provider": null
     },
     {
@@ -260,8 +260,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.23,
-      "trace_id": "query_70f55d0a9b81423eaadea970f0e6c3cf",
+      "latency_ms": 24.78,
+      "trace_id": "query_fb2f04765ccc44ecbb062c9877246583",
       "provider": null
     },
     {
@@ -273,8 +273,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.93,
-      "trace_id": "query_6b2d866a205746b89ee87b55dfa44d51",
+      "latency_ms": 27.12,
+      "trace_id": "query_eebf7302404e43a7a5e054eb632623d9",
       "provider": null
     },
     {
@@ -286,8 +286,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.4,
-      "trace_id": "query_f3d87ba0bff64d739934d19d02450e18",
+      "latency_ms": 22.25,
+      "trace_id": "query_638672510cbc4a8a9bace22df5b6b980",
       "provider": null
     },
     {
@@ -299,8 +299,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.51,
-      "trace_id": "query_5233afb870674b2e8eb41c6b49a27d26",
+      "latency_ms": 24.56,
+      "trace_id": "query_48aaf34c55d641c9b220d16d693b5f2b",
       "provider": null
     },
     {
@@ -312,8 +312,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.85,
-      "trace_id": "query_ef9dbe48d7204d4585c965fd8c91d812",
+      "latency_ms": 26.36,
+      "trace_id": "query_0789e4fbc98c4ab19afcd39c372f519f",
       "provider": null
     },
     {
@@ -325,8 +325,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.02,
-      "trace_id": "query_22bb5e19ce1b4c378ac3b7ec21025eb1",
+      "latency_ms": 21.62,
+      "trace_id": "query_2867caff885e4055ad49105085d3e062",
       "provider": null
     },
     {
@@ -338,8 +338,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 22.35,
-      "trace_id": "query_18c7715cba354af586a98e65c9085034",
+      "latency_ms": 24.08,
+      "trace_id": "query_1fe9c6de9fdd4944bf294a13b293dc3a",
       "provider": null
     },
     {
@@ -351,8 +351,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 24.41,
-      "trace_id": "query_d3e34b011c614f6ea49cb46c0a4274b3",
+      "latency_ms": 20.88,
+      "trace_id": "query_fe89451faa75459a9532ddceecfa9159",
       "provider": null
     },
     {
@@ -364,8 +364,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 22.07,
-      "trace_id": "query_5793f4967499464fa4ae706559f69ca0",
+      "latency_ms": 22.41,
+      "trace_id": "query_9c9b7bfd125441e8be02df4171b09def",
       "provider": null
     },
     {
@@ -377,8 +377,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.29,
-      "trace_id": "query_5bb1931a0a75445d9de4026d94b990ed",
+      "latency_ms": 20.32,
+      "trace_id": "query_53d0e61935b341cbacceececa0854fe6",
       "provider": null
     },
     {
@@ -390,8 +390,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 22.65,
-      "trace_id": "query_cd5e3067c7a740c1b92ba19c8713e74a",
+      "latency_ms": 22.84,
+      "trace_id": "query_9326afc484a74559a28fbc00f805b6cf",
       "provider": null
     },
     {
@@ -403,8 +403,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.06,
-      "trace_id": "query_289b9678c73940d6998275e64d5407ec",
+      "latency_ms": 23.12,
+      "trace_id": "query_182c0b9515a44d8d96844025a1c63c8b",
       "provider": null
     },
     {
@@ -416,8 +416,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.53,
-      "trace_id": "query_0d2f00aefb294d36b32d3449df473f9b",
+      "latency_ms": 23.78,
+      "trace_id": "query_922ac0fa6d6c410e88f400a4ab12b21f",
       "provider": null
     },
     {
@@ -429,8 +429,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.45,
-      "trace_id": "query_6c58af2f8108464f8e5479790395a512",
+      "latency_ms": 24.78,
+      "trace_id": "query_0ce18198c3564f1682bce5c1f66bf2ba",
       "provider": null
     },
     {
@@ -442,8 +442,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.03,
-      "trace_id": "query_d99a9f8897db455a84ce17f25c344a82",
+      "latency_ms": 21.45,
+      "trace_id": "query_2c3ebc03182f4a6498bcfcf09fc7114e",
       "provider": null
     },
     {
@@ -455,8 +455,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.29,
-      "trace_id": "query_02276a27dd1941369be3078f6bfd88e2",
+      "latency_ms": 21.95,
+      "trace_id": "query_f58c808562b44b48b88bc520f5fcc00f",
       "provider": null
     },
     {
@@ -468,8 +468,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.67,
-      "trace_id": "query_f8285a5ae93949e9b9f9ab5567b01659",
+      "latency_ms": 20.98,
+      "trace_id": "query_8219b6b08da248e1a25de91f9a2a0abd",
       "provider": null
     },
     {
@@ -481,8 +481,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 22.16,
-      "trace_id": "query_f552e855500949e39fe31a3ddc6af27c",
+      "latency_ms": 20.95,
+      "trace_id": "query_9f984e788cc941caa9ef57914a6c6beb",
       "provider": null
     },
     {
@@ -494,8 +494,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 44.04,
-      "trace_id": "query_171f929d80b54e869cadca1f6c3d8a03",
+      "latency_ms": 43.93,
+      "trace_id": "query_3c4613607292454387142333428a8100",
       "provider": null
     },
     {
@@ -507,8 +507,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.53,
-      "trace_id": "query_0236bd6fa3c345edbebc4f525cfb7572",
+      "latency_ms": 22.65,
+      "trace_id": "query_08273f5cb7f34aa4a6d69f4b6b2bedd8",
       "provider": null
     },
     {
@@ -520,8 +520,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.73,
-      "trace_id": "query_71aab12d08ff45b7b5dc93f4789cc01f",
+      "latency_ms": 23.05,
+      "trace_id": "query_09ec6c853f2c451ca9a49ec6355c8184",
       "provider": null
     },
     {
@@ -533,8 +533,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.57,
-      "trace_id": "query_01e1808c35c34c21b7b62d8544ef3797",
+      "latency_ms": 22.04,
+      "trace_id": "query_5482eb7676174eb0bc61ac993cd71dba",
       "provider": null
     },
     {
@@ -546,8 +546,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.15,
-      "trace_id": "query_fb204a52825d409e8dbe2e22b316243c",
+      "latency_ms": 22.67,
+      "trace_id": "query_f4e499e3eb3849b1a7c9745acbf57a55",
       "provider": null
     },
     {
@@ -559,8 +559,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 24.16,
-      "trace_id": "query_2edcbf58651d4093a8290c27c59969d2",
+      "latency_ms": 22.44,
+      "trace_id": "query_cfb0a503cad344d29888511027552f08",
       "provider": null
     },
     {
@@ -572,8 +572,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.62,
-      "trace_id": "query_8bc0ee8cd55845e3acc5ad77b9a83d40",
+      "latency_ms": 21.0,
+      "trace_id": "query_433deae6ece844dc81e6d3d48200cb03",
       "provider": null
     },
     {
@@ -585,8 +585,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.46,
-      "trace_id": "query_bf75d39d4d03413e8f8f7d329838cb32",
+      "latency_ms": 24.8,
+      "trace_id": "query_56f7f726a5444909b9becdbab29d5160",
       "provider": null
     },
     {
@@ -598,8 +598,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.26,
-      "trace_id": "query_1c1b1b3c800248b58bd43c03066c4b04",
+      "latency_ms": 22.79,
+      "trace_id": "query_8ceb27ed39a2476d9599560a7f1d37a9",
       "provider": null
     },
     {
@@ -611,8 +611,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.47,
-      "trace_id": "query_17d9a3907a32410787e6738feb46668d",
+      "latency_ms": 22.31,
+      "trace_id": "query_644c85b85b0343ba93ae64c4dc4ed117",
       "provider": null
     },
     {
@@ -624,8 +624,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 23.42,
-      "trace_id": "query_bd932284fb364874a78482fc86baa44e",
+      "latency_ms": 22.53,
+      "trace_id": "query_6cb7a640091d40138896469b09275ce4",
       "provider": null
     },
     {
@@ -637,8 +637,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 23.15,
-      "trace_id": "query_c97ea5d994cc47d2b8db7c02a3b66b84",
+      "latency_ms": 23.42,
+      "trace_id": "query_76ca4f1bf15f437d8188ffeb439ab1d5",
       "provider": null
     },
     {
@@ -650,8 +650,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 23.31,
-      "trace_id": "query_44241ac8cd094de79938503ea0c0db96",
+      "latency_ms": 21.97,
+      "trace_id": "query_fd6fe587cdcb4547972f81b50975cc6d",
       "provider": null
     },
     {
@@ -663,8 +663,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 23.04,
-      "trace_id": "query_2b49e48874a24025ada67f395d0b343c",
+      "latency_ms": 21.96,
+      "trace_id": "query_68b97859a65d4c3383b563067a11f67f",
       "provider": null
     },
     {
@@ -677,7 +677,7 @@
       "text_passed": true,
       "passed": true,
       "latency_ms": 23.26,
-      "trace_id": "query_6a8f16eecbbc4c3bb2f18c5b3868dfbb",
+      "trace_id": "query_dd66d4dc91824ff3b88968f4757197e4",
       "provider": null
     },
     {
@@ -689,8 +689,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 23.47,
-      "trace_id": "query_641fd9318b744bb9a7ea7ec1d05f1441",
+      "latency_ms": 21.23,
+      "trace_id": "query_d765aa1d9fcb4d4a865c4b519aafa2a7",
       "provider": null
     },
     {
@@ -702,8 +702,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.54,
-      "trace_id": "query_cac5c323f36047ada636c95a357b6a3e",
+      "latency_ms": 23.18,
+      "trace_id": "query_835f9c1fadcb4c6abad2915011a69f0e",
       "provider": null
     },
     {
@@ -715,8 +715,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.26,
-      "trace_id": "query_c6e73a5f17b3452e83c4c5e8c6d7f850",
+      "latency_ms": 21.25,
+      "trace_id": "query_ed6c9e8f12e74542bd01afbdd99b84ea",
       "provider": null
     },
     {
@@ -728,8 +728,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.8,
-      "trace_id": "query_c9d62653be404955be628f5549c481e4",
+      "latency_ms": 22.24,
+      "trace_id": "query_cb3d66dd6d3349a388fc27a8ce2f3f7b",
       "provider": null
     },
     {
@@ -741,8 +741,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.49,
-      "trace_id": "query_ed6d107f11d74616a5e4b4d6d27d4e1a",
+      "latency_ms": 24.54,
+      "trace_id": "query_f215bc84a49d4a2bab7fd3bb3353fa10",
       "provider": null
     },
     {
@@ -754,8 +754,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.92,
-      "trace_id": "query_d812c1a3c23048af981eabb76775b177",
+      "latency_ms": 24.77,
+      "trace_id": "query_8d2cc9a3e21b48e4b49e7f5647865f67",
       "provider": null
     },
     {
@@ -767,8 +767,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 22.69,
-      "trace_id": "query_42fa8ceb7dcf4332a83192d839e4c2ee",
+      "latency_ms": 24.86,
+      "trace_id": "query_dd8aa17b63544f73824015920f4287ba",
       "provider": null
     },
     {
@@ -780,8 +780,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 22.56,
-      "trace_id": "query_675a2c040fac422d8eaa999e39f1db3b",
+      "latency_ms": 21.98,
+      "trace_id": "query_5c4163b7921d4f2f9b79a81c54f5fcd1",
       "provider": null
     },
     {
@@ -793,8 +793,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 22.23,
-      "trace_id": "query_580016487dbb481c9512b8126859c09f",
+      "latency_ms": 28.61,
+      "trace_id": "query_bfb97bc475cc4db9a435c08bcbd0e7ad",
       "provider": null
     },
     {
@@ -806,8 +806,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 22.33,
-      "trace_id": "query_0ce1cc10f4064dc39a43638a0bf97ae3",
+      "latency_ms": 49.94,
+      "trace_id": "query_7b88f9066ca34b2ba22d00e9fd631516",
       "provider": null
     },
     {
@@ -819,8 +819,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 44.75,
-      "trace_id": "query_83dcc747c4e5454194c97acf7c6a2d5e",
+      "latency_ms": 21.66,
+      "trace_id": "query_f4c8326e68544bc7860c89df4585d9d6",
       "provider": null
     },
     {
@@ -832,8 +832,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.49,
-      "trace_id": "query_0906e3f426a049a890462e46f9424eb4",
+      "latency_ms": 24.0,
+      "trace_id": "query_f4f78e0121da4273a044c7afb134a462",
       "provider": null
     },
     {
@@ -845,8 +845,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.95,
-      "trace_id": "query_a709066d5d994b1680ea63f741a2739f",
+      "latency_ms": 23.35,
+      "trace_id": "query_13e6cc871f2643709331ee0ac6798e93",
       "provider": null
     },
     {
@@ -858,8 +858,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.82,
-      "trace_id": "query_893bc6213b9f474d993c51f9c623c584",
+      "latency_ms": 31.4,
+      "trace_id": "query_87c578648634473aa142d7e1b5d1277e",
       "provider": null
     },
     {
@@ -871,8 +871,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.39,
-      "trace_id": "query_78d3a9fcf11d4b33b090c2f3bbbd7464",
+      "latency_ms": 24.67,
+      "trace_id": "query_315dd415e23643bebe23cb96746b2557",
       "provider": null
     },
     {
@@ -884,8 +884,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.79,
-      "trace_id": "query_93c1470fda584609ab9b66f2ff3e2b40",
+      "latency_ms": 24.03,
+      "trace_id": "query_a8d257cb54a342949146b167480222b7",
       "provider": null
     },
     {
@@ -897,8 +897,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.05,
-      "trace_id": "query_2e8c0296139f4e2b854abbef6235c741",
+      "latency_ms": 25.14,
+      "trace_id": "query_371ae8259cf1433db5d33dabaf3cadda",
       "provider": null
     },
     {
@@ -910,8 +910,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.57,
-      "trace_id": "query_f9cba90e437f4352a3f9dcd0ea42c289",
+      "latency_ms": 23.48,
+      "trace_id": "query_0a2dd6d957b84673be102441a7961cd2",
       "provider": null
     },
     {
@@ -923,8 +923,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 23.12,
-      "trace_id": "query_3a9985cf6da84ba1bb20746943fcf304",
+      "latency_ms": 22.37,
+      "trace_id": "query_1a261705e5b4479f85170eb27fed06b2",
       "provider": null
     },
     {
@@ -936,8 +936,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 23.56,
-      "trace_id": "query_c921f06377b74cf58c54d18fbec7860c",
+      "latency_ms": 21.83,
+      "trace_id": "query_97e99b183635463fa534f455e791e60f",
       "provider": null
     },
     {
@@ -949,8 +949,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.73,
-      "trace_id": "query_3de7a038c2424dc4b2201ca1acd91808",
+      "latency_ms": 20.13,
+      "trace_id": "query_bfe0ab2a0f014483aa6cca012d3d2f94",
       "provider": null
     },
     {
@@ -962,8 +962,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 22.73,
-      "trace_id": "query_80bf7f3f8d0841a7bab3c92e24cf1bb3",
+      "latency_ms": 22.4,
+      "trace_id": "query_2a6c7a54a7d34f66b11919f1efa14606",
       "provider": null
     },
     {
@@ -975,8 +975,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.83,
-      "trace_id": "query_d0bde7a661d04cbb87c2b92c4b4a4748",
+      "latency_ms": 20.47,
+      "trace_id": "query_90a7c332893e441a96deca991b1408af",
       "provider": null
     },
     {
@@ -988,8 +988,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.71,
-      "trace_id": "query_6ec2601dc8cf4eccaaead6a01c3a01bd",
+      "latency_ms": 22.81,
+      "trace_id": "query_1b8a05ade11a448ba82ea9c054134322",
       "provider": null
     },
     {
@@ -1001,8 +1001,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.35,
-      "trace_id": "query_55616bf56b5c4f56a0079612ad0c1fa1",
+      "latency_ms": 20.2,
+      "trace_id": "query_61072df6c4ae4334b0000c7a3f8b24f5",
       "provider": null
     },
     {
@@ -1014,8 +1014,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 24.54,
-      "trace_id": "query_7b80f0913b984e0792a08ccfebec9e69",
+      "latency_ms": 20.84,
+      "trace_id": "query_311479b8bdf74181b6139521242c84d2",
       "provider": null
     },
     {
@@ -1027,8 +1027,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.35,
-      "trace_id": "query_5c4fbc90c9e44ad0a04b795ce61e4b40",
+      "latency_ms": 22.25,
+      "trace_id": "query_97a74ed92f6d4770945a2b72714a482c",
       "provider": null
     },
     {
@@ -1040,8 +1040,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.41,
-      "trace_id": "query_49c9a0b8fc784029b9170d5126e5612a",
+      "latency_ms": 22.04,
+      "trace_id": "query_d4257f1fb5a04f78b322eb9e2616157d",
       "provider": null
     },
     {
@@ -1053,8 +1053,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.39,
-      "trace_id": "query_1314f564af8a40cf8114e3c5349af7b7",
+      "latency_ms": 25.72,
+      "trace_id": "query_6007030dbfdd425899d6e03742ca4a4c",
       "provider": null
     },
     {
@@ -1066,8 +1066,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.07,
-      "trace_id": "query_c0a34d95043340e1826b3473817aff16",
+      "latency_ms": 25.02,
+      "trace_id": "query_d5d515ce7d3b483099f963d78c116e61",
       "provider": null
     },
     {
@@ -1079,8 +1079,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.09,
-      "trace_id": "query_1b6fb7b8ccf74bc19cc8f456b9f2ba6e",
+      "latency_ms": 23.41,
+      "trace_id": "query_f4b3227510c24db8b573c5569a336170",
       "provider": null
     },
     {
@@ -1092,8 +1092,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 22.64,
-      "trace_id": "query_2c4f404ec39f4c0cb5a4ea8476609906",
+      "latency_ms": 26.85,
+      "trace_id": "query_b83b9de1f2a942e593fd4928cf4a8d6b",
       "provider": null
     },
     {
@@ -1105,8 +1105,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.61,
-      "trace_id": "query_f40a8b55f6e44ba8abd28c0bde80ba0b",
+      "latency_ms": 22.86,
+      "trace_id": "query_0bde3f873edd43aea98338d34c595b70",
       "provider": null
     },
     {
@@ -1118,8 +1118,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.12,
-      "trace_id": "query_6e7325c460fb4091af9a74ee37c3c2cd",
+      "latency_ms": 51.41,
+      "trace_id": "query_ec783496b7cf47439e7296486ec06106",
       "provider": null
     },
     {
@@ -1131,8 +1131,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 37.99,
-      "trace_id": "query_50b2783410c446958b3db25e455669c9",
+      "latency_ms": 22.29,
+      "trace_id": "query_3ede33cd48b24a75ba0628944f9b9194",
       "provider": null
     },
     {
@@ -1144,8 +1144,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 22.31,
-      "trace_id": "query_8a3413616cad477889d137856ae7329d",
+      "latency_ms": 24.63,
+      "trace_id": "query_282bc282c6654fa7975d41cbb6bb1788",
       "provider": null
     },
     {
@@ -1157,8 +1157,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 23.9,
-      "trace_id": "query_0e96e986712c44fa90d77d432f2699cc",
+      "latency_ms": 21.76,
+      "trace_id": "query_976ed1c689e54229aff69e00eb8a6f9e",
       "provider": null
     },
     {
@@ -1170,8 +1170,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 22.23,
-      "trace_id": "query_5428c1444bff428e9c91e78d97886c11",
+      "latency_ms": 21.57,
+      "trace_id": "query_860d5805831548799f8e07ef6a069217",
       "provider": null
     },
     {
@@ -1183,8 +1183,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.78,
-      "trace_id": "query_de1b1254ec38429f9681c146f5cee585",
+      "latency_ms": 21.86,
+      "trace_id": "query_d5f2bf1e8b4c44cabf6712ea74e49e80",
       "provider": null
     },
     {
@@ -1196,8 +1196,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.16,
-      "trace_id": "query_26ca0b943b6c40cf84369da82c78d2cf",
+      "latency_ms": 21.16,
+      "trace_id": "query_b9a2cdae9c914ae6ad812f15efd5b2f5",
       "provider": null
     },
     {
@@ -1209,8 +1209,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.69,
-      "trace_id": "query_7a98f3c364c04a1a8c32b937490c0602",
+      "latency_ms": 24.09,
+      "trace_id": "query_0f23329b542d412ebe441688621ae5b8",
       "provider": null
     },
     {
@@ -1222,8 +1222,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.31,
-      "trace_id": "query_d915228018164eb8b38920b61884c857",
+      "latency_ms": 24.33,
+      "trace_id": "query_b9de8d44bf23460a8f28b7f0f6e6b82e",
       "provider": null
     },
     {
@@ -1235,8 +1235,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.47,
-      "trace_id": "query_571a81041dc24e6884f0c41a34aa6b37",
+      "latency_ms": 23.35,
+      "trace_id": "query_b8e371ad1ce54ffaad216104e12b36ac",
       "provider": null
     },
     {
@@ -1248,8 +1248,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 22.27,
-      "trace_id": "query_c6ed6afaf4c842adadd29fc0a6c702b0",
+      "latency_ms": 26.17,
+      "trace_id": "query_f2568a3f823c4aef8367eec029f8dee8",
       "provider": null
     },
     {
@@ -1261,8 +1261,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.23,
-      "trace_id": "query_22e897871bc74c9f897c50c4f8148822",
+      "latency_ms": 23.12,
+      "trace_id": "query_e4e5d01a6d434b15ba6ef90d54bd3323",
       "provider": null
     },
     {
@@ -1274,8 +1274,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.96,
-      "trace_id": "query_5387abdec8ed4c9c8bd4d6c8e640ac24",
+      "latency_ms": 22.97,
+      "trace_id": "query_7d8348b1becf491c98add7ae22faf0b5",
       "provider": null
     },
     {
@@ -1287,8 +1287,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.71,
-      "trace_id": "query_afdf9584fd6e4295b9e45714cf8b3bcc",
+      "latency_ms": 20.21,
+      "trace_id": "query_562bd7c0a2784e6bb0882f3b48ea5f7f",
       "provider": null
     },
     {
@@ -1300,8 +1300,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.73,
-      "trace_id": "query_389f4d04fd3e486f877f34b037719595",
+      "latency_ms": 22.29,
+      "trace_id": "query_ee88d88918c545fca027c00bfd1d843c",
       "provider": null
     },
     {
@@ -1313,8 +1313,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.77,
-      "trace_id": "query_fa25c17f2c564ec887a3de1875299952",
+      "latency_ms": 20.93,
+      "trace_id": "query_e2605b314267413f9a70cd55ed25ed78",
       "provider": null
     },
     {
@@ -1326,8 +1326,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.86,
-      "trace_id": "query_48b1f3cd9cb14fae8b93d28b34cb06f3",
+      "latency_ms": 20.33,
+      "trace_id": "query_8d3d2dcd35f44f83a0d91ef0fa724340",
       "provider": null
     },
     {
@@ -1339,8 +1339,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 23.42,
-      "trace_id": "query_1ea9a89126174aa4a0f1db4d5164f833",
+      "latency_ms": 21.48,
+      "trace_id": "query_770ab881f1eb4620a2896d59b517207f",
       "provider": null
     },
     {
@@ -1352,8 +1352,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.77,
-      "trace_id": "query_6e3fbcae60304364afcdbff7d195b0a8",
+      "latency_ms": 23.21,
+      "trace_id": "query_baf54033e45344539efdbc30d81af508",
       "provider": null
     },
     {
@@ -1365,8 +1365,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 23.71,
-      "trace_id": "query_402529b4f8d445b8a72c7b71b30df65d",
+      "latency_ms": 22.06,
+      "trace_id": "query_798705edf624439188cde43b25413de3",
       "provider": null
     },
     {
@@ -1378,8 +1378,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.13,
-      "trace_id": "query_57d62022c68d485f9a4d0f68ff773ea1",
+      "latency_ms": 22.54,
+      "trace_id": "query_8ced4180a9114851830bfe743772d673",
       "provider": null
     },
     {
@@ -1391,8 +1391,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.95,
-      "trace_id": "query_bc3c9657b6af4874bce7957bd5256acc",
+      "latency_ms": 23.24,
+      "trace_id": "query_133306f27fc545e39db5dd3859fccf68",
       "provider": null
     },
     {
@@ -1404,8 +1404,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.73,
-      "trace_id": "query_abdfccf3fe064747b9577a5c9803dc33",
+      "latency_ms": 21.71,
+      "trace_id": "query_d68c34fd3ba843428e7add8d9626dafc",
       "provider": null
     },
     {
@@ -1417,8 +1417,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.43,
-      "trace_id": "query_35d2339ec584404183c5c369b884f818",
+      "latency_ms": 21.41,
+      "trace_id": "query_46316a45462f4830bdd4c67f5faa55da",
       "provider": null
     },
     {
@@ -1430,8 +1430,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 25.21,
-      "trace_id": "query_9cafa06f12b04b1c96d5fa2facc8a5f9",
+      "latency_ms": 21.77,
+      "trace_id": "query_ac26e4f1cfa24084821f3eaf00f85215",
       "provider": null
     },
     {
@@ -1443,8 +1443,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.5,
-      "trace_id": "query_f8e1e42d95894788a37bb5b0a24c94b7",
+      "latency_ms": 48.91,
+      "trace_id": "query_8e49faad4461440aa6aee88ff2ae0ea1",
       "provider": null
     },
     {
@@ -1456,8 +1456,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 38.32,
-      "trace_id": "query_ebc8b7b24b0544b684595c76fdee3973",
+      "latency_ms": 23.81,
+      "trace_id": "query_f7916b89ad624cae8448810b4b9b3dd6",
       "provider": null
     },
     {
@@ -1469,8 +1469,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 25.96,
-      "trace_id": "query_a3f454a50cb84ddebf482f46e726fd49",
+      "latency_ms": 22.23,
+      "trace_id": "query_340f026f56534f97bff0c6110c9f6fb6",
       "provider": null
     },
     {
@@ -1482,8 +1482,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 21.37,
-      "trace_id": "query_297b13852ee74084b5acaabe079db9ac",
+      "latency_ms": 21.55,
+      "trace_id": "query_8cd917a7a99445bf9003f527692c4190",
       "provider": null
     },
     {
@@ -1495,8 +1495,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.97,
-      "trace_id": "query_1dc0e0d043fa445da831207bbc91d871",
+      "latency_ms": 23.22,
+      "trace_id": "query_842c9f535e274101b4db3bc8aedfe691",
       "provider": null
     },
     {
@@ -1508,8 +1508,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 18.03,
-      "trace_id": "query_9708bebeba1048c9b1811a3c150587e6",
+      "latency_ms": 18.85,
+      "trace_id": "query_62e88a53d1f1464dbe153b1789c40a92",
       "provider": null
     },
     {
@@ -1521,8 +1521,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 20.31,
-      "trace_id": "query_7655d31ccc5d4ddc8e4618395f731819",
+      "latency_ms": 18.25,
+      "trace_id": "query_cc495c941f754c0690965e7668682c39",
       "provider": null
     },
     {
@@ -1534,8 +1534,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.93,
-      "trace_id": "query_747ff10234cd4982b8cd78b9062dea73",
+      "latency_ms": 20.65,
+      "trace_id": "query_3c08d1db385149e99793ee46956a0baf",
       "provider": null
     },
     {
@@ -1547,8 +1547,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 17.58,
-      "trace_id": "query_2121cfc0c7834fc5ac8500f07e25bd3c",
+      "latency_ms": 18.45,
+      "trace_id": "query_69334b08ffa3406fa44502f810c5a53a",
       "provider": null
     },
     {
@@ -1560,8 +1560,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 17.09,
-      "trace_id": "query_07da41186296477eaf9b8b9d74007e49",
+      "latency_ms": 17.6,
+      "trace_id": "query_ba8bfa1495104ea2983e56a3a18a43ff",
       "provider": null
     },
     {
@@ -1573,8 +1573,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 18.63,
-      "trace_id": "query_a4a7d572f1c74545a38410161ceea078",
+      "latency_ms": 18.53,
+      "trace_id": "query_4e6f015d7dad432483a87eb1b37f5182",
       "provider": null
     },
     {
@@ -1586,8 +1586,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 18.15,
-      "trace_id": "query_86fe8e7940c64d45bf0411579b1647f6",
+      "latency_ms": 20.84,
+      "trace_id": "query_04d3c80012274deeb0d9387f1c2ac499",
       "provider": null
     },
     {
@@ -1599,8 +1599,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.92,
-      "trace_id": "query_647fbf624b374778a61ec5361c81398f",
+      "latency_ms": 18.19,
+      "trace_id": "query_a5f08a4f14e94f7982e86fd525f9cc76",
       "provider": null
     },
     {
@@ -1612,8 +1612,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 18.02,
-      "trace_id": "query_99d14497af884bf8b686d8b917bb277d",
+      "latency_ms": 17.76,
+      "trace_id": "query_d1cbf13111cf4068ae1c0165342d5477",
       "provider": null
     },
     {
@@ -1625,8 +1625,8 @@
       "source_passed": true,
       "text_passed": true,
       "passed": true,
-      "latency_ms": 19.14,
-      "trace_id": "query_4fb61581afd549a6b22ba27d03fd76e7",
+      "latency_ms": 18.62,
+      "trace_id": "query_bef0b093e0a14be2abe996621953d653",
       "provider": null
     }
   ]

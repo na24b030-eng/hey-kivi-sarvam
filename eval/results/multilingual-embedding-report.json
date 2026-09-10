@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-09-08T15:45:12.506774+00:00",
+  "created_at": "2026-09-10T17:31:04.298488+00:00",
   "embedding_model": "intfloat/multilingual-e5-small",
   "question_language": "en",
   "target_language": "hi",
@@ -7,10 +7,11 @@
   "required_external_id": "hindi-dentist",
   "top_external_id": "hindi-dentist",
   "target_retrieval": {
-    "source_id": "src_0d3becf8da53474f8ed49944e48847ed",
+    "source_id": "src_f5a3a752472044188a5bcee9085d38a1",
     "external_id": "hindi-dentist",
     "lexical_rank": null,
     "dense_rank": 1,
+    "retrieval_mode": "embedding",
     "rrf_score": 0.0163934
   },
   "passed": true

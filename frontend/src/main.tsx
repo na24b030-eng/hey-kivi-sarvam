@@ -659,7 +659,7 @@ function Ask({ question, setQuestion, answer, busy, submit, sourceCount, memoryC
               <div className="sources">
                 {answer.evidence.map((source, index) => (
                   <button type="button" className="source-evidence" disabled={busy} onClick={() => inspect(source)} key={source.id}>
-                    <strong>{index + 1} · {source.external_id}</strong>
+                    <strong>{index + 1} · {source.external_id || source.id}</strong>
                     <p>{source.text}</p>
                     <small>Inspect source</small>
                   </button>

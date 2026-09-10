@@ -154,8 +154,11 @@ def extract_entities_and_relations(
             return None
 
         # Strip markdown code fences if present
-        content = re.sub(r"^```(?:json)?\s*", "", content.strip())
-        content = re.sub(r"\s*```$", "", content.strip())
+        match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", content)
+        if match:
+            content = match.group(1).strip()
+        else:
+            content = content.strip()
 
         data = json.loads(content)
         if not isinstance(data, dict):
@@ -474,6 +477,6 @@ def _try_parse_date(text: str) -> datetime | None:
             try:
                 from dateutil.parser import parse as dateparse
                 return dateparse(match.group(1)).replace(tzinfo=UTC)
-            except (ValueError, TypeError, OverflowError):
+            except (ImportError, ValueError, TypeError, OverflowError):
                 continue
     return None

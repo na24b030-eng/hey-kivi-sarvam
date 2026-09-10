@@ -254,8 +254,8 @@ def multi_hop_expand(
     """Find bridge sources that share entities with hop-1 results.
 
     This enables answering questions like "Is the Harbor lead available Friday?"
-    when Source A says "Dev leads Harbor" and Source B says "Dev is on leave Friday"
-    — Source B wouldn't match "Harbor" directly but shares the entity "Dev".
+    when Source A says "Dev leads Harbor" and Source B says "Dev is on leave Friday":
+    Source B would not match "Harbor" directly but shares the entity "Dev".
     """
     if not hop1_sources:
         return []
