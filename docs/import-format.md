@@ -1,12 +1,12 @@
 # Transcript Import Specification
 
-Kivi Memory accepts line-delimited JSON (`.jsonl`) files encoded in UTF-8. Each line represents an individual transcript record containing raw automatic speech recognition output, formatted text, and optional contextual metadata.
+Kivi accepts line-delimited JSON (`.jsonl`) files in UTF-8. Each line is a single transcript record with raw ASR output, formatted text, and optional metadata.
 
 ---
 
-## Schema Overview
+## Schema
 
-The normative JSON Schema is maintained in [`backend/schemas/transcript.schema.json`](../backend/schemas/transcript.schema.json).
+The normative JSON Schema lives in [`backend/schemas/transcript.schema.json`](../backend/schemas/transcript.schema.json).
 
 ### Example Record
 
@@ -28,37 +28,40 @@ The normative JSON Schema is maintained in [`backend/schemas/transcript.schema.j
 
 ---
 
-## Field Reference
+## Fields
 
 | Field | Type | Required | Description |
-| :--- | :---: | :---: | :--- |
-| `schema_version` | integer | **Yes** | Schema version identifier (must be `1`). |
-| `id` | string | **Yes** | Unique identifier for the transcript within the target namespace. |
-| `raw_asr` | string | **Yes** | Raw, unformatted speech recognition output. |
-| `formatted_text` | string | **Yes** | Cleaned, punctuated, and formatted transcript text. |
-| `occurred_at` | string | No | RFC 3339 timestamp with timezone offset (e.g., `2026-09-07T10:30:00+05:30`). |
-| `timezone` | string | No | IANA timezone identifier (e.g., `Asia/Kolkata`). |
-| `app` | string | No | Source application where dictation occurred. |
-| `language_hints` | array of strings | No | ISO language codes (e.g., `["en", "hi"]`). |
-| `context` | object | No | Arbitrary dictionary containing custom application or interaction metadata. |
+|:---|:---:|:---:|:---|
+| `schema_version` | integer | **Yes** | Must be `1` |
+| `id` | string | **Yes** | Unique ID within the target namespace |
+| `raw_asr` | string | **Yes** | Raw, unformatted speech recognition output |
+| `formatted_text` | string | **Yes** | Cleaned, punctuated text |
+| `occurred_at` | string | No | RFC 3339 timestamp (e.g., `2026-09-07T10:30:00+05:30`) |
+| `timezone` | string | No | IANA timezone (e.g., `Asia/Kolkata`) |
+| `app` | string | No | Source application |
+| `language_hints` | string[] | No | ISO language codes (e.g., `["en", "hi"]`) |
+| `context` | object | No | Arbitrary metadata dict |
 
 ---
 
-## Ingestion Semantics
+## How Ingestion Works
 
-1. **Text Complementarity**: While both `raw_asr` and `formatted_text` are required fields, one may be empty if only a single text representation is available. Records where both fields are completely blank or whitespace are rejected.
-2. **Dual-View Indexing**: Both raw and formatted representations are chunked and embedded separately, enabling phonetic search without compromising formatted response generation.
-3. **Atomic File Validation**: Batch imports are validated prior to ingestion. If any line violates schema validation or timestamp formats, the entire import is rejected with specific line error diagnostics.
-4. **Idempotency**: Submitting an identical record payload under an existing `id` is a safe, no-op idempotent action. Modifying a record's contents under an existing ID initiates a revision update.
+1. **Dual-View Indexing** — Both `raw_asr` and `formatted_text` are chunked and embedded separately. Raw enables phonetic search; formatted produces clean answers.
+2. **Semantic Extraction** — If `SARVAM_API_KEY` is configured, entities, aliases, and relationships are extracted from each record and stored in the knowledge graph. Without the key, this step is gracefully skipped.
+3. **Atomic Validation** — If any line fails schema validation, the entire import is rejected with specific line-level error diagnostics.
+4. **Idempotency** — Re-importing the same `id` with identical content is a no-op. Changing content under an existing `id` triggers a revision update.
 
 ---
 
-## CLI Ingestion
-
-To ingest a transcript file via the command line:
+## CLI Import
 
 ```powershell
-uv run --project backend python -m kivi_memory.cli import --namespace <workspace_name> --file <path_to_transcripts.jsonl>
-uv run --project backend python -m kivi_memory.cli worker --drain
-```
+# Import a file into a namespace
+uv run --project backend python -m kivi_memory.cli import --namespace my_workspace --file path/to/transcripts.jsonl
 
+# Process all queued records (chunking, embedding, entity extraction)
+uv run --project backend python -m kivi_memory.cli worker --drain
+
+# Verify the import
+uv run --project backend python -m kivi_memory.cli inspect --namespace my_workspace
+```
