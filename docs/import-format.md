@@ -46,10 +46,10 @@ The normative JSON Schema lives in [`backend/schemas/transcript.schema.json`](..
 
 ## How Ingestion Works
 
-1. **Dual-View Indexing** — Both `raw_asr` and `formatted_text` are chunked and embedded separately. Raw enables phonetic search; formatted produces clean answers.
-2. **Semantic Extraction** — If `SARVAM_API_KEY` is configured, entities, aliases, and relationships are extracted from each record and stored in the knowledge graph. Without the key, this step is gracefully skipped.
-3. **Atomic Validation** — If any line fails schema validation, the entire import is rejected with specific line-level error diagnostics.
-4. **Idempotency** — Re-importing the same `id` with identical content is a no-op. Changing content under an existing `id` triggers a revision update.
+1. **Dual-View Indexing**: Both `raw_asr` and `formatted_text` are chunked and embedded separately. Raw enables phonetic search; formatted produces clean answers.
+2. **Semantic Extraction**: If `SARVAM_API_KEY` is configured, entities, aliases, and relationships are extracted from each record and stored in the knowledge graph. Without the key, this step is gracefully skipped.
+3. **Atomic Validation**: If any line fails schema validation, the entire import is rejected with specific line-level error diagnostics.
+4. **Idempotency**: Re-importing the same `id` with identical content is a no-op. Changing content under an existing `id` triggers a revision update.
 
 ---
 

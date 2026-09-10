@@ -68,7 +68,7 @@ In Render Dashboard → **New +** → **Web Service** → connect your repo.
 |:---|:---|:---|
 | `PYTHON_VERSION` | `3.12.13` | Ensures Python 3.12 |
 | `TRUSTED_ORIGINS` | `https://your-app.vercel.app,http://localhost:8000` | Comma-separated CORS origins |
-| `SARVAM_API_KEY` | *(your key)* | Optional — enables Sarvam 105B synthesis + entity extraction |
+| `SARVAM_API_KEY` | *(your key)* | Optional: enables Sarvam 105B synthesis + entity extraction |
 
 ### Health Check
 
@@ -117,5 +117,5 @@ Free tier disk is ephemeral (cleared on redeploy). For persistent SQLite across 
 
 ### What Runs on Boot
 The start command does two things in sequence:
-1. `migrate` — Runs all Alembic migrations (0001–0005), creating all 11 tables
-2. `serve` — Starts the FastAPI server on `0.0.0.0:$PORT`
+1. `migrate`: Runs all Alembic migrations (0001-0005), creating all 11 tables
+2. `serve`: Starts the FastAPI server on `0.0.0.0:$PORT`

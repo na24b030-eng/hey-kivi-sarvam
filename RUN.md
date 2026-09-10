@@ -115,7 +115,7 @@ In **Hey Kivi**, ask: *"When does Harbor launch after Dev approves the release c
 
 ### Multi-Hop Reasoning
 Ask: *"Who manages the person working on Project Lantern?"*
-→ Kivi bridges across separate conversations — one where someone was assigned to Lantern, another where their manager was mentioned.
+→ Kivi bridges across separate conversations: one where someone was assigned to Lantern, another where their manager was mentioned.
 
 ### Abstention on Missing History
 Ask something unrecorded: *"What is the capital of Peru?"*
@@ -125,7 +125,7 @@ Ask something unrecorded: *"What is the capital of Peru?"*
 If two recent notes conflict (e.g., "meeting is Wednesday" vs "meeting moved to Thursday"), Kivi surfaces an amber **disambiguation card** in the UI asking you to clarify.
 
 ### Memory Governance
-In **Memory**, edit an active claim or suppress a source. Re-ask the question — the updated memory state is reflected immediately.
+In **Memory**, edit an active claim or suppress a source. Re-ask the question; the updated memory state is reflected immediately.
 
 ### Source Inspector
 In **History**, select any transcript to see side-by-side: raw ASR, formatted text, chunk boundaries, derived memory candidates, and extracted entities.
