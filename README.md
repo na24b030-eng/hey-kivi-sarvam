@@ -231,19 +231,4 @@ The SQLite database has 11 tables across 5 Alembic migrations:
 - **[vision.md](vision.md)**: Product vision
 - **[positioning.md](positioning.md)**: Product positioning
 
----
 
-## What I'd build next
-
-If I kept going, the big things would be:
-
-1. **Live audio pipeline**: Real-time Whisper/Sarvam STT → streaming ingestion instead of batch JSONL import
-2. **PostgreSQL + pgvector**: Replace SQLite for multi-user production (concurrent writes, proper vector index)
-3. **Graph visualization**: Interactive UI to explore the knowledge graph and entity relationships
-4. **Webhook integrations**: Push notifications when contradictions are detected or memories expire
-5. **Fine-tuned embeddings**: Domain-adapt the embedding model on actual user transcript patterns
-6. **Auth & multi-tenancy**: OAuth + per-user namespace isolation for real deployment
-
----
-
-*Built with curiosity and too many late nights. If you're reading this, feel free to poke around the code; I tried to keep it clean.*
