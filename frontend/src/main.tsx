@@ -411,8 +411,26 @@ function App() {
         api<Source[]>(`/api/namespaces/${curId}/sources`),
         api<Memory[]>(`/api/namespaces/${curId}/memories`),
         api<Namespace[]>('/api/namespaces'),
-      ]).then(([nextSources, nextMemories, nextNamespaces]) => {
+      ]).then(async ([nextSources, nextMemories, nextNamespaces]) => {
         if (cancelled) return
+        if ((namespace.name === 'demo' || namespace.id === 'demo') && nextSources.length === 0) {
+          try {
+            setNotice('Loading sample demo records...')
+            await api(`/api/namespaces/${curId}/seed`, { method: 'POST' })
+            await api('/api/worker/drain', { method: 'POST' })
+            const [seededSources, seededMemories] = await Promise.all([
+              api<Source[]>(`/api/namespaces/${curId}/sources`),
+              api<Memory[]>(`/api/namespaces/${curId}/memories`),
+            ])
+            if (cancelled) return
+            setSources(seededSources)
+            setMemories(seededMemories)
+            setNotice('')
+            return
+          } catch {
+            // gracefully continue
+          }
+        }
         setSources(nextSources)
         setMemories(nextMemories)
         setNamespaces(nextNamespaces)
