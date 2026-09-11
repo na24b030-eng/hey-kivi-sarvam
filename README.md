@@ -1,6 +1,6 @@
 # Hey Kivi: Semantic Memory for Spoken Interactions
 
-I built Kivi because I noticed something frustrating: voice notes are incredibly easy to create and almost impossible to search later. A useful detail gets buried in yesterday's standup, mixed with an older plan, or phrased differently from how you'd search for it. Kivi fixes that.
+Voice notes are incredibly easy to create and almost impossible to search later. A useful detail gets buried in yesterday's standup, mixed with an older plan, or phrased differently from how you'd search for it. Kivi fixes that.
 
 It's an evidence-backed semantic memory engine that indexes spoken transcripts, extracts durable facts and preferences, builds a relational knowledge graph across entities, and generates answers strictly grounded in verifiable source evidence, with full provenance and clickable citations.
 
