@@ -368,6 +368,14 @@ function App() {
         const found = all.find(item => item.id === savedId)
         if (found) {
           setNamespace(found)
+        } else if (savedId === 'demo') {
+          try {
+            const demo = await api<Namespace>('/api/namespaces', { method: 'POST', body: JSON.stringify({ name: 'demo' }) })
+            setNamespaces(prev => [...prev.filter(n => n.id !== demo.id), demo])
+            setNamespace(demo)
+          } catch {
+            window.sessionStorage?.removeItem('kivi_active_namespace_id')
+          }
         } else {
           window.sessionStorage?.removeItem('kivi_active_namespace_id')
         }
