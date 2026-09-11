@@ -34,7 +34,7 @@ flowchart LR
 The repo includes a `render.yaml` that configures everything automatically:
 
 1. Go to [Render Dashboard](https://dashboard.render.com) → **New +** → **Blueprint**
-2. Connect your GitHub repo (`hey-kivi-sarvam`)
+2. Connect your GitHub repo (`memory_spoken-Interactions`)
 3. Render reads `render.yaml` and sets up:
    - **Service**: `kivi-memory-backend` (Python 3, Free plan)
    - **Build**: `pip install uv && uv sync --project backend --locked`

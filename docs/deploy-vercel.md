@@ -24,7 +24,7 @@ CORS is configured on Render via `TRUSTED_ORIGINS` to allow the Vercel domain.
 
 ## Deploying
 
-1. In Vercel → **Add New → Project** → import `na24b030-eng/hey-kivi-sarvam` from GitHub
+1. In Vercel → **Add New → Project** → import `na24b030-eng/memory_spoken-Interactions` from GitHub
 2. Keep the repo root as the Vercel **Root Directory**: `vercel.json` handles everything:
    - Install: `npm --prefix frontend ci`
    - Build: `npm --prefix frontend run build`

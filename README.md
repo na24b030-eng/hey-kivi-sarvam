@@ -9,7 +9,7 @@ It's an evidence-backed semantic memory engine that indexes spoken transcripts, 
 [![TypeScript](https://img.shields.io/badge/Language-TypeScript-blue.svg?style=flat-square)](https://www.typescriptlang.org/)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB.svg?style=flat-square)](https://www.python.org/)
 [![SQLite](https://img.shields.io/badge/Database-SQLite_WAL-003B57.svg?style=flat-square)](https://www.sqlite.org/)
-[![CI](https://github.com/na24b030-eng/hey-kivi-sarvam/actions/workflows/ci.yml/badge.svg)](https://github.com/na24b030-eng/hey-kivi-sarvam/actions)
+[![CI](https://github.com/na24b030-eng/memory_spoken-Interactions/actions/workflows/ci.yml/badge.svg)](https://github.com/na24b030-eng/memory_spoken-Interactions/actions)
 
 > Read the [Product Vision](vision.md) and [Product Positioning](positioning.md).
 
@@ -88,7 +88,7 @@ Everything runs on free tiers:
 |:---|:---|:---|
 | **Vercel** | [hey-kivi-sarvam-dnaq.vercel.app](https://hey-kivi-sarvam-dnaq.vercel.app) | React frontend (Vite build) |
 | **Render** | [hey-kivi-sarvam.onrender.com](https://hey-kivi-sarvam.onrender.com) | FastAPI backend + SQLite |
-| **GitHub** | [na24b030-eng/hey-kivi-sarvam](https://github.com/na24b030-eng/hey-kivi-sarvam) | Source + CI (pytest, ruff, vitest) |
+| **GitHub** | [na24b030-eng/memory_spoken-Interactions](https://github.com/na24b030-eng/memory_spoken-Interactions) | Source + CI (pytest, ruff, vitest) |
 
 Health: [`/api/health`](https://hey-kivi-sarvam.onrender.com/api/health) · Readiness: [`/api/readiness`](https://hey-kivi-sarvam.onrender.com/api/readiness)
 

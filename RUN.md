@@ -219,6 +219,6 @@ The project is live on free tiers:
 |:---|:---|:---|
 | **Frontend (Vercel)** | [hey-kivi-sarvam-dnaq.vercel.app](https://hey-kivi-sarvam-dnaq.vercel.app) | [docs/deploy-vercel.md](docs/deploy-vercel.md) |
 | **Backend (Render)** | [hey-kivi-sarvam.onrender.com](https://hey-kivi-sarvam.onrender.com) | [docs/deploy-render.md](docs/deploy-render.md) |
-| **CI** | [GitHub Actions](https://github.com/na24b030-eng/hey-kivi-sarvam/actions) | [.github/workflows/ci.yml](.github/workflows/ci.yml) |
+| **CI** | [GitHub Actions](https://github.com/na24b030-eng/memory_spoken-Interactions/actions) | [.github/workflows/ci.yml](.github/workflows/ci.yml) |
 
 Both auto-deploy from the `master` branch on push.
