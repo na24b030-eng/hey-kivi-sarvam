@@ -328,3 +328,27 @@ def test_concurrent_revision_check_rejects_stale(tmp_path: Path):
     assert second.status_code == 409
     assert second.json()["code"] == "stale_namespace"
 
+
+def test_reset_and_delete_namespace(tmp_path: Path):
+    app = client(tmp_path)
+    ns = app.post("/api/namespaces", json={"name": "ToReset"}).json()
+    rec = json.dumps({
+        "schema_version": 1,
+        "id": "reset-doc",
+        "raw_asr": "harbor launch on monday",
+        "formatted_text": "Harbor launch on Monday.",
+    })
+    app.post(f"/api/namespaces/{ns['id']}/imports", json={"jsonl": rec})
+    app.post("/api/worker/drain")
+    assert len(app.get(f"/api/namespaces/{ns['id']}/sources").json()) == 1
+
+    res = app.post(f"/api/namespaces/{ns['id']}/reset")
+    assert res.status_code == 200
+    assert len(app.get(f"/api/namespaces/{ns['id']}/sources").json()) == 0
+    assert len(app.get(f"/api/namespaces/{ns['id']}/memories").json()) == 0
+
+    del_res = app.delete(f"/api/namespaces/{ns['id']}")
+    assert del_res.status_code == 200
+    namespaces = [item["id"] for item in app.get("/api/namespaces").json()]
+    assert ns["id"] not in namespaces
+

@@ -150,7 +150,7 @@ uv run --project backend python -m kivi_memory.cli evaluate --namespace demo --s
 ### Test suites
 
 ```powershell
-# Backend tests (55 tests including 15 semantic intelligence tests)
+# Backend tests (56 tests including 15 semantic intelligence tests)
 uv run --project backend pytest backend/tests
 
 # Backend linting

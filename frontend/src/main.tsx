@@ -200,6 +200,14 @@ async function demoApi<T>(path: string, options?: RequestInit): Promise<T> {
     return { accepted, conflicts } as T
   }
   if (path === '/api/worker/drain' && method === 'POST') return { state: 'idle', processed: 0 } as T
+  if (namespaceId && path.endsWith('/reset') && method === 'POST') {
+    store.sources = store.sources.filter(item => !item.id.startsWith(`${namespaceId}:`))
+    store.memories = store.memories.filter(item => !item.id.startsWith(`${namespaceId}:`))
+    const ns = store.namespaces.find(item => item.id === namespaceId)
+    if (ns) ns.revision += 1
+    saveDemoStore(store)
+    return { namespace: namespaceId, deleted_sources: 0, revision: ns?.revision || 1 } as T
+  }
   if (namespaceId && path.endsWith('/ask') && method === 'POST') {
     if (!payload.question || !String(payload.question).trim()) {
       throw new Error('question must contain a non-whitespace character')
@@ -354,7 +362,19 @@ function App() {
   const refreshNamespaces = async () => {
     const all = await api<Namespace[]>('/api/namespaces')
     setNamespaces(all)
-    if (!namespace && all[0]) setNamespace(all[0])
+    try {
+      const savedId = window.sessionStorage?.getItem('kivi_active_namespace_id')
+      if (savedId) {
+        const found = all.find(item => item.id === savedId)
+        if (found) {
+          setNamespace(found)
+        } else {
+          window.sessionStorage?.removeItem('kivi_active_namespace_id')
+        }
+      }
+    } catch {
+      // Storage access restricted
+    }
   }
 
   const refreshData = async (current = namespace) => {
@@ -406,7 +426,7 @@ function App() {
 
   const createSpace = async () => {
     const used = new Set(namespaces.map(item => item.name.toLocaleLowerCase()))
-    let number = Math.max(2, namespaces.length + 1)
+    let number = Math.max(1, namespaces.length + 1)
     let name = namespaces.length ? `Memory ${number}` : 'My memory'
     while (used.has(name.toLocaleLowerCase())) {
       number += 1
@@ -415,8 +435,27 @@ function App() {
     setBusy(true)
     try {
       const item = await api<Namespace>('/api/namespaces', { method: 'POST', body: JSON.stringify({ name }) })
+      try {
+        window.sessionStorage?.setItem('kivi_active_namespace_id', item.id)
+      } catch {}
+      setNamespaces(prev => [...prev.filter(n => n.id !== item.id), item])
       setNamespace(item)
       setNotice(`Memory space “${item.name}” created.`)
+    } catch (error) {
+      setNotice((error as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const resetSpace = async () => {
+    if (!namespace) return
+    if (!window.confirm(`Reset "${namespace.name}"? This will delete all transcripts, chunks, embeddings, and memories in this workspace.`)) return
+    setBusy(true)
+    try {
+      await api(`/api/namespaces/${encodeURIComponent(namespace.id)}/reset`, { method: 'POST' })
+      await refreshData()
+      setNotice(`Workspace “${namespace.name}” has been reset. All records cleared.`)
     } catch (error) {
       setNotice((error as Error).message)
     } finally {
@@ -550,13 +589,52 @@ function App() {
   }
 
   if (!namespace) {
+    const demoSpace = namespaces.find(n => n.name === 'demo' || n.id === 'demo')
     return (
       <main className="welcome">
         <div className="welcome-mark">kivi<span>MEMORY</span></div>
         <p className="eyebrow">PRIVATE TRANSCRIPT MEMORY</p>
         <h1>Give Kivi a memory.</h1>
         <p>Import transcript history, recover the context behind an idea, and keep every answer connected to the exact source that supported it.</p>
-        <button onClick={createSpace} disabled={busy}>{busy ? 'Creating workspace...' : 'Create a memory space'}</button>
+        <div className="welcome-actions">
+          <button onClick={createSpace} disabled={busy}>
+            {busy ? 'Creating workspace...' : '+ Create a clean memory space'}
+          </button>
+          {demoSpace && (
+            <button
+              className="quiet welcome-demo-btn"
+              onClick={() => {
+                try {
+                  window.sessionStorage?.setItem('kivi_active_namespace_id', demoSpace.id)
+                } catch {}
+                setNamespace(demoSpace)
+              }}
+            >
+              Explore sample demo (demo)
+            </button>
+          )}
+          {namespaces.length > 0 && (
+            <div className="welcome-select-row">
+              <select
+                defaultValue=""
+                onChange={event => {
+                  const chosen = namespaces.find(item => item.id === event.target.value)
+                  if (chosen) {
+                    try {
+                      window.sessionStorage?.setItem('kivi_active_namespace_id', chosen.id)
+                    } catch {}
+                    setNamespace(chosen)
+                  }
+                }}
+              >
+                <option value="" disabled>Or open an existing space...</option>
+                {namespaces.map(item => (
+                  <option key={item.id} value={item.id}>{item.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
         <small>{API_BASE_URL ? 'Connected to the FastAPI memory backend.' : 'Vercel demo mode stores this workspace in your browser. Connect VITE_API_BASE_URL for the full backend workflow.'}</small>
         {notice && <p className="notice">{notice}</p>}
       </main>
@@ -584,11 +662,38 @@ function App() {
         <div className="space-controls">
           <label>
             WORKSPACE
-            <select value={namespace.id} onChange={event => setNamespace(namespaces.find(item => item.id === event.target.value) || null)}>
+            <select
+              value={namespace.id}
+              onChange={event => {
+                const chosen = namespaces.find(item => item.id === event.target.value) || null
+                if (chosen) {
+                  try {
+                    window.sessionStorage?.setItem('kivi_active_namespace_id', chosen.id)
+                  } catch {}
+                } else {
+                  try {
+                    window.sessionStorage?.removeItem('kivi_active_namespace_id')
+                  } catch {}
+                }
+                setNamespace(chosen)
+              }}
+            >
               {namespaces.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           </label>
           <button className="quiet" onClick={createSpace}>+ New space</button>
+          <button
+            className="quiet"
+            onClick={() => {
+              try {
+                window.sessionStorage?.removeItem('kivi_active_namespace_id')
+              } catch {}
+              setNamespace(null)
+            }}
+          >
+            ← Welcome page
+          </button>
+          <button className="quiet destructive-action" onClick={resetSpace}>Reset this space</button>
         </div>
       </aside>
       <main className="content">

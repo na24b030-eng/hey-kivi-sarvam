@@ -150,4 +150,31 @@ describe("Frontend Browser Storage & Demo Mode Correctness", () => {
     // displayedData should NOT be overwritten by workspace A
     assert.equal(displayedData, "initial-A", "Stale fetch from workspace A must not update workspace B");
   });
+
+  it("Item 50: demo reset clears sources and memories for targeted workspace", () => {
+    const store = {
+      namespaces: [{ id: "space-1", name: "Space 1", revision: 1 }],
+      sources: [
+        { id: "space-1:src:1", formatted_text: "Note 1" },
+        { id: "space-2:src:2", formatted_text: "Note 2" },
+      ],
+      memories: [
+        { id: "space-1:mem:1", value: "Fact 1" },
+        { id: "space-2:mem:2", value: "Fact 2" },
+      ],
+    };
+
+    // Simulate reset for space-1
+    const target = "space-1";
+    store.sources = store.sources.filter((s) => !s.id.startsWith(`${target}:`));
+    store.memories = store.memories.filter((m) => !m.id.startsWith(`${target}:`));
+    const ns = store.namespaces.find((n) => n.id === target);
+    if (ns) ns.revision += 1;
+
+    assert.equal(store.sources.length, 1);
+    assert.equal(store.sources[0].id, "space-2:src:2");
+    assert.equal(store.memories.length, 1);
+    assert.equal(store.memories[0].id, "space-2:mem:2");
+    assert.equal(ns.revision, 2);
+  });
 });

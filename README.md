@@ -124,8 +124,8 @@ I built a frozen evaluation suite to make sure things actually work:
 | Retrieval & Abstention | 120 | Grounded Accuracy | **120/120 (100%)** |
 | Live Provider Smoke | 13 | End-to-End with Sarvam 105B | **13/13 (100%)** |
 | Cross-Lingual Embedding | 1 | Zero-Overlap Dense Match | **Passed** |
-| Backend Unit Tests | 55 | pytest pass rate | **55/55** |
-| Frontend Tests | 6 | vitest pass rate | **6/6** |
+| Backend Unit Tests | 56 | pytest pass rate | **56/56** |
+| Frontend Tests | 7 | vitest pass rate | **7/7** |
 
 The cross-lingual test is my favorite: an English query ("dentist appointment") retrieves a pure Hindi record with zero lexical overlap. That's the multilingual embeddings doing their job.
 
@@ -174,11 +174,11 @@ For the full operational guide (eval commands, blind imports, resets), see **[RU
 │   │   ├── settings.py         # All configuration with validation
 │   │   └── cli.py              # CLI commands (serve, migrate, seed, evaluate, etc.)
 │   ├── migrations/             # Alembic migrations (0001–0005)
-│   ├── tests/                  # 55 pytest tests
+│   ├── tests/                  # 56 pytest tests
 │   └── schemas/                # JSON Schema for transcript validation
 ├── frontend/
 │   ├── src/main.tsx            # React app with disambiguation cards
-│   └── tests/                  # 6 vitest tests
+│   └── tests/                  # 7 vitest tests
 ├── data/                       # Synthetic data generator & 500-record corpus
 ├── docs/                       # Deployment guides & data contracts
 ├── eval/                       # Evaluation suites & test reports

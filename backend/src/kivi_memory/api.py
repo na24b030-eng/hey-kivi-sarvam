@@ -10,7 +10,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
-from sqlalchemy import func, select, text, update
+from sqlalchemy import delete, func, select, text, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -23,6 +23,8 @@ from .contracts import (
     ValidateImportRequest,
 )
 from .db import (
+    Entity,
+    EntityRelation,
     Job,
     Memory,
     MemoryOperation,
@@ -206,6 +208,39 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/api/namespaces")
     def list_namespaces(db: Session = Depends(session_dep)):
         return [{"id": item.id, "name": item.name, "revision": item.revision} for item in db.scalars(select(Namespace).order_by(Namespace.created_at)).all()]
+
+    @app.post("/api/namespaces/{namespace_id}/reset")
+    def reset_namespace(namespace_id: str, request: Request, db: Session = Depends(session_dep)):
+        namespace = namespace_or_404(namespace_id, db, request)
+        source_ids = [source.id for source in db.scalars(select(Source).where(Source.namespace_id == namespace.id)).all()]
+        db.execute(delete(QueryRun).where(QueryRun.namespace_id == namespace.id))
+        db.execute(delete(MemoryOperation).where(MemoryOperation.namespace_id == namespace.id))
+        db.execute(delete(EntityRelation).where(EntityRelation.namespace_id == namespace.id))
+        db.execute(delete(Entity).where(Entity.namespace_id == namespace.id))
+        for source_id in source_ids:
+            source = db.get(Source, source_id)
+            if source:
+                db.delete(source)
+        namespace.revision += 1
+        db.commit()
+        db.refresh(namespace)
+        return {"namespace": namespace.id, "deleted_sources": len(source_ids), "revision": namespace.revision}
+
+    @app.delete("/api/namespaces/{namespace_id}")
+    def delete_namespace(namespace_id: str, request: Request, db: Session = Depends(session_dep)):
+        namespace = namespace_or_404(namespace_id, db, request)
+        source_ids = [source.id for source in db.scalars(select(Source).where(Source.namespace_id == namespace.id)).all()]
+        db.execute(delete(QueryRun).where(QueryRun.namespace_id == namespace.id))
+        db.execute(delete(MemoryOperation).where(MemoryOperation.namespace_id == namespace.id))
+        db.execute(delete(EntityRelation).where(EntityRelation.namespace_id == namespace.id))
+        db.execute(delete(Entity).where(Entity.namespace_id == namespace.id))
+        for source_id in source_ids:
+            source = db.get(Source, source_id)
+            if source:
+                db.delete(source)
+        db.delete(namespace)
+        db.commit()
+        return {"deleted": namespace_id}
 
     @app.post("/api/namespaces/{namespace_id}/imports/validate")
     def validate_import(namespace_id: str, payload: ValidateImportRequest, request: Request, db: Session = Depends(session_dep)):
