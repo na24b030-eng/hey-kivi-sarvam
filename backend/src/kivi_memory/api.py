@@ -271,6 +271,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         result = import_records(db, namespace, payload.jsonl, settings.max_record_bytes, payload.replace_conflicts)
         return result
 
+    @app.post("/api/namespaces/{namespace_id}/seed")
+    def seed_namespace(namespace_id: str, request: Request, db: Session = Depends(session_dep)):
+        namespace = namespace_or_404(namespace_id, db, request)
+        
+        root = Path(__file__).resolve().parents[3]
+        file_path = root / "data" / "synthetic-500.jsonl"
+        if not file_path.exists():
+            fail(404, "missing_seed_data", "Synthetic corpus is missing.", request)
+            
+        jsonl_data = file_path.read_text(encoding="utf-8")
+        result = import_records(db, namespace, jsonl_data, settings.max_record_bytes, False)
+        return result
+
     @app.get("/api/namespaces/{namespace_id}/jobs")
     def list_jobs(namespace_id: str, request: Request, db: Session = Depends(session_dep)):
         namespace_or_404(namespace_id, db, request)

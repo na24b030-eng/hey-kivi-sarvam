@@ -425,9 +425,10 @@ function App() {
   }, [namespace?.id])
 
   const createSpace = async () => {
+    const customSpaces = namespaces.filter(n => n.name !== 'demo' && n.id !== 'demo')
     const used = new Set(namespaces.map(item => item.name.toLocaleLowerCase()))
-    let number = Math.max(1, namespaces.length + 1)
-    let name = namespaces.length ? `Memory ${number}` : 'My memory'
+    let number = Math.max(1, customSpaces.length + 1)
+    let name = customSpaces.length ? `Memory ${number}` : 'My memory'
     while (used.has(name.toLocaleLowerCase())) {
       number += 1
       name = `Memory ${number}`
