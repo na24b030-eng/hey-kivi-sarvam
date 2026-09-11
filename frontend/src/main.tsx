@@ -492,7 +492,11 @@ function App() {
 
   const submitAsk = async (event: FormEvent, mode: 'answer' | 'draft' = 'answer') => {
     event.preventDefault()
-    if (!namespace || !question.trim()) return
+    if (!namespace) return
+    if (!question.trim()) {
+      setNotice('Type a topic or question first, then click "Ask Kivi" or "Draft an update".')
+      return
+    }
     const reqNsId = namespace.id
     setBusy(true)
     setNotice('')
