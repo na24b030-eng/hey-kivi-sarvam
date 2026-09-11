@@ -753,7 +753,7 @@ function renderAnswerText(
   evidence: Evidence[],
   inspect: (source: Pick<Source, 'id'>) => void
 ) {
-  const pattern = /\[source:([a-zA-Z0-9_\-]+)\]/g
+  const pattern = /\[source:([^\]]+)\]/g
   const parts: (string | React.ReactNode)[] = []
   let lastIndex = 0
   let match: RegExpExecArray | null
@@ -762,26 +762,30 @@ function renderAnswerText(
     if (match.index > lastIndex) {
       parts.push(text.slice(lastIndex, match.index))
     }
-    const sourceId = match[1]
-    const evidenceIndex = evidence.findIndex(e => e.id === sourceId)
-    const num = evidenceIndex >= 0 ? evidenceIndex + 1 : null
-    const sourceItem = evidenceIndex >= 0 ? evidence[evidenceIndex] : { id: sourceId }
-    const externalLabel = 'external_id' in sourceItem && sourceItem.external_id ? sourceItem.external_id : sourceId
-    const titleText = evidenceIndex >= 0
-      ? `Source ${num}: ${externalLabel}`
-      : `Source: ${sourceId}`
+    const inner = match[1]
+    const ids = inner.split(/[,;\s]+/).map(s => s.replace(/^source:/, '').trim()).filter(Boolean)
 
-    parts.push(
-      <button
-        key={`cite-${match.index}-${sourceId}`}
-        type="button"
-        className="citation-pill"
-        onClick={() => inspect(sourceItem)}
-        title={titleText}
-      >
-        {num ?? 'source'}
-      </button>
-    )
+    ids.forEach((sourceId, i) => {
+      const evidenceIndex = evidence.findIndex(e => e.id === sourceId)
+      const num = evidenceIndex >= 0 ? evidenceIndex + 1 : null
+      const sourceItem = evidenceIndex >= 0 ? evidence[evidenceIndex] : { id: sourceId }
+      const externalLabel = 'external_id' in sourceItem && sourceItem.external_id ? sourceItem.external_id : sourceId
+      const titleText = evidenceIndex >= 0
+        ? `Source ${num}: ${externalLabel}`
+        : `Source: ${sourceId}`
+
+      parts.push(
+        <button
+          key={`cite-${match!.index}-${sourceId}-${i}`}
+          type="button"
+          className="citation-pill"
+          onClick={() => inspect(sourceItem)}
+          title={titleText}
+        >
+          {num ?? 'source'}
+        </button>
+      )
+    })
     lastIndex = pattern.lastIndex
   }
 
