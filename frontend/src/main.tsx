@@ -750,7 +750,7 @@ function Ask({ question, setQuestion, answer, busy, submit, sourceCount, memoryC
           <section className="memory-stats">
             <article><strong>{sourceCount}</strong><span>searchable sources</span></article>
             <article><strong>{memoryCount}</strong><span>active memory candidates</span></article>
-            <article><strong>1 click</strong><span>back to the source</span></article>
+            
           </section>
         </>
       )}
