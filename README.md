@@ -133,6 +133,18 @@ Logs and reports are in [`eval/results/`](eval/results/).
 
 ---
 
+## Limitations & Boundaries
+
+Being clear about what Kivi does not do:
+
+1. **Audio waveform access**: Kivi operates on dual-view transcripts (`raw_asr` and `formatted_text`), not raw audio waveforms or acoustic lattices. Severe speech-to-text corruption cannot be resolved through acoustic re-scoring.
+2. **Knowledge graph traversal depth**: Multi-hop bridge traversal is bounded to 2 hops (maximum 4 bridge entities per query) to keep inference fast on CPU without graph expansion explosion.
+3. **Contradiction scope**: Contradiction detection targets conflicting statements on the same entity and predicate within a temporal window (such as rescheduled meetings or changed dates). Broad conceptual or policy shifts across unrelated notes require user review.
+4. **Single-node architecture**: SQLite with WAL mode is designed for responsive personal use and free-tier hosting. Large-scale enterprise multi-tenancy would benefit from PostgreSQL with pgvector.
+5. **Forgetting boundary**: Deletion cascades through all tables, chunks, vectors, and query traces. However, it does not guarantee forensic erasure from historical WAL transaction logs or immutable filesystem backups.
+
+---
+
 ## Quick Start
 
 ### Prerequisites
