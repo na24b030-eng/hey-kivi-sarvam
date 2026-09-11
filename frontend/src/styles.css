@@ -90,6 +90,7 @@ button {
 button:hover:not(:disabled) {
   transform: translateY(-1px);
   background: #16543b;
+  color: #ffffff;
 }
 
 button:disabled {

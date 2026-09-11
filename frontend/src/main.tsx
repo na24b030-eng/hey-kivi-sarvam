@@ -598,21 +598,33 @@ function App() {
         <p>Import transcript history, recover the context behind an idea, and keep every answer connected to the exact source that supported it.</p>
         <div className="welcome-actions">
           <button onClick={createSpace} disabled={busy}>
-            {busy ? 'Creating workspace...' : '+ Create a clean memory space'}
+            {busy ? 'Creating workspace...' : 'Create a memory space'}
           </button>
-          {demoSpace && (
-            <button
+          <button
               className="quiet welcome-demo-btn"
-              onClick={() => {
+              disabled={busy}
+              onClick={async () => {
+                let space = namespaces.find(n => n.name === 'demo' || n.id === 'demo')
+                if (!space) {
+                  setBusy(true)
+                  try {
+                    space = await api<Namespace>('/api/namespaces', { method: 'POST', body: JSON.stringify({ name: 'demo' }) })
+                    setNamespaces(prev => [...prev.filter(n => n.id !== space!.id), space!])
+                  } catch (error) {
+                    setNotice((error as Error).message)
+                    setBusy(false)
+                    return
+                  }
+                  setBusy(false)
+                }
                 try {
-                  window.sessionStorage?.setItem('kivi_active_namespace_id', demoSpace.id)
+                  window.sessionStorage?.setItem('kivi_active_namespace_id', space.id)
                 } catch {}
-                setNamespace(demoSpace)
+                setNamespace(space)
               }}
             >
               Explore sample demo (demo)
             </button>
-          )}
           {namespaces.length > 0 && (
             <div className="welcome-select-row">
               <select
