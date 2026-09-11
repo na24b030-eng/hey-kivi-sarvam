@@ -9,7 +9,7 @@ from typing import Any
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from sqlalchemy import delete, func, select, text, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -175,6 +175,20 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 payload_hash=payload_hash,
             )
         )
+
+    @app.get("/", include_in_schema=False)
+    def root(request: Request):
+        accept = request.headers.get("accept", "")
+        if "text/html" in accept:
+            return RedirectResponse(url="https://hey-kivi-sarvam-dnaq.vercel.app", status_code=307)
+        return {
+            "service": "Hey Kivi Memory Engine API",
+            "version": "0.1.0",
+            "status": "alive",
+            "frontend": "https://hey-kivi-sarvam-dnaq.vercel.app",
+            "health": "/api/health",
+            "docs": "/docs",
+        }
 
     @app.get("/api/health")
     def health():

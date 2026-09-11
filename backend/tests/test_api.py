@@ -352,3 +352,14 @@ def test_reset_and_delete_namespace(tmp_path: Path):
     namespaces = [item["id"] for item in app.get("/api/namespaces").json()]
     assert ns["id"] not in namespaces
 
+
+def test_root_redirect_and_json(tmp_path: Path):
+    app = client(tmp_path)
+    html_resp = app.get("/", headers={"accept": "text/html,application/xhtml+xml"}, follow_redirects=False)
+    assert html_resp.status_code == 307
+    assert "hey-kivi-sarvam-dnaq.vercel.app" in html_resp.headers["location"]
+
+    json_resp = app.get("/", headers={"accept": "application/json"})
+    assert json_resp.status_code == 200
+    assert json_resp.json()["status"] == "alive"
+
