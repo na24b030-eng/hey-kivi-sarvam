@@ -1,9 +1,16 @@
 # Product Positioning
 
-Most of us talk faster than we type, so voice notes feel like magic until you have to find something you said last Tuesday. Traditional dictation tools type out your words and immediately forget them. Standard AI chatbots take your notes and hallucinate things you never actually said.
+Kivi is a semantic memory engine for people who use voice dictation at work.
 
-Kivi takes a different path: it acts as a reliable memory companion for the things you intentionally dictate throughout your workday.
+### The Problem
+When you dictate notes throughout the week, the information gets lost across different apps and documents. Traditional search only matches exact words, and standard AI assistants make things up when they do not know the answer.
 
-When you ask Hey Kivi a question, it does not guess. It searches through your spoken history, connects dots across different conversations, and gives you a straight answer with a direct link back to the exact note where you said it. If your plans evolved, it tells you what changed. If you said something in Hindi two days ago and ask about it in English today, it still finds it. And when two recent notes directly clash, it stops to ask you for clarification instead of quietly picking the wrong one.
+### What Kivi Does
+Kivi saves what you dictate, connects related facts across separate notes, and gives you accurate, source-backed answers to your questions.
 
-Most importantly, you stay in the driver's seat. If Kivi remembers something wrong, you can edit it. If a private note should be forgotten, you can delete it with a click. It is a tool designed to give you clarity and continuity without asking you to surrender control.
+- **Direct answers with citations**: Every answer includes clickable links to the exact transcripts used as evidence.
+- **Understands changes over time**: If you update a date or plan in a later note, Kivi recognizes the change instead of quoting outdated plans.
+- **Connects separate notes**: If note A mentions a person and note B mentions their project, Kivi connects them to answer multi-step questions.
+- **Bilingual search**: You can ask questions in English and find notes you dictated in Hindi, even without matching words.
+- **Asks when notes conflict**: If two recent notes contradict each other, Kivi asks you to clarify instead of guessing.
+- **Full user control**: You can inspect, edit, or permanently delete any stored memory at any time.
