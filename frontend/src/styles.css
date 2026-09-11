@@ -277,6 +277,11 @@ header > p:not(.eyebrow) {
   padding: 13px 15px;
 }
 
+.starter button:hover:not(:disabled) {
+  background: #16543b;
+  color: #ffffff;
+}
+
 .memory-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

@@ -678,7 +678,8 @@ function App() {
                 setNamespace(chosen)
               }}
             >
-              {namespaces.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+              <option value="">-- Close workspace --</option>
+                {namespaces.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           </label>
           <button className="quiet" onClick={createSpace}>+ New space</button>
