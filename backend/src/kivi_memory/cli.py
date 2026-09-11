@@ -224,6 +224,17 @@ def main() -> int:
     if args.command == "doctor": return command_doctor(settings, args.download_embedding)
     if args.command == "migrate": return command_migrate()
     if args.command == "serve":
+        factory, _ = build_session_factory(settings)
+        with factory() as session:
+            try:
+                demo = ensure_namespace(session, "demo")
+                session.commit()
+                count = session.scalar(select(func.count(Source.id)).where(Source.namespace_id == demo.id)) or 0
+                if count == 0:
+                    command_seed(settings, "demo")
+                    command_worker(settings, once=False, drain=True)
+            except Exception as exc:  # noqa: BLE001
+                print(f"[WARN] Startup demo initialization failed: {exc}", file=sys.stderr)
         uvicorn.run(create_app(settings), host=args.host, port=args.port)
         return 0
     if args.command == "worker": return command_worker(settings, args.once, args.drain)
