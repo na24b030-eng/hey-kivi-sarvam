@@ -740,6 +740,50 @@ function App() {
   )
 }
 
+function renderAnswerText(
+  text: string,
+  evidence: Evidence[],
+  inspect: (source: Pick<Source, 'id'>) => void
+) {
+  const pattern = /\[source:([a-zA-Z0-9_\-]+)\]/g
+  const parts: (string | React.ReactNode)[] = []
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index))
+    }
+    const sourceId = match[1]
+    const evidenceIndex = evidence.findIndex(e => e.id === sourceId)
+    const num = evidenceIndex >= 0 ? evidenceIndex + 1 : null
+    const sourceItem = evidenceIndex >= 0 ? evidence[evidenceIndex] : { id: sourceId }
+    const externalLabel = 'external_id' in sourceItem && sourceItem.external_id ? sourceItem.external_id : sourceId
+    const titleText = evidenceIndex >= 0
+      ? `Source ${num}: ${externalLabel}`
+      : `Source: ${sourceId}`
+
+    parts.push(
+      <button
+        key={`cite-${match.index}-${sourceId}`}
+        type="button"
+        className="citation-pill"
+        onClick={() => inspect(sourceItem)}
+        title={titleText}
+      >
+        {num ?? 'source'}
+      </button>
+    )
+    lastIndex = pattern.lastIndex
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex))
+  }
+
+  return parts
+}
+
 function Ask({ question, setQuestion, answer, busy, submit, sourceCount, memoryCount, inspect }: { question: string; setQuestion: (value: string) => void; answer: Answer | null; busy: boolean; submit: (event: FormEvent, mode?: 'answer' | 'draft') => void; sourceCount: number; memoryCount: number; inspect: (source: Pick<Source, 'id'>) => void }) {
   return (
     <>
@@ -768,7 +812,6 @@ function Ask({ question, setQuestion, answer, busy, submit, sourceCount, memoryC
           <section className="memory-stats">
             <article><strong>{sourceCount}</strong><span>searchable sources</span></article>
             <article><strong>{memoryCount}</strong><span>active memory candidates</span></article>
-            
           </section>
         </>
       )}
@@ -776,7 +819,9 @@ function Ask({ question, setQuestion, answer, busy, submit, sourceCount, memoryC
         <section className="answer">
           <p className="eyebrow">{answer.status.replaceAll('_', ' ')}</p>
           <h2>{answer.draft_text ? 'Draft an update' : 'A useful answer, with a path back to what you said.'}</h2>
-          <p className="answer-text">{answer.draft_text || answer.answer}</p>
+          <div className="answer-card">
+            <div className="answer-text">{renderAnswerText(answer.draft_text || answer.answer, answer.evidence, inspect)}</div>
+          </div>
           {answer.clarifications && answer.clarifications.length > 0 && (
             <div className="clarification-card" style={{ background: 'rgba(234, 179, 8, 0.08)', border: '1px solid rgba(234, 179, 8, 0.3)', borderRadius: '8px', padding: '1rem', margin: '1rem 0' }}>
               <strong style={{ color: '#eab308', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
@@ -796,9 +841,12 @@ function Ask({ question, setQuestion, answer, busy, submit, sourceCount, memoryC
               <div className="sources">
                 {answer.evidence.map((source, index) => (
                   <button type="button" className="source-evidence" disabled={busy} onClick={() => inspect(source)} key={source.id}>
-                    <strong>{index + 1} · {source.external_id || source.id}</strong>
+                    <strong>
+                      <span className="source-badge">{index + 1}</span>
+                      {source.external_id || source.id}
+                    </strong>
                     <p>{source.text}</p>
-                    <small>Inspect source</small>
+                    <small>Inspect source →</small>
                   </button>
                 ))}
               </div>
