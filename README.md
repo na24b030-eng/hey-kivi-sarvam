@@ -210,15 +210,15 @@ The SQLite database has 11 tables across 5 Alembic migrations:
 
 ## Tech Stack
 
-| Layer | Technology | Why I chose it |
-|:---|:---|:---|
-| Backend | FastAPI + SQLAlchemy + Alembic | Async-ready, great for prototyping, strong ORM |
-| Frontend | React 18 + Vite + TypeScript | Fast builds, type safety, simple SPA |
-| Database | SQLite (WAL mode) | Zero-config, single-file, deployable anywhere including free tiers |
-| Embeddings | `intfloat/multilingual-e5-small` | 118M params, runs on CPU, handles Hindi+English |
-| LLM | Sarvam 105B (via API) | Indian-language-first model, affordable at ₹29/M input tokens |
-| CI | GitHub Actions | Free for public repos, runs pytest + ruff + vitest |
-| Hosting | Vercel (frontend) + Render (backend) | Both have free tiers, auto-deploy from GitHub |
+| Layer | Technology |
+|:---|:---|
+| Backend | FastAPI + SQLAlchemy + Alembic |
+| Frontend | React 18 + Vite + TypeScript |
+| Database | SQLite (WAL mode) |
+| Embeddings | `intfloat/multilingual-e5-small` |
+| LLM | Sarvam 105B (via API) |
+| CI | GitHub Actions |
+| Hosting | Vercel (frontend) + Render (backend) |
 
 ---
 
