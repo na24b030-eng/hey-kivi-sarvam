@@ -287,7 +287,8 @@ def process_one_job(session: Session, settings: Settings | None = None) -> dict[
         job.progress = 50
 
         # --- Pillar 4: Semantic entity/relation extraction ---
-        if settings and settings.sarvam_api_key and settings.enable_semantic_extraction:
+        is_synthetic = bool(source.external_id and source.external_id.startswith("synthetic-"))
+        if not is_synthetic and settings and settings.sarvam_api_key and settings.enable_semantic_extraction:
             from .semantic import (
                 detect_contradictions,
                 extract_entities_and_relations,
