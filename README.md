@@ -11,7 +11,7 @@ It's an evidence-backed semantic memory engine that indexes spoken transcripts, 
 [![SQLite](https://img.shields.io/badge/Database-SQLite_WAL-003B57.svg?style=flat-square)](https://www.sqlite.org/)
 [![CI](https://github.com/na24b030-eng/hey-kivi-sarvam/actions/workflows/ci.yml/badge.svg)](https://github.com/na24b030-eng/hey-kivi-sarvam/actions)
 
-> **Why this exists:** Read the [Product Vision](vision.md) and [Product Positioning](positioning.md).
+> Read the [Product Vision](vision.md) and [Product Positioning](positioning.md).
 
 ---
 
