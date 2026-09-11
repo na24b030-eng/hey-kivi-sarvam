@@ -12,7 +12,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .db import Embedding, Entity, EntityAlias, EntityMention, Memory, Source, SourceChunk
-from .embeddings import encode_passage, encode_query, vector_from_blob
+from .embeddings import encode_query, vector_from_blob
 from .settings import Settings
 
 STOPWORDS = {
