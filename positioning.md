@@ -1,9 +1,9 @@
 # Product Positioning
 
-Kivi is a reliable memory for the things people intentionally say while they work. It helps them find earlier context, understand what changed, and prepare the next response, without guessing.
+Most of us talk faster than we type, so voice notes feel like magic until you have to find something you said last Tuesday. Traditional dictation tools type out your words and immediately forget them. Standard AI chatbots take your notes and hallucinate things you never actually said.
 
-Facts, events, and preferences stay connected to their original scope, source, and the entities they reference. A knowledge graph weaves individual claims into a connected web where multi-hop questions ("Who manages the person on this project?") have grounded answers.
+Kivi takes a different path: it acts as a reliable memory companion for the things you intentionally dictate throughout your workday.
 
-Scheduled items and ephemeral details decay naturally so they don't compete with permanent facts. When recent claims contradict each other, Kivi asks for clarification instead of silently picking a winner.
+When you ask Hey Kivi a question, it does not guess. It searches through your spoken history, connects dots across different conversations, and gives you a straight answer with a direct link back to the exact note where you said it. If your plans evolved, it tells you what changed. If you said something in Hindi two days ago and ask about it in English today, it still finds it. And when two recent notes directly clash, it stops to ask you for clarification instead of quietly picking the wrong one.
 
-Hey Kivi turns that memory into useful, source-backed answers with clickable citations. Ordinary dictation remains focused on accurate writing. Clear evidence, correction, and deletion are what make the experience trustworthy.
+Most importantly, you stay in the driver's seat. If Kivi remembers something wrong, you can edit it. If a private note should be forgotten, you can delete it with a click. It is a tool designed to give you clarity and continuity without asking you to surrender control.

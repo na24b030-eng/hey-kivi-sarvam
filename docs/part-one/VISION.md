@@ -1,41 +1,31 @@
 # Product Vision
 
-Spoken notes are easy to create and surprisingly hard to recover. A useful detail gets buried in yesterday's update, mixed with an older plan, or phrased differently from how you'd search for it later. I built Kivi to make those moments easier to find and use again.
+### Why Voice Notes Break Down
+We speak thoughts naturally: while walking between meetings, while thinking out loud, while wrapping up a call, or while dictating a quick update before closing the laptop. In that moment, speaking feels effortless.
 
-## The core idea
+The trouble starts two weeks later. A teammate asks, "Did we ever agree on the launch date with Dev?" and suddenly you are digging through scattered Slack clips, voice memos, and draft emails. You know you talked about it, but you cannot remember the exact phrasing or where it went. And if you dictated part of it in Hindi and part of it in English, searching by simple keywords is almost useless.
 
-Kivi is a careful work companion. It remembers enough to restore context, keeps the original record close by, and leaves the final decision with the person using it. The main goal is **continuity**: helping someone return to a topic without reconstructing it from scattered notes and partial memory.
+I built Kivi to solve that quiet everyday frustration. It is designed to be a careful companion for your working memory: something that listens to what you deliberately say, keeps track of the details, and helps you pick up the thread whenever you return.
 
-## What matters most
+### What Continuity Really Means
+Good memory is not about hoarding every word forever. It is about continuity. When you return to a project, you want three simple things:
 
-Three activities drive the design:
+1. **You want to know what was actually said**: not an AI's creative reinterpretation, but the real words, with a single click back to the original transcript.
+2. **You want to know what changed**: projects evolve constantly. If you said Monday on the 4th, but then pushed it to Wednesday on the 7th, your memory assistant should understand the timeline instead of quoting an old draft as settled truth.
+3. **You want help writing the next response**: whether that is an email update or a status summary, drafted in your own preferred style and grounded entirely in real history.
 
-1. **Recovery**: A person should be able to find an earlier interaction and inspect what was actually said, with the original transcript always one click away.
+And this has to work naturally the way people actually talk in India and around the world, weaving between Hindi and English without forcing you to pick a single language.
 
-2. **Evolution tracking**: When plans or details change, Kivi should explain the current state of a topic. It tracks state transitions chronologically, supersedes outdated claims, and detects contradictions proactively rather than silently picking the newest claim.
+### A Healthier Way to Treat Memory
+Human memory is nuanced, and software should respect that:
 
-3. **Grounded drafting**: Kivi should prepare a draft using the relevant history, citing every claim back to its source. These activities should work across Hindi and English references to the same subject.
+- **Facts are not permanent by default**: A dentist appointment next Tuesday matters right now, but six months from now it is just digital clutter. Kivi lets temporary schedules and quick reminders fade naturally over time so they never crowd out permanent truths.
+- **Doubt should be visible, not hidden**: A dictated thought is not a signed contract. A brainstormed deadline is not an approved launch. When records conflict or notes are sparse, Kivi says "I don't have enough evidence" or asks for clarification. We do not need AI that sounds confident when it is guessing; we need AI that tells the truth about what it knows.
+- **Connecting the dots**: Ideas do not live in isolation. When you mention Priya in one voice note and her project in another, Kivi connects those dots into a living knowledge web. That way, when you ask "Who is leading the Harbor work?", it can bridge the gap across separate conversations without breaking a sweat.
 
-## What counts as memory
+### Trust Comes from Control
+People will never trust a memory tool if it feels like a black box they cannot touch.
 
-Useful memory includes factual claims, decisions, events, and explicit preferences about how someone wants help. Each memory retains its source, time, speaker, and scope. Temporary details (like "dentist appointment next Tuesday") remain searchable but decay naturally over time through soft exponential curves; they shouldn't rank equally with permanent facts six months later.
+If Kivi extracts a fact that is slightly off, you can open it and edit it. If a project was cancelled or a personal note was saved by mistake, you can delete the source and know with certainty that every chunk, vector, and memory derived from it is permanently wiped from the database.
 
-Repetition alone should not create a personality profile. Quoted preferences stay attached to the person who expressed them.
-
-## Handling uncertainty
-
-Kivi handles uncertainty conservatively. A dictated message isn't necessarily a sent message. A proposed deadline isn't automatically an accepted deadline. A newer quotation doesn't always replace an earlier fact.
-
-When records conflict, dates are missing, or raw speech recognition differs from formatted text, the uncertainty stays visible. Contradictions surface as disambiguation prompts rather than being hidden behind a confident answer.
-
-## Connected knowledge
-
-Individual facts are more useful when connected. When Kivi extracts entities and relationships from transcripts, it can bridge across conversations, answering questions that require reasoning over multiple separate interactions. The knowledge graph is the connective tissue that turns isolated voice notes into a searchable web of context.
-
-## Trust through control
-
-Trust depends on control. People should be able to open a source from an answer, correct a mistaken memory, limit a preference to the right context, and remove information from future use. Those changes should survive restarts and reprocessing without requiring anyone to understand the underlying database.
-
-## What success looks like
-
-Kivi produces useful, source-backed answers from unfamiliar transcript history while remaining cautious about unsupported conclusions. The system is measurable, inspectable, and clear about its limits. Always-on capture and autonomous external actions can wait until the memory experience itself is dependable.
+Success for Kivi is simple: when you open it after a long week of scattered voice dictations, it feels like sitting down with a thoughtful colleague who was paying attention, kept good notes, always points you back to the facts, and never tries to guess what you meant.
