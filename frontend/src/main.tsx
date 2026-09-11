@@ -650,7 +650,7 @@ function App() {
                 setNamespace(space)
               }}
             >
-              Explore sample demo (demo)
+              Explore demo memory
             </button>
           {namespaces.length > 0 && (
             <div className="welcome-select-row">
@@ -666,7 +666,7 @@ function App() {
                   }
                 }}
               >
-                <option value="" disabled>Or open an existing space...</option>
+                <option value="" disabled>Choose an existing memory space...</option>
                 {namespaces.map(item => (
                   <option key={item.id} value={item.id}>{item.name}</option>
                 ))}
@@ -805,7 +805,19 @@ function Ask({ question, setQuestion, answer, busy, submit, sourceCount, memoryC
         <p>Find something you said. See what changed. Prepare the next response with the record beside you.</p>
       </header>
       <form className="askbox" onSubmit={event => submit(event)}>
-        <textarea value={question} onChange={event => setQuestion(event.target.value)} placeholder="Ask about something you dictated..." />
+        <textarea
+          value={question}
+          onChange={event => setQuestion(event.target.value)}
+          onKeyDown={event => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+              event.preventDefault()
+              if (!busy && question.trim()) {
+                submit(event)
+              }
+            }
+          }}
+          placeholder="Ask about something you dictated... (Press Enter to ask, Shift+Enter for new line)"
+        />
         <div>
           <small>Your history stays within this workspace.</small>
           <span>
