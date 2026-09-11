@@ -185,7 +185,7 @@ For the full operational guide (eval commands, blind imports, resets), see **[RU
 │   │   ├── db.py               # SQLAlchemy models (11 tables)
 │   │   ├── settings.py         # All configuration with validation
 │   │   └── cli.py              # CLI commands (serve, migrate, seed, evaluate, etc.)
-│   ├── migrations/             # Alembic migrations (0001–0005)
+│   ├── migrations/             # Alembic migrations (0001-0006)
 │   ├── tests/                  # 57 pytest tests
 │   └── schemas/                # JSON Schema for transcript validation
 ├── frontend/
@@ -202,7 +202,7 @@ For the full operational guide (eval commands, blind imports, resets), see **[RU
 
 ## Database Schema
 
-The SQLite database has 11 tables across 5 Alembic migrations:
+The SQLite database has 11 tables across 6 Alembic migrations:
 
 | Table | Purpose | Migration |
 |:---|:---|:---|

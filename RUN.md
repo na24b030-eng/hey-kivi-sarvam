@@ -61,10 +61,10 @@ npm --prefix frontend run build
 
 ## 4. Database Setup
 
-The SQLite schema is managed through 5 Alembic migrations:
+The SQLite schema is managed through 6 Alembic migrations:
 
 ```powershell
-# Run all migrations (0001–0005, including the knowledge graph tables)
+# Run all migrations (0001-0006, including semantic embeddings)
 uv run --project backend python -m kivi_memory.cli migrate
 
 # Download the multilingual embedding model (runs once, ~450MB)
@@ -88,6 +88,7 @@ uv run --project backend python -m kivi_memory.cli worker --drain
 | 0003 | `query_runs`, `query_sources` (audit trail) |
 | 0004 | Schema refinements |
 | 0005 | `entities`, `entity_aliases`, `entity_mentions`, `entity_relations` + `decay_class`/`expires_at` on memories |
+| 0006 | `semantic_embedding` vector BLOB column added to `memories` |
 
 ---
 

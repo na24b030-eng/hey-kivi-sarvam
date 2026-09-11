@@ -25,3 +25,6 @@
 
 .vercel
 .env*
+
+backend/data/
+test_suppression_data/

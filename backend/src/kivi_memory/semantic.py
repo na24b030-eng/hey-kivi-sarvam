@@ -176,19 +176,27 @@ def extract_entities_and_relations(
 
         for rel in data.get("relations", []):
             if isinstance(rel, dict) and rel.get("subject") and rel.get("predicate"):
+                try:
+                    conf = min(1.0, max(0.0, float(rel.get("confidence", 1.0))))
+                except (ValueError, TypeError):
+                    conf = 1.0
                 graph.relations.append(ExtractedRelation(
                     subject=rel["subject"],
                     predicate=rel["predicate"],
                     obj=rel.get("object", ""),
-                    confidence=min(1.0, max(0.0, float(rel.get("confidence", 1.0)))),
+                    confidence=conf,
                 ))
 
         for coref in data.get("coreferences", []):
             if isinstance(coref, dict) and coref.get("pronoun") and coref.get("resolved_entity"):
+                try:
+                    sent_idx = int(coref.get("sentence_index", 0))
+                except (ValueError, TypeError):
+                    sent_idx = 0
                 graph.coreferences.append(Coreference(
                     pronoun=coref["pronoun"],
                     resolved_entity=coref["resolved_entity"],
-                    sentence_index=int(coref.get("sentence_index", 0)),
+                    sentence_index=sent_idx,
                 ))
 
         for hint in data.get("decay_hints", []):

@@ -364,6 +364,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             cur = db.get(Namespace, namespace_id)
             fail(409, "stale_namespace", "Memory changed while you were editing it.", request, details={"revision": cur.revision if cur else None})
 
+        mem_text = f"{memory.subject} {memory.predicate} {clean_value}"
+        mem_vec = None
+        if settings:
+            from .embeddings import encode_passage
+            encoded_mem = encode_passage(settings, mem_text)
+            if encoded_mem:
+                mem_vec = encoded_mem[0]
+
         memory.state = "superseded"
         replacement = Memory(
             id=f"mem_{uuid.uuid4().hex}",
@@ -375,6 +383,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             scope=memory.scope,
             source_id=memory.source_id,
             supersedes_id=memory.id,
+            semantic_embedding=mem_vec,
         )
         db.add(replacement)
         record_operation(db, namespace_id, payload.operation_id, "correct", memory_id, payload_hash=payload_hash)

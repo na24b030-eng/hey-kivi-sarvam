@@ -95,6 +95,7 @@ class Memory(Base):
     supersedes_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
     decay_class: Mapped[str] = mapped_column(String(24), default="permanent")
     expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    semantic_embedding: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
 
 
 class Entity(Base):

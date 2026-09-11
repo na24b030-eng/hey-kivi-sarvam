@@ -198,12 +198,10 @@ def suppressed_source_ids(
         if query & mem_tokens:
             blocked.add(memory.source_id)
             continue
-        if query_vector is not None and settings:
-            encoded = encode_passage(settings, mem_text)
-            if encoded:
-                vec = vector_from_blob(encoded[0])
-                if vec.size == query_vector.size and float(np.dot(query_vector, vec)) >= settings.embedding_min_similarity:
-                    blocked.add(memory.source_id)
+        if query_vector is not None and settings and memory.semantic_embedding:
+            vec = vector_from_blob(memory.semantic_embedding)
+            if vec.size == query_vector.size and float(np.dot(query_vector, vec)) >= settings.embedding_min_similarity:
+                blocked.add(memory.source_id)
     return blocked
 
 

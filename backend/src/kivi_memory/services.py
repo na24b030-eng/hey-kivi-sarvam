@@ -356,10 +356,17 @@ def process_one_job(session: Session, settings: Settings | None = None) -> dict[
                             target_id=item.id,
                             reason="newer_source_imported",
                         ))
+                mem_text = f"{subject} {predicate} {value}"
+                mem_vec = None
+                if settings:
+                    encoded_mem = encode_passage(settings, mem_text)
+                    if encoded_mem:
+                        mem_vec = encoded_mem[0]
+
                 new_mem = Memory(
                     id=ident("mem"), namespace_id=source.namespace_id, kind=kind, subject=subject,
                     predicate=predicate, value=value, scope=scope, state="active", source_id=source.id,
-                    decay_class=mem_decay_class, expires_at=mem_expires_at,
+                    decay_class=mem_decay_class, expires_at=mem_expires_at, semantic_embedding=mem_vec
                 )
                 session.add(new_mem)
                 session.flush()
@@ -372,10 +379,16 @@ def process_one_job(session: Session, settings: Settings | None = None) -> dict[
                     reason="extracted_from_source",
                 ))
             else:
+                mem_text = f"{subject} {predicate} {value}"
+                mem_vec = None
+                if settings:
+                    encoded_mem = encode_passage(settings, mem_text)
+                    if encoded_mem:
+                        mem_vec = encoded_mem[0]
                 session.add(Memory(
                     id=ident("mem"), namespace_id=source.namespace_id, kind=kind, subject=subject,
                     predicate=predicate, value=value, scope=scope, state="superseded", source_id=source.id,
-                    decay_class=mem_decay_class, expires_at=mem_expires_at,
+                    decay_class=mem_decay_class, expires_at=mem_expires_at, semantic_embedding=mem_vec
                 ))
 
         # Stale-attempt & eligibility recheck before publishing
