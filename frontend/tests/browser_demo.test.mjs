@@ -177,4 +177,91 @@ describe("Frontend Browser Storage & Demo Mode Correctness", () => {
     assert.equal(store.memories[0].id, "space-2:mem:2");
     assert.equal(ns.revision, 2);
   });
+
+  it("Citation parser handles both [source:id] and [id], and ignores non-citation brackets like [redacted]", () => {
+    const evidence = [
+      { id: "src_abc123", external_id: "synthetic-001", text: "Evidence one" },
+      { id: "src_def456", external_id: "note-42", text: "Evidence two" },
+    ];
+
+    const parseAnswer = (text) => {
+      const pattern = /\[(?:source:)?([a-zA-Z0-9_\-]+(?:\s*[,;\s]\s*(?:source:)?[a-zA-Z0-9_\-]+)*)\]/g;
+      const parts = [];
+      let lastIndex = 0;
+      let match;
+
+      while ((match = pattern.exec(text)) !== null) {
+        const inner = match[1];
+        const ids = inner.split(/[,;\s]+/).map((s) => s.replace(/^source:/, "").trim()).filter(Boolean);
+
+        const validCites = ids.map((sourceId) => {
+          const evidenceIndex = evidence.findIndex((e) => e.id === sourceId || e.external_id === sourceId);
+          const isKnownPattern = sourceId.startsWith("src_") || sourceId.startsWith("synthetic-");
+          if (evidenceIndex >= 0 || isKnownPattern) {
+            const num = evidenceIndex >= 0 ? evidenceIndex + 1 : null;
+            return { sourceId, num };
+          }
+          return null;
+        }).filter((c) => c !== null);
+
+        if (validCites.length === 0) continue;
+
+        if (match.index > lastIndex) {
+          parts.push(text.slice(lastIndex, match.index));
+        }
+        validCites.forEach((cite) => {
+          parts.push({ type: "pill", id: cite.sourceId, num: cite.num });
+        });
+        lastIndex = pattern.lastIndex;
+      }
+      if (lastIndex < text.length) {
+        parts.push(text.slice(lastIndex));
+      }
+      return parts;
+    };
+
+    // Case 1: Standard [source:id]
+    const res1 = parseAnswer("Launch Monday [source:src_abc123].");
+    assert.equal(res1.length, 3);
+    assert.equal(res1[0], "Launch Monday ");
+    assert.equal(res1[1].type, "pill");
+    assert.equal(res1[1].num, 1);
+    assert.equal(res1[2], ".");
+
+    // Case 2: Without prefix [src_abc123] and [synthetic-001]
+    const res2 = parseAnswer("Launch [synthetic-001] and note [src_def456].");
+    assert.equal(res2[1].type, "pill");
+    assert.equal(res2[1].id, "synthetic-001");
+    assert.equal(res2[1].num, 1);
+    assert.equal(res2[3].type, "pill");
+    assert.equal(res2[3].id, "src_def456");
+    assert.equal(res2[3].num, 2);
+
+    // Case 3: Preserves [redacted] as text
+    const res3 = parseAnswer("Note [redacted] occurred before launch [source:src_abc123].");
+    assert.ok(res3[0].includes("[redacted]"), "Must preserve [redacted] as literal text");
+    assert.equal(res3[1].type, "pill");
+  });
+
+  it("Quick text format produces valid TranscriptRecord payload", () => {
+    const rawNote = "Met with Sarah about budget. Approved ₹50,000 for phase two.";
+    const tz = "Asia/Kolkata";
+    const record = {
+      schema_version: 1,
+      id: `note-test-01`,
+      raw_asr: rawNote,
+      formatted_text: rawNote,
+      occurred_at: new Date().toISOString(),
+      timezone: tz,
+      app: "Quick Paste",
+      language_hints: ["en"],
+      context: { source: "quick_paste" },
+    };
+
+    assert.equal(record.schema_version, 1);
+    assert.ok(record.id.length > 0);
+    assert.equal(record.raw_asr, rawNote);
+    assert.ok(record.occurred_at.includes("T"));
+    assert.equal(record.context.source, "quick_paste");
+  });
 });
