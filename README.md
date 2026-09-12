@@ -186,11 +186,11 @@ For the full operational guide (eval commands, blind imports, resets), see **[RU
 │   │   ├── settings.py         # All configuration with validation
 │   │   └── cli.py              # CLI commands (serve, migrate, seed, evaluate, etc.)
 │   ├── migrations/             # Alembic migrations (0001-0006)
-│   ├── tests/                  # 57 pytest tests
+│   ├── tests/                  # 58 pytest tests
 │   └── schemas/                # JSON Schema for transcript validation
 ├── frontend/
 │   ├── src/main.tsx            # React app with disambiguation cards
-│   └── tests/                  # 7 vitest tests
+│   └── tests/                  # 9 unit tests (node --test)
 ├── data/                       # Synthetic data generator & 500-record corpus
 ├── docs/                       # Deployment guides & data contracts
 ├── eval/                       # Evaluation suites & test reports
