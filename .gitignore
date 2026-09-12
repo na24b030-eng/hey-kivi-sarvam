@@ -1,7 +1,7 @@
-# Private working notes and interview preparation; never stage these files.
+# Private working notes.
 /.local-notes/
 
-# Local PDF inspection intermediates.
+# Local PDF inspection.
 /tmp/
 /backend/tmp/
 
