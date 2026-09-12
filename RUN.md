@@ -135,6 +135,8 @@ In **History**, select any transcript to see side-by-side: raw ASR, formatted te
 
 ## 7. Evaluation & Benchmarks
 
+> For full metrics, latency distributions, and category breakdowns, see **[docs/BENCHMARK_REPORT.md](docs/BENCHMARK_REPORT.md)**.
+
 Run the reproducible benchmark suites:
 
 ```powershell

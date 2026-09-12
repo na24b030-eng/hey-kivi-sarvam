@@ -237,6 +237,7 @@ The SQLite database has 11 tables across 6 Alembic migrations:
 ## Documentation
 
 - **[RUN.md](RUN.md)**: Full operational guide: setup, evaluation, resets
+- **[docs/BENCHMARK_REPORT.md](docs/BENCHMARK_REPORT.md)**: Formal 120-case benchmark breakdown, latency percentiles, and cross-lingual metrics
 - **[docs/import-format.md](docs/import-format.md)**: JSONL transcript schema specification
 - **[docs/deploy-render.md](docs/deploy-render.md)**: Backend deployment on Render
 - **[docs/deploy-vercel.md](docs/deploy-vercel.md)**: Frontend deployment on Vercel
