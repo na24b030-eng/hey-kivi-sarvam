@@ -772,3 +772,32 @@ header > p:not(.eyebrow) {
     flex-direction: column;
   }
 }
+
+.notice {
+  background: #eef3eb;
+  border-left: 3px solid #1d6345;
+  color: #163d2f;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin: 12px 0;
+  line-height: 1.4;
+}
+
+.notice.warming {
+  background: #fef9c3;
+  border-left-color: #ca8a04;
+  color: #713f12;
+}
+
+.import-mode-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.import-mode-tabs button {
+  padding: 8px 14px;
+  font-size: 13px;
+}
+

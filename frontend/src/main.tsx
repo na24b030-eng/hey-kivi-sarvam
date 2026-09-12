@@ -199,6 +199,48 @@ async function demoApi<T>(path: string, options?: RequestInit): Promise<T> {
     saveDemoStore(store)
     return { accepted, conflicts } as T
   }
+  if (namespaceId && path.endsWith('/seed') && method === 'POST') {
+    const curatedSeed = [
+      { id: 'synthetic-001', raw: 'harbor launches on monday after dev approves the release checklist', fmt: 'Harbor launches on Monday after Dev approves the release checklist.', app: 'VS Code' },
+      { id: 'synthetic-002', raw: 'nila foods approved ₹45,000 for ember phase one', fmt: 'Nila Foods approved ₹45,000 for Ember phase one.', app: 'Gmail' },
+      { id: 'synthetic-003', raw: 'arjun said the orchid review needs the security note before sign-off', fmt: 'Arjun said the Orchid review needs the security note before sign-off.', app: 'Gmail' },
+      { id: 'synthetic-004', raw: 'i prefer concise weekly updates with a decision and next step for harbor', fmt: 'I prefer concise weekly updates with a decision and next step for Harbor.', app: 'Google Meet' },
+      { id: 'synthetic-005', raw: 'the train for the northwind visit leaves at 18:10 on thursday', fmt: 'The train for the Northwind visit leaves at 18:10 on Thursday.', app: 'Google Meet' },
+      { id: 'synthetic-006', raw: 'study note: revise database indexing before the tuesday exam', fmt: 'Study note: revise database indexing before the Tuesday exam.', app: 'Notepad' },
+      { id: 'synthetic-007', raw: 'for the household list, buy olive oil and rice', fmt: 'For the household list, buy olive oil and rice.', app: 'Linear' },
+      { id: 'synthetic-008', raw: 'mosaic slipped because the api contract changed after the client review', fmt: 'Mosaic slipped because the API contract changed after the client review.', app: 'Slack' },
+      { id: 'synthetic-009', raw: 'arjun asked whether harbor could launch friday; no decision was made', fmt: 'Arjun asked whether Harbor could launch Friday; no decision was made.', app: 'Google Meet' },
+      { id: 'synthetic-010', raw: 'draft only: tell banyan health that lantern is ready for the next discussion', fmt: 'Draft only: tell Banyan Health that Lantern is ready for the next discussion.', app: 'Google Meet' },
+      { id: 'synthetic-011', raw: 'ember demo is on monday not sunday', fmt: 'Ember demo is on Monday, not Sunday.', app: 'Notepad' },
+      { id: 'synthetic-013', raw: 'lantern launches on monday after arjun approves the release checklist', fmt: 'Lantern launches on Monday after Arjun approves the release checklist.', app: 'Linear' },
+      { id: 'synthetic-014', raw: 'saffron labs approved ₹80,000 for kite phase one', fmt: 'Saffron Labs approved ₹80,000 for Kite phase one.', app: 'VS Code' },
+      { id: 'synthetic-016', raw: 'i prefer concise weekly updates with a decision and next step for lantern', fmt: 'I prefer concise weekly updates with a decision and next step for Lantern.', app: 'Gmail' },
+    ]
+    curatedSeed.forEach(item => {
+      const srcId = `${namespaceId}:src:${item.id}`
+      const source: SourceDetail = {
+        id: srcId,
+        external_id: item.id,
+        raw_asr: item.raw,
+        formatted_text: item.fmt,
+        occurred_at: new Date().toISOString(),
+        app: item.app,
+        processing_status: 'ready',
+        eligible: true,
+        source_version: 1,
+        chunks: [{ id: `${namespaceId}:chunk:${item.id}`, view: 'formatted', text: item.fmt }],
+        memories: [],
+      }
+      const derived = deriveMemories(namespaceId, source)
+      source.memories = derived
+      store.sources = store.sources.filter(s => s.id !== srcId).concat(source)
+      store.memories = store.memories.filter(m => m.source_id !== srcId).concat(derived)
+    })
+    const ns = store.namespaces.find(item => item.id === namespaceId)
+    if (ns) ns.revision += 1
+    saveDemoStore(store)
+    return { accepted: curatedSeed.length, conflicts: 0 } as T
+  }
   if (path === '/api/worker/drain' && method === 'POST') return { state: 'idle', processed: 0 } as T
   if (namespaceId && path.endsWith('/reset') && method === 'POST') {
     store.sources = store.sources.filter(item => !item.id.startsWith(`${namespaceId}:`))
@@ -303,6 +345,13 @@ async function demoApi<T>(path: string, options?: RequestInit): Promise<T> {
     saveDemoStore(store)
     return { deleted: sourceId, revision: namespace?.revision || 1 } as T
   }
+  if (namespaceId && method === 'DELETE' && !path.includes('/sources/')) {
+    store.namespaces = store.namespaces.filter(item => item.id !== namespaceId)
+    store.sources = store.sources.filter(item => !item.id.startsWith(`${namespaceId}:`))
+    store.memories = store.memories.filter(item => !item.id.startsWith(`${namespaceId}:`))
+    saveDemoStore(store)
+    return { deleted: namespaceId } as T
+  }
   throw new Error('This action needs the FastAPI backend. Set VITE_API_BASE_URL for the full server workflow.')
 }
 
@@ -345,6 +394,7 @@ function App() {
   const [notice, setNotice] = useState('')
   const [busy, setBusy] = useState(false)
   const [backendStatus, setBackendStatus] = useState<'checking' | 'connected' | 'offline'>('checking')
+  const [isWarmingUp, setIsWarmingUp] = useState(false)
 
   const activeNamespaceRef = useRef<string | null>(null)
   activeNamespaceRef.current = namespace?.id || null
@@ -354,9 +404,21 @@ function App() {
       setBackendStatus('offline')
       return
     }
+    const timer = window.setTimeout(() => {
+      setIsWarmingUp(true)
+    }, 3000)
     fetch(`${API_BASE_URL}/api/health`)
-      .then(res => res.ok ? setBackendStatus('connected') : setBackendStatus('offline'))
-      .catch(() => setBackendStatus('offline'))
+      .then(res => {
+        window.clearTimeout(timer)
+        setIsWarmingUp(false)
+        setBackendStatus(res.ok ? 'connected' : 'offline')
+      })
+      .catch(() => {
+        window.clearTimeout(timer)
+        setIsWarmingUp(false)
+        setBackendStatus('offline')
+      })
+    return () => window.clearTimeout(timer)
   }, [])
 
   const refreshNamespaces = async () => {
@@ -490,6 +552,27 @@ function App() {
     }
   }
 
+  const deleteSpace = async () => {
+    if (!namespace || namespace.name === 'demo' || namespace.id === 'demo') return
+    if (!window.confirm(`Permanently delete workspace "${namespace.name}"? This will delete all its sources and memories.`)) return
+    const idToDelete = namespace.id
+    const nameDeleted = namespace.name
+    setBusy(true)
+    try {
+      await api(`/api/namespaces/${encodeURIComponent(idToDelete)}`, { method: 'DELETE' })
+      try {
+        window.sessionStorage?.removeItem('kivi_active_namespace_id')
+      } catch {}
+      setNamespaces(prev => prev.filter(n => n.id !== idToDelete))
+      setNamespace(null)
+      setNotice(`Workspace “${nameDeleted}” was permanently deleted.`)
+    } catch (error) {
+      setNotice((error as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
   const submitAsk = async (event: FormEvent, mode: 'answer' | 'draft' = 'answer') => {
     event.preventDefault()
     if (!namespace) return
@@ -515,28 +598,48 @@ function App() {
     }
   }
 
-  const importData = async (event: FormEvent) => {
+  const importData = async (event: FormEvent, quickText?: string) => {
     event.preventDefault()
-    if (!namespace || !jsonl.trim()) return
+    if (!namespace) return
+
+    let dataToSend = jsonl.trim()
+    if (quickText && quickText.trim()) {
+      const clean = quickText.trim()
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+      const record = {
+        schema_version: 1,
+        id: `note-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+        raw_asr: clean,
+        formatted_text: clean,
+        occurred_at: new Date().toISOString(),
+        timezone: tz,
+        app: 'Quick Paste',
+        language_hints: ['en'],
+        context: { source: 'quick_paste' },
+      }
+      dataToSend = JSON.stringify(record)
+    }
+
+    if (!dataToSend) return
     const reqNsId = namespace.id
     setBusy(true)
     try {
       const encId = encodeURIComponent(reqNsId)
       const preview = await api<{ valid_count: number; invalid_count: number; errors: { line: number; message: string }[] }>(
         `/api/namespaces/${encId}/imports/validate`,
-        { method: 'POST', body: JSON.stringify({ jsonl }) },
+        { method: 'POST', body: JSON.stringify({ jsonl: dataToSend }) },
       )
       if (preview.invalid_count) throw new Error(`Line ${preview.errors[0]?.line || '?'} is invalid. Fix the JSONL before importing.`)
       if (!preview.valid_count) throw new Error('No valid records found. Review the JSONL fields.')
       const result = await api<{ accepted: number; conflicts: number }>(
         `/api/namespaces/${encId}/imports`,
-        { method: 'POST', body: JSON.stringify({ jsonl }) },
+        { method: 'POST', body: JSON.stringify({ jsonl: dataToSend }) },
       )
       await api('/api/worker/drain', { method: 'POST' })
       if (activeNamespaceRef.current === reqNsId) {
         await refreshData()
         if (result.accepted) setJsonl('')
-        setNotice(result.conflicts ? `Processed ${result.accepted} records; ${result.conflicts} changed IDs need explicit replacement.` : `Imported and processed ${result.accepted} records.`)
+        setNotice(result.conflicts ? `Processed ${result.accepted} records; ${result.conflicts} changed IDs need explicit replacement.` : `Imported and processed ${result.accepted} record${result.accepted === 1 ? '' : 's'}.`)
       }
     } catch (error) {
       setNotice((error as Error).message)
@@ -679,6 +782,11 @@ function App() {
           )}
         </div>
         <small>{API_BASE_URL ? 'Connected to the FastAPI memory backend.' : 'Vercel demo mode stores this workspace in your browser. Connect VITE_API_BASE_URL for the full backend workflow.'}</small>
+        {isWarmingUp && (
+          <div className="notice warming">
+            The Render backend is waking up from idle state (~15-25s on free tier). Please hold on a moment...
+          </div>
+        )}
         {notice && <p className="notice">{notice}</p>}
       </main>
     )
@@ -738,9 +846,17 @@ function App() {
             ← Welcome page
           </button>
           <button className="quiet destructive-action" onClick={resetSpace}>Reset this space</button>
+          {namespace.name !== 'demo' && namespace.id !== 'demo' && (
+            <button className="quiet destructive-action" onClick={deleteSpace}>Delete this space</button>
+          )}
         </div>
       </aside>
       <main className="content">
+        {isWarmingUp && (
+          <div className="notice warming">
+            The Render backend is waking up from idle state (~15-25s on free tier). Your requests will connect shortly.
+          </div>
+        )}
         {notice && <div className="notice">{notice}</div>}
         {view === 'ask' && <Ask question={question} setQuestion={setQuestion} answer={answer} busy={busy} submit={submitAsk} sourceCount={readySources} memoryCount={activeMemories} inspect={inspect} />}
         {view === 'history' && <History sources={sources} busy={busy} deleteSource={deleteSource} inspect={inspect} />}
@@ -757,36 +873,46 @@ function renderAnswerText(
   evidence: Evidence[],
   inspect: (source: Pick<Source, 'id'>) => void
 ) {
-  const pattern = /\[source:([^\]]+)\]/g
+  const pattern = /\[(?:source:)?([a-zA-Z0-9_\-]+(?:\s*[,;\s]\s*(?:source:)?[a-zA-Z0-9_\-]+)*)\]/g
   const parts: (string | React.ReactNode)[] = []
   let lastIndex = 0
   let match: RegExpExecArray | null
 
   while ((match = pattern.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index))
-    }
     const inner = match[1]
     const ids = inner.split(/[,;\s]+/).map(s => s.replace(/^source:/, '').trim()).filter(Boolean)
 
-    ids.forEach((sourceId, i) => {
-      const evidenceIndex = evidence.findIndex(e => e.id === sourceId)
-      const num = evidenceIndex >= 0 ? evidenceIndex + 1 : null
-      const sourceItem = evidenceIndex >= 0 ? evidence[evidenceIndex] : { id: sourceId }
-      const externalLabel = 'external_id' in sourceItem && sourceItem.external_id ? sourceItem.external_id : sourceId
-      const titleText = evidenceIndex >= 0
-        ? `Source ${num}: ${externalLabel}`
-        : `Source: ${sourceId}`
+    const validCites = ids.map(sourceId => {
+      const evidenceIndex = evidence.findIndex(e => e.id === sourceId || e.external_id === sourceId)
+      const isKnownPattern = sourceId.startsWith('src_') || sourceId.startsWith('synthetic-')
+      if (evidenceIndex >= 0 || isKnownPattern) {
+        const num = evidenceIndex >= 0 ? evidenceIndex + 1 : null
+        const sourceItem = evidenceIndex >= 0 ? evidence[evidenceIndex] : { id: sourceId }
+        const externalLabel = 'external_id' in sourceItem && sourceItem.external_id ? sourceItem.external_id : sourceId
+        const titleText = evidenceIndex >= 0 ? `Source ${num}: ${externalLabel}` : `Source: ${sourceId}`
+        return { sourceId, num, sourceItem, titleText }
+      }
+      return null
+    }).filter((c): c is NonNullable<typeof c> => c !== null)
 
+    if (validCites.length === 0) {
+      continue
+    }
+
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index))
+    }
+
+    validCites.forEach((cite, i) => {
       parts.push(
         <button
-          key={`cite-${match!.index}-${sourceId}-${i}`}
+          key={`cite-${match!.index}-${cite.sourceId}-${i}`}
           type="button"
           className="citation-pill"
-          onClick={() => inspect(sourceItem)}
-          title={titleText}
+          onClick={() => inspect(cite.sourceItem)}
+          title={cite.titleText}
         >
-          {num ?? 'source'}
+          {cite.num ?? 'source'}
         </button>
       )
     })
@@ -946,18 +1072,72 @@ function MemoryList({ memories, suppress, correct, busy }: { memories: Memory[];
   )
 }
 
-function Import({ jsonl, setJsonl, busy, submit }: { jsonl: string; setJsonl: (value: string) => void; busy: boolean; submit: (event: FormEvent) => void }) {
+function Import({
+  jsonl,
+  setJsonl,
+  busy,
+  submit,
+}: {
+  jsonl: string
+  setJsonl: (value: string) => void
+  busy: boolean
+  submit: (event: FormEvent, quickText?: string) => void
+}) {
+  const [mode, setMode] = useState<'quick' | 'jsonl'>('quick')
+  const [quickText, setQuickText] = useState('')
+
+  const handleQuickSubmit = (e: FormEvent) => {
+    e.preventDefault()
+    if (!quickText.trim()) return
+    submit(e, quickText)
+  }
+
   return (
     <>
       <header>
         <p className="eyebrow">IMPORT</p>
         <h1>Bring in a transcript history.</h1>
-        <p>Paste UTF-8 JSONL using the documented v1 record format. Source text is retained exactly.</p>
+        <p>Add dictations or meeting notes to your workspace. Source text is retained exactly.</p>
       </header>
-      <form className="import" onSubmit={submit}>
-        <textarea value={jsonl} onChange={event => setJsonl(event.target.value)} placeholder={'{"schema_version":1,"id":"note-001","raw_asr":"lantern launch monday","formatted_text":"Lantern launches Monday."}'} />
-        <button disabled={busy}>{busy ? 'Importing...' : 'Validate, import, and process'}</button>
-      </form>
+      <div className="import-mode-tabs">
+        <button
+          type="button"
+          className={mode === 'quick' ? 'active' : 'quiet'}
+          onClick={() => setMode('quick')}
+        >
+          Quick text
+        </button>
+        <button
+          type="button"
+          className={mode === 'jsonl' ? 'active' : 'quiet'}
+          onClick={() => setMode('jsonl')}
+        >
+          JSONL format (v1)
+        </button>
+      </div>
+      {mode === 'quick' ? (
+        <form className="import" onSubmit={handleQuickSubmit}>
+          <textarea
+            value={quickText}
+            onChange={event => setQuickText(event.target.value)}
+            placeholder="Type or paste any voice dictation or meeting note...&#10;&#10;e.g. Discussed Orion project launch with Dev. Launch is scheduled for Monday after checklist review."
+          />
+          <button disabled={busy || !quickText.trim()}>
+            {busy ? 'Importing and processing...' : 'Import note'}
+          </button>
+        </form>
+      ) : (
+        <form className="import" onSubmit={submit}>
+          <textarea
+            value={jsonl}
+            onChange={event => setJsonl(event.target.value)}
+            placeholder={'{"schema_version":1,"id":"note-001","raw_asr":"lantern launch monday","formatted_text":"Lantern launches Monday."}'}
+          />
+          <button disabled={busy || !jsonl.trim()}>
+            {busy ? 'Importing...' : 'Validate, import, and process'}
+          </button>
+        </form>
+      )}
     </>
   )
 }
