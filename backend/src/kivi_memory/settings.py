@@ -87,3 +87,18 @@ class Settings(BaseSettings):
         path = self.embedding_cache_dir or (self.app_data_dir / "embeddings")
         path.mkdir(parents=True, exist_ok=True)
         return path
+
+
+def get_synthetic_corpus_path() -> Path | None:
+    """Resolve the synthetic benchmark corpus path from package data, repo, or cwd."""
+    candidates = [
+        Path(__file__).resolve().parent / "data" / "synthetic-500.jsonl",
+        Path(__file__).resolve().parents[3] / "data" / "synthetic-500.jsonl",
+        Path(__file__).resolve().parents[2] / "data" / "synthetic-500.jsonl",
+        Path.cwd() / "data" / "synthetic-500.jsonl",
+        Path.cwd().parent / "data" / "synthetic-500.jsonl",
+    ]
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    return None

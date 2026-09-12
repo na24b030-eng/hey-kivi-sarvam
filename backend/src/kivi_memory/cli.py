@@ -30,7 +30,7 @@ from .db import (
 from .embeddings import load_encoder
 from .evaluation import run_suite
 from .services import ensure_namespace, import_records, process_one_job
-from .settings import Settings
+from .settings import Settings, get_synthetic_corpus_path
 
 
 def command_doctor(settings: Settings, download_embedding: bool = False) -> int:
@@ -87,9 +87,8 @@ def command_worker(settings: Settings, once: bool, drain: bool) -> int:
 
 
 def command_seed(settings: Settings, namespace_name: str) -> int:
-    root = Path(__file__).resolve().parents[3]
-    file_path = root / "data" / "synthetic-500.jsonl"
-    if not file_path.exists():
+    file_path = get_synthetic_corpus_path()
+    if not file_path or not file_path.exists():
         print("Synthetic corpus is missing. Run data/generate_synthetic.py first.", file=sys.stderr)
         return 1
     return command_import(settings, namespace_name, file_path)

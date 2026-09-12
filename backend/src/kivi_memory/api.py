@@ -43,7 +43,7 @@ from .services import (
     process_one_job,
     source_payload,
 )
-from .settings import Settings
+from .settings import Settings, get_synthetic_corpus_path
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -275,9 +275,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def seed_namespace(namespace_id: str, request: Request, db: Session = Depends(session_dep)):
         namespace = namespace_or_404(namespace_id, db, request)
         
-        root = Path(__file__).resolve().parents[3]
-        file_path = root / "data" / "synthetic-500.jsonl"
-        if not file_path.exists():
+        file_path = get_synthetic_corpus_path()
+        if not file_path or not file_path.exists():
             fail(404, "missing_seed_data", "Synthetic corpus is missing.", request)
             
         jsonl_data = file_path.read_text(encoding="utf-8")

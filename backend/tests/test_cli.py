@@ -76,3 +76,21 @@ def test_command_evaluate_offline_with_negative_case(tmp_path: Path, capsys):
     assert report["passed"] == 2
     assert report["evidence_accuracy"] == 1.0
 
+
+def test_get_synthetic_corpus_path_resolves_and_seeds(tmp_path: Path):
+    from kivi_memory.cli import command_seed
+    from kivi_memory.settings import get_synthetic_corpus_path
+
+    seed_path = get_synthetic_corpus_path()
+    assert seed_path is not None
+    assert seed_path.exists()
+    assert seed_path.name == "synthetic-500.jsonl"
+
+    settings = Settings(app_data_dir=tmp_path, sarvam_api_key="")
+    exit_code = command_seed(settings, "seeded_space")
+    assert exit_code == 0
+
+    factory, _ = build_session_factory(settings)
+    with factory() as session:
+        sources_count = session.scalar(select(func.count(Source.id)))
+        assert sources_count == 500
